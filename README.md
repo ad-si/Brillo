@@ -1,62 +1,85 @@
-gloss
-=====
+# Brillo
 
-[![Build Status](https://travis-ci.org/tmcdonell/gloss.svg?branch=master)](https://travis-ci.org/tmcdonell/gloss)
+Brillo hides the pain of drawing simple vector graphics and raster images
+behind a nice data type and a few display functions.
 
-Gloss hides the pain of drawing simple vector graphics behind a nice
-data type and a few display functions.
+<table>
+  <tr>
+    <td>
+      <img
+        src="gloss-examples/picture/Visibility/screenshot.png"
+        style="max-height: 200px"
+      >
+    </td>
+    <td>
+      <img
+        src="gloss-examples/picture/Tree/screenshot.png"
+        style="max-height: 200px"
+      >
+    </td>
+    <td>
+      <img
+        src="gloss-examples/images/perspec.png"
+        style="max-height: 170px"
+      >
+    </td>
+  </tr>
+</table>
 
-* Home page and bug tracker are on a [separate site](http://gloss.ouroborus.net).
 
-Example
--------
+## Example
+
 Getting something on the screen is as easy as:
 
-    import Graphics.Gloss
-    main = display (InWindow "Nice Window" (200, 200) (10, 10)) white (Circle 80)
+```hs
+import Graphics.Gloss
 
-Explore and run the example projects using [stack](http://haskellstack.org):
+main = display
+  (InWindow "Nice Window" (200, 200) (10, 10))
+  white
+  (Circle 80)
+```
 
-    $ stack setup
-    $ stack build
-    $ stack exec gloss-boids
+Explore and run the [example projects](./gloss-examples/README.md)
+with [stack](http://haskellstack.org):
+
+```sh
+stack run gloss-boids
+```
 
 
-Usage
------
+## Usage
+
 Once the window is open you can use the following:
 
- * Quit
-   - esc-key
-
- * Move Viewport
-   - arrow keys
-   - left-click drag
-
- * Zoom Viewport
-   - page up/down-keys
-   - control-left-click drag
-   - right-click drag
-   - mouse wheel
-
- * Rotate Viewport
-   - home/end-keys
-   - alt-left-click drag
-
- * Reset Viewport
-   - 'r'-key
+- Quit
+  - esc-key
+- Move Viewport
+  - arrow keys
+  - left-click drag
+- Zoom Viewport
+  - page up/down-keys
+  - control-left-click drag
+  - right-click drag
+  - mouse wheel
+- Rotate Viewport
+  - home/end-keys
+  - alt-left-click drag
+- Reset Viewport
+  - 'r'-key
 
 
-More
-----
-* Animations and simulations can be constructed similarly using the 'animate' and 'simulate' functions
-* Games with user input can be constructed with the 'play' function.
-* See the gloss-examples package for more.
+## More
+
+- Animations and simulations can be constructed similarly
+    using the `animate` and `simulate` functions
+- Games with user input can be constructed with the `play` function.
+- See the [gloss-examples](./gloss-examples/README.md) directory for more.
 
 
-PULL REQUESTS
--------------
+## Contributing
 
-As Gloss is now fairly stable, I typically make releases only when there is a new GHC version. If you have added a new feature or fixed a bug, and want your pull request merged sooner than that, then send email to benl AT ouroborus.net. I don't pay attention to github notifications, but am happy to receive emails from people. If you have changed any internal functionality then please test that all the `gloss-examples` still work before submitting your pull request.
+Contributions are very welcome!
 
-If you just want to bump a dependency version then get a Hackage trustee to edit the package information directly on Hackage. You don't need to raise a pull request here.
+Please test that all the `gloss-examples` still work
+before submitting your pull request.
