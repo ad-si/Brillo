@@ -1,6 +1,6 @@
 
 module Main where
-import Graphics.Gloss
+import Brillo
 
 -- Check that arcs with width 0 are drawn the same way around as arcs with
 -- width greater than 0.

@@ -1,0 +1,51 @@
+name:           brillo-rendering
+version:        1.13.1.2
+license:        MIT
+license-file:   LICENSE
+author:         Elise Huard, Ben Lippmeier, Adrian Sieber
+maintainer:     brillo@ad-si.com
+category:       Graphics
+build-type:     Simple
+cabal-version:  >=1.10
+synopsis:       Brillo picture data types and rendering functions.
+description:
+        Brillo picture data types and rendering functions.
+        These functions don't do any window management.
+        If you want Brillo to setup your window as well,
+        then use the plain @brillo@ package.
+
+source-repository head
+  type:         git
+  location:     https://github.com/ad-si/Brillo
+
+source-repository this
+  type:         git
+  tag:          v1.12.0.0
+  location:     https://github.com/ad-si/Brillo
+
+library
+  exposed-modules:
+        Brillo.Rendering
+
+  other-modules:
+        Brillo.Internals.Data.Color
+        Brillo.Internals.Data.Picture
+        Brillo.Internals.Rendering.Bitmap
+        Brillo.Internals.Rendering.Circle
+        Brillo.Internals.Rendering.Color
+        Brillo.Internals.Rendering.Common
+        Brillo.Internals.Rendering.Picture
+        Brillo.Internals.Rendering.State
+
+  build-depends:
+          base                          >= 4.8 && < 5
+        , bmp                           == 1.2.*
+        , bytestring                    == 0.11.*
+        , containers                    >= 0.5 && < 0.7
+        , OpenGL                        >= 2.12 && < 3.1
+
+  ghc-options:
+        -Wall -O2
+
+  default-language:
+        Haskell2010

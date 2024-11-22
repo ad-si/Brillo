@@ -1,0 +1,27 @@
+# Brillo Examples
+
+Execute the commands in the root directory of the repository.
+
+Command | Result
+--------|--------
+`stack run brillo-bitmap`     | <img src="picture/Bitmap/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-boids`      | <img src="picture/Boids/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-clock`      | <img src="picture/Clock/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-color`      | <img src="picture/Color/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-conway`     | <img src="picture/Conway/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-draw`       | <img src="picture/Draw/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-easy`       | <img src="picture/Easy/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-eden`       | <img src="picture/Eden/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-flake`      | <img src="picture/Flake/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-gameevent`  | <img src="picture/GameEvent/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-graph`      | <img src="picture/Graph/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-gravity`    | <img src="picture/Gravity/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-hello`      | <img src="picture/Hello/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-lifespan`   | <img src="picture/Lifespan/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-machina`    | <img src="picture/Machina/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-occlusion`  | <img src="picture/Occlusion/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-render`     | <img src="picture/Render/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-styrene`    | <img src="picture/Styrene/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-tree`       | <img src="picture/Tree/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-visibility` | <img src="picture/Visibility/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-zen`        | <img src="picture/Zen/screenshot.png" style="max-height: 250px"/>

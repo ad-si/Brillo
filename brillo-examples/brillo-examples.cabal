@@ -1,0 +1,441 @@
+Name:                brillo-examples
+Version:             1.13.0.4
+License:             MIT
+License-file:        LICENSE
+Author:              Ben Lippmeier, Adrian Sieber
+Maintainer:          brillo@ad-si.com
+Build-Type:          Simple
+Cabal-Version:       >=1.10
+Stability:           experimental
+Category:            Graphics
+Homepage:            https://github.com/ad-si/Brillo
+Description:
+        Examples using the Brillo graphics library.
+        A mixed bag of fractals, particle simulations and cellular automata.
+
+Synopsis:
+        Examples using the Brillo library
+
+Flag llvm
+  Description:  Compile via LLVM. This produces much better object code
+                but your GHC needs to have been built against the LLVM compiler.
+
+  Default:      False
+
+source-repository head
+  type:           git
+  location:       https://github.com/ad-si/Brillo
+
+source-repository this
+  type:         git
+  tag:          v1.13.0.2
+  location:     https://github.com/ad-si/Brillo
+
+Executable brillo-bitmap
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Bitmap
+  Build-depends:
+          base
+        , bytestring
+        , bmp
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-boids
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Boids
+
+  other-modules:
+        Vec2
+        KDTree2d
+
+  Build-depends:
+          base
+        , random
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -threaded
+        -rtsopts
+
+
+Executable brillo-clock
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Clock
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-color
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Color
+
+  Build-depends:
+          base
+        , brillo
+        , vector
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-conway
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Conway
+
+  other-modules:
+        Cell
+        World
+
+  Build-depends:
+          base
+        , random
+        , brillo
+        , vector
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-draw
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Draw
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-easy
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Easy
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-eden
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Eden
+
+  other-modules:
+        Cell
+        Community
+        World
+
+  Build-depends:
+          base
+        , brillo
+        , random
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-flake
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Flake
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-gameevent
+  Main-is:        Main.hs
+  hs-source-dirs: picture/GameEvent
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-hello
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Hello
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-lifespan
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Lifespan
+
+  other-modules:
+        Cell
+        Community
+        World
+
+  Build-depends:
+          base
+        , brillo
+        , random
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-machina
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Machina
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-occlusion
+  Main-is: Main.hs
+  hs-source-dirs: picture/Occlusion
+
+  other-modules:
+        Cell
+        World
+        State
+        Data
+
+  Build-depends:
+          base
+        , brillo
+        , brillo-algorithms
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -threaded
+        -rtsopts
+
+
+Executable brillo-styrene
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Styrene
+
+  other-modules:
+        Actor
+        Advance
+        Collide
+        Config
+        Contact
+        QuadTree
+        World
+
+  Build-depends:
+          base
+        , containers
+        , ghc-prim
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-tree
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Tree
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-visibility
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Visibility
+
+  other-modules:
+        Draw
+        Geometry.Randomish
+        Geometry.Segment
+        Interface
+        State
+        World
+
+  Build-depends:
+          base
+        , brillo
+        , vector
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-zen
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Zen
+
+  Build-depends:
+          base
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-graph
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Graph
+
+  Build-depends:
+          base
+        , containers
+        , random
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-gravity
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Gravity
+
+  Build-depends:
+          base
+        , containers
+        , random
+        , brillo
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts
+
+
+Executable brillo-render
+  Build-depends:
+        base
+        , containers
+        , brillo
+        , brillo-rendering
+        , GLFW-b
+  Main-is:        Main.hs
+  hs-source-dirs: picture/Render
+  ghc-options:
+        -O2
+        -Wall
+        -threaded
+        -rtsopts

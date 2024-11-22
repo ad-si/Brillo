@@ -1,0 +1,97 @@
+Name:                brillo
+Version:             1.13.2.2
+License:             MIT
+License-file:        LICENSE
+Author:              Ben Lippmeier, Adrian Sieber
+Maintainer:          brillo@ad-si.com
+Build-Type:          Simple
+Cabal-Version:       >=1.10
+Stability:           stable
+Category:            Graphics
+Homepage:            https://github.com/ad-si/Brillo
+Description:
+        Brillo hides the pain of drawing simple vector graphics
+        behind a nice data type and a few display functions.
+        Brillo uses GLFW and OpenGL under the hood,
+        but you won't need to worry about any of that.
+        Get something cool on the screen in under 10 minutes.
+
+Synopsis:
+        Painless 2D vector graphics, animations, and simulations powered by GLFW
+
+source-repository head
+  type:         git
+  location:     https://github.com/ad-si/Brillo
+
+source-repository this
+  type:         git
+  tag:          v1.13.0.0
+  location:     https://github.com/ad-si/Brillo
+
+Library
+  Build-Depends:
+          base
+        , bmp
+        , bytestring
+        , containers
+        , ghc-prim
+        , GLFW-b >= 3.3 && < 4
+        , brillo-rendering
+        , OpenGL
+
+  ghc-options:
+        -O2
+        -Wall
+
+  Default-Language:
+        GHC2021
+
+  Exposed-modules:
+        Brillo
+        Brillo.Data.Bitmap
+        Brillo.Data.Color
+        Brillo.Data.Controller
+        Brillo.Data.Display
+        Brillo.Data.Picture
+        Brillo.Data.Point
+        Brillo.Data.Point.Arithmetic
+        Brillo.Data.Vector
+        Brillo.Data.ViewPort
+        Brillo.Data.ViewState
+        Brillo.Geometry.Angle
+        Brillo.Geometry.Line
+        Brillo.Interface.Pure.Display
+        Brillo.Interface.Pure.Animate
+        Brillo.Interface.Pure.Simulate
+        Brillo.Interface.Pure.Game
+        Brillo.Interface.IO.Animate
+        Brillo.Interface.IO.Display
+        Brillo.Interface.IO.Interact
+        Brillo.Interface.IO.Simulate
+        Brillo.Interface.IO.Game
+        Brillo.Interface.Environment
+
+  Other-modules:
+        Brillo.Internals.Color
+        Brillo.Internals.Interface.Animate.State
+        Brillo.Internals.Interface.Animate.Timing
+        Brillo.Internals.Interface.Backend.Types
+        Brillo.Internals.Interface.Callback
+        Brillo.Internals.Interface.Common.Exit
+        Brillo.Internals.Interface.Debug
+        Brillo.Internals.Interface.Event
+        Brillo.Internals.Interface.Simulate.Idle
+        Brillo.Internals.Interface.Simulate.State
+        Brillo.Internals.Interface.ViewState.KeyMouse
+        Brillo.Internals.Interface.ViewState.Motion
+        Brillo.Internals.Interface.ViewState.Reshape
+        Brillo.Internals.Interface.Window
+        Brillo.Internals.Interface.Display
+        Brillo.Internals.Interface.Animate
+        Brillo.Internals.Interface.Interact
+        Brillo.Internals.Interface.Simulate
+        Brillo.Internals.Interface.Game
+        Brillo.Internals.Interface.Backend
+        Brillo.Internals.Interface.Backend.GLFW
+
+  CPP-Options: -DWITHGLFW

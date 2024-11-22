@@ -5,24 +5,24 @@ help: makefile
 
 .PHONY: test
 test:
-	stack run gloss-bitmap && \
-	stack run gloss-boids && \
-	stack run gloss-clock && \
-	stack run gloss-color && \
-	stack run gloss-conway && \
-	stack run gloss-draw && \
-	stack run gloss-easy && \
-	stack run gloss-eden && \
-	stack run gloss-flake && \
-	stack run gloss-gameevent && \
-	stack run gloss-graph && \
-	stack run gloss-gravity && \
-	stack run gloss-hello && \
-	stack run gloss-lifespan && \
-	stack run gloss-machina && \
-	stack run gloss-occlusion && \
-	stack run gloss-styrene && \
-	stack run gloss-tree && \
-	stack run gloss-visibility && \
-	stack run gloss-zen && \
-	stack run gloss-render  # Must be last as it can't be closed
+	stack run brillo-bitmap && \
+	stack run brillo-boids && \
+	stack run brillo-clock && \
+	stack run brillo-color && \
+	stack run brillo-conway && \
+	stack run brillo-draw && \
+	stack run brillo-easy && \
+	stack run brillo-eden && \
+	stack run brillo-flake && \
+	stack run brillo-gameevent && \
+	stack run brillo-graph && \
+	stack run brillo-gravity && \
+	stack run brillo-hello && \
+	stack run brillo-lifespan && \
+	stack run brillo-machina && \
+	stack run brillo-occlusion && \
+	stack run brillo-styrene && \
+	stack run brillo-tree && \
+	stack run brillo-visibility && \
+	stack run brillo-zen && \
+	stack run brillo-render  # Must be last as it can't be closed

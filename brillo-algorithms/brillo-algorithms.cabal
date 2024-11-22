@@ -1,0 +1,44 @@
+Name:                brillo-algorithms
+Version:             1.13.0.3
+License:             MIT
+License-file:        LICENSE
+Author:              Ben Lippmeier, Adrian Sieber
+Maintainer:          brillo@ad-si.com
+Build-Type:          Simple
+Cabal-Version:       >=1.10
+Stability:           stable
+Category:            Graphics
+Homepage:            https://github.com/ad-si/Brillo
+Description:
+        Data structures and algorithms for working with 2D graphics.
+
+Synopsis:
+        Data structures and algorithms for working with 2D graphics.
+
+source-repository head
+  type:           git
+  location:       https://github.com/ad-si/Brillo
+
+source-repository this
+  type:         git
+  tag:          v1.12.0.0
+  location:     https://github.com/ad-si/Brillo
+
+Library
+  Build-Depends:
+          base                          >= 4.8 && < 5
+        , ghc-prim
+        , containers                    >= 0.5 && < 0.7
+        , brillo                         == 1.13.*
+
+  Default-Language: GHC2021
+
+  ghc-options:
+        -O2
+        -Wall
+
+  Exposed-modules:
+        Brillo.Algorithms.RayCast
+        Brillo.Data.Extent
+        Brillo.Data.Quad
+        Brillo.Data.QuadTree

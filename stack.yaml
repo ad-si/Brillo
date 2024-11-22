@@ -1,7 +1,7 @@
 resolver: lts-22.42
 
 packages:
-  - gloss
-  - gloss-algorithms
-  - gloss-examples
-  - gloss-rendering
+  - brillo
+  - brillo-algorithms
+  - brillo-examples
+  - brillo-rendering
