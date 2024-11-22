@@ -46,9 +46,6 @@
 --   Gloss programs should be compiled with @-threaded@, otherwise the GHC runtime
 --   will limit the frame-rate to around 20Hz.
 --
---   To build gloss using the GLFW window manager instead of GLUT use
---        @cabal install gloss --flags=\"GLFW -GLUT\"@
---
 -- @
 -- Release Notes:
 --

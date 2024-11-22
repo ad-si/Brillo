@@ -19,8 +19,8 @@ import Graphics.Gloss.Data.Display
 --   the backend needs to have OpenGL in a state where it's able to accept them.
 --
 class Backend a where
-        -- | Initialize the state used by the backend. If you don't use any state,
-        -- make a Unit-like type; see the GLUT backend for an example.
+        -- | Initialize the state used by the backend.
+        -- If you don't use any state, make a Unit-like type.
         initBackendState           :: a
 
         -- | Perform any initialization that needs to happen before opening a window

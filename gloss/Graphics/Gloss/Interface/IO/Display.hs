@@ -34,7 +34,7 @@ import Graphics.Gloss.Internals.Interface.Backend
 --
 --   * Note that calling `controllerSetRedraw` indicates that the picture should
 --     be redrawn, but does not cause this to happen immediately, due to
---     limitations in the GLUT and GLFW window managers. The display runs on
+--     limitations in the GLFW window manager. The display runs on
 --     a one second timer interrupt, and if there have been no display events
 --     we need to wait for the next timer interrupt before redrawing.
 --     Having the timer interrupt period at 1 second keeps the CPU usage

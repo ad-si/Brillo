@@ -92,7 +92,7 @@ simulate_run simSR _ viewSA worldSR worldAdvance backendRef
                 { SM.stateIteration     = nFinal
                 , SM.stateSimTime       = newSimTime }
 
-        -- tell glut we want to draw the window after returning
+        -- tell backend we want to draw the window after returning
         Backend.postRedisplay backendRef
 
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE TupleSections #-}
 {-# OPTIONS_HADDOCK hide #-}
 
 module Graphics.Gloss.Internals.Rendering.Picture
@@ -18,7 +18,6 @@ import Control.Monad
 import Graphics.Rendering.OpenGL                        (($=), get)
 import qualified Graphics.Rendering.OpenGL.GL           as GL
 import qualified Graphics.Rendering.OpenGL.GLU.Errors   as GLU
-import qualified Graphics.UI.GLUT                       as GLUT
 
 
 -- | Render a picture into the current OpenGL context.
@@ -87,9 +86,15 @@ drawPicture state circScale picture
         --      so disable it during the renderString call.
         Text str
          -> do
-                GL.blend        $= GL.Disabled
-                GL.preservingMatrix $ GLUT.renderString GLUT.Roman str
-                GL.blend        $= GL.Enabled
+                let renderChar (x, y) _c = GL.preservingMatrix $ do
+                        GL.translate (GL.Vector3 (gf x) (gf y) 0)
+                        renderCircle 0 0 circScale 15 2
+                mapM_
+                        (uncurry renderChar) $
+                        zip (map (, 0) [0, 30 ..])
+                        str
+
+
 
         -- colors with float components.
         Color col p
@@ -272,12 +277,6 @@ handleError place err
       , "  To make this program work you'll need to reduce the number of nested"
       , "  transforms used when defining the Picture given to Gloss. Sorry." ]
 
-    -- Issue #32: Spurious "Invalid Operation" errors under Windows 7 64-bit.
-    --   When using GLUT under Windows 7 it complains about InvalidOperation,
-    --   but doesn't provide any other details. All the examples look ok, so
-    --   we're just ignoring the error for now.
-    GLU.Error GLU.InvalidOperation _
-     -> return ()
     _
      -> error $ unlines
      [  "Gloss / OpenGL Internal Error " ++ show place
