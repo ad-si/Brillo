@@ -1,0 +1,83 @@
+# Changelog
+
+## For 1.11.1:
+
+Thanks to Lars Wyssard
+- Use default display resolution in full-screen mode.
+
+## For 1.10.1:
+
+- Gloss no longer consumes CPU time when displaying static pictures.
+- Added displayIO wrapper for mostly static pictures, eg when
+  plotting graphs generated from infrequently updated files.
+- Allow viewport to be scaled with control-left-click drag.
+- Rotation of viewport changed to alt-left-click drag.
+- Preserve current colour when rendering bitmpaps.
+- Changed to proper sum-of-squares colour mixing, rather than naive
+  addition of components which was causing mixed colours to be too dark.
+Thanks to Thomas DuBuisson
+- Allow bitmaps to be specified in RGBA byte order as well as ABGR.
+Thanks to Gabriel Gonzalez
+- Package definitions for building with Stack.
+
+## For 1.9.1:
+
+Thanks to Elise Huard
+- Split rendering code into gloss-rendering package.
+
+## For 1.8.0:
+
+Thanks to Francesco Mazzoli
+- Factored out ViewPort and ViewState handling into user visible modules.
+
+## For 1.7.0:
+
+- Tweaked circle level-of-detail reduction code.
+- Increased frame rate cap to 100hz.
+Thanks to Doug Burke
+- Primitives for drawing arcs and sectors.
+Thanks to Thomas DuBuisson
+- IO versions of animate, simplate and play.
+
+## For 1.6.0:
+
+Thanks to Anthony Cowley
+- Full screen mode display mode.
+
+## For 1.5.0:
+
+- O(1) Conversion of ForeignPtrs to bitmaps.
+- An extra flag on the Bitmap constructor allows bitmaps to be cached
+  in texture memory between frames.
+
+## For 1.4.0:
+
+- Added texture caching.
+Thanks to Christiaan Baaij:
+- Refactoring of Gloss internals to support multiple window manager backends.
+- Support for using GLFW as the window library instead of GLUT.
+    GLUT is still the default, but to use GLFW install gloss with:
+      cabal install gloss --flags=\"GLFW -GLUT\"
+
+## For 1.3.0:
+
+- Various wibbles for GHC 7.1
+Thanks to Ben Lambert-Smith:
+- New support for displaying bitmap files.
+
+## For 1.2.0:
+
+- Cleaned up module hierarchy.
+- Added line-line intersection utils.
+- Enabled -Wall and fixed all warnings.
+- Various wibbles for GHC 7.0
+Thanks to Thomas DuBuisson:
+- Fixed a bug causing motion events to give the wrong position.
+Thanks to Stephan Maka:
+- Fixed a space leak in simulate mode when the window was hidden.
+
+## For 1.1.0:
+
+- Added game mode.
+- Added QuadTree and Extent structures.
+- Added simple ray casting.
