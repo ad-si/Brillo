@@ -4,4 +4,5 @@ packages:
   - brillo
   - brillo-algorithms
   - brillo-examples
+  - brillo-juicy
   - brillo-rendering

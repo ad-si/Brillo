@@ -1,0 +1,37 @@
+name:                brillo-juicy
+version:             0.2.4
+synopsis:            Load any image supported by Juicy.Pixels in your brillo application
+description:         Lets you convert any image supported by Juicy.Pixels in a brillo application
+                     by converting to brillo' Bitmap representation.
+                     Version 0.1.2 just enabled caching (from a frame to the next, and so on)
+                     of the images you load, so that they are not recomputed for each frame.
+                     Credits go to Jonathan Daugherty for the patch.
+homepage:            https://github.com/ad-si/Brillo
+license:             BSD3
+license-file:        LICENSE
+author:              Alp Mestanogullari <alpmestan@gmail.com>, Adrian Sieber
+maintainer:          Adrian Sieber
+category:            Graphics
+build-type:          Simple
+cabal-version:       >=1.8
+
+library
+  exposed-modules:     Brillo.Juicy
+
+  build-depends:       base >=4 && < 5,
+                       bytestring,
+                       bmp >= 1.2.4.1,
+                       brillo >= 1.13,
+                       JuicyPixels,
+                       vector
+  ghc-options:         -O2 -Wall
+
+executable brillo-juicy-viewer
+  main-is:             brillo-juicy.hs
+  build-depends:       base >= 4 && < 5,
+                       bytestring,
+                       bmp >= 1.2.4.1,
+                       brillo >= 1.13,
+                       JuicyPixels,
+                       vector
+  ghc-options:         -O2 -Wall -threaded
