@@ -8,19 +8,20 @@ behind a nice data type and a few display functions.
     <td>
       <img
         src="gloss-examples/picture/Visibility/screenshot.png"
-        style="max-height: 200px"
+        height="235px"
+        width="228px"
       >
     </td>
     <td>
       <img
         src="gloss-examples/picture/Tree/screenshot.png"
-        style="max-height: 200px"
       >
     </td>
     <td>
       <img
         src="gloss-examples/images/perspec.png"
-        style="max-height: 170px"
+        height="145px"
+        width="280px"
       >
     </td>
   </tr>
