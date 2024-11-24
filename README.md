@@ -93,8 +93,12 @@ before submitting your pull request.
 This library is a fork of [gloss](https://github.com/benl23x5/gloss)
 and improves upon it in the following ways:
 
-- Remove support for deprecated backends GLUT and SDL
+- Remove support for deprecated backends GLUT and SDL and use GLFW instead
+  - High DPI / Retina display support
+  - (x) button can be used to close the window
 - Remove broken `gloss-raster` due to unmaintained dependency "repa"
+- In-source `brillo-juicy` package
 - Remove broken Travis CI scripts
 - Add screenshots for all examples
 - Manage issues and discussions on GitHub
+- Format all code with Fourmolu

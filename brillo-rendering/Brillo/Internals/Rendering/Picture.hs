@@ -1,5 +1,8 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_HADDOCK hide #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use bimap" #-}
+{-# HLINT ignore "Use unless" #-}
 
 module Brillo.Internals.Rendering.Picture
         (renderPicture)
@@ -19,6 +22,8 @@ import Graphics.Rendering.OpenGL                        (($=), get)
 import qualified Graphics.Rendering.OpenGL.GL           as GL
 import qualified Graphics.Rendering.OpenGL.GLU.Errors   as GLU
 
+import Data.Vector.Storable        (unsafeToForeignPtr)
+import qualified Brillo.Internals.Rendering.VectorFont as VF
 
 -- | Render a picture into the current OpenGL context.
 --
@@ -81,18 +86,18 @@ drawPicture state circScale picture
         ThickArc a1 a2 radius thickness
          ->  renderArc 0 0 circScale radius a1 a2 thickness
 
-        -- stroke text
-        --      text looks weird when we've got blend on,
-        --      so disable it during the renderString call.
+        -- Vector font text
         Text str
-         -> do
-                let renderChar (x, y) _c = GL.preservingMatrix $ do
-                        GL.translate (GL.Vector3 (gf x) (gf y) 0)
-                        renderCircle 0 0 circScale 15 2
-                mapM_
-                        (uncurry renderChar) $
-                        zip (map (, 0) [0, 30 ..])
-                        str
+          -> let
+                characters :: [[(Double, Double)]]
+                characters = VF.renderSafe VF.canvastextFont str
+              in
+                GL.preservingMatrix $ do
+                        GL.scale (gf 5) (gf 5) 0
+                        forM_ characters $ \stroke -> do
+                                GL.renderPrimitive GL.LineStrip $ do
+                                        forM_ stroke $ \(x,y) -> do
+                                                GL.vertex $ GL.Vertex2 x y
 
 
 
@@ -188,15 +193,15 @@ drawPicture state circScale picture
                   --   To prevent this we add an "epsilon-border".
                   --   This has been testet to fix the problem.
                   let defTexCoords =
-                        map (\(x,y) -> (x / fromIntegral width, y / fromIntegral height)) $
+                        map (\(x,y) -> (x / fromIntegral width, y / fromIntegral height))
                         [ vecMap (+eps) (+eps) $ toFloatVec imgSectionPos
-                        , vecMap (subtract eps) (+eps) $ toFloatVec $
+                        , vecMap (subtract eps) (+eps) $ toFloatVec
                             ( fst imgSectionPos + fst imgSectionSize
                             , snd imgSectionPos )
-                        , vecMap (subtract eps) (subtract eps) $ toFloatVec $
+                        , vecMap (subtract eps) (subtract eps) $ toFloatVec
                             ( fst imgSectionPos + fst imgSectionSize
                             , snd imgSectionPos + snd imgSectionSize )
-                        , vecMap (+eps) (subtract eps) $ toFloatVec $
+                        , vecMap (+eps) (subtract eps) $ toFloatVec
                             ( fst imgSectionPos
                             , snd imgSectionPos + snd imgSectionSize )
                         ]
@@ -254,7 +259,7 @@ drawPicture state circScale picture
 -- Errors ---------------------------------------------------------------------
 checkErrors :: String -> IO ()
 checkErrors place
- = do   errors          <- get $ GLU.errors
+ = do   errors          <- get GLU.errors
         when (not $ null errors)
          $ mapM_ (handleError place) errors
 

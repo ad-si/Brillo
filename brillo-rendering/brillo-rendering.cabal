@@ -35,6 +35,7 @@ library
         Brillo.Internals.Rendering.Color
         Brillo.Internals.Rendering.Common
         Brillo.Internals.Rendering.Picture
+        Brillo.Internals.Rendering.VectorFont
         Brillo.Internals.Rendering.State
 
   build-depends:
@@ -43,6 +44,7 @@ library
         , bytestring                    == 0.11.*
         , containers                    >= 0.5 && < 0.7
         , OpenGL                        >= 2.12 && < 3.1
+        , vector                        >= 0.13 && < 0.14
 
   ghc-options:
         -Wall -O2

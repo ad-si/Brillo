@@ -85,7 +85,7 @@ data Picture
         --   If the thickness is 0 then this is equivalent to `Arc`.
         | ThickArc      Float Float Float Float
 
-        -- | Some text to draw with a vector font.
+        -- | Text to draw with a vector font
         | Text          String
 
         -- | A bitmap image.
