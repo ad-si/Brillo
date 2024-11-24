@@ -21,7 +21,8 @@ import Control.Monad
 import Graphics.Rendering.OpenGL                        (($=), get)
 import qualified Graphics.Rendering.OpenGL.GL           as GL
 import qualified Graphics.Rendering.OpenGL.GLU.Errors   as GLU
-
+import Codec.Picture.Types (promoteImage, Image(..),PixelRGBA8, Pixel8 )
+import Graphics.Text.PCF (PCFText(..), loadPCF, renderPCFText)
 import Data.Vector.Storable        (unsafeToForeignPtr)
 import qualified Brillo.Internals.Rendering.VectorFont as VF
 
@@ -46,6 +47,18 @@ renderPicture state circScale picture
         checkErrors "before drawPicture."
         drawPicture state circScale picture
         checkErrors "after drawPicture."
+
+
+fromImage8 :: Image Pixel8 -> Picture
+fromImage8 img = do
+        let
+                Image { imageWidth = w, imageHeight = h, imageData = imgData }
+                        :: Image PixelRGBA8 = promoteImage img
+                (ptr, _, _) = unsafeToForeignPtr imgData
+
+        bitmapOfForeignPtr w h
+                        (BitmapFormat TopToBottom PxRGBA)
+                        ptr True
 
 
 drawPicture :: State -> Float -> Picture -> IO ()
@@ -98,6 +111,25 @@ drawPicture state circScale picture
                                 GL.renderPrimitive GL.LineStrip $ do
                                         forM_ stroke $ \(x,y) -> do
                                                 GL.vertex $ GL.Vertex2 x y
+
+        -- Bitmap font text
+        BitmapText str
+                -> do
+                pcf <- either fail return =<< loadPCF
+                        "/Users/adrian/Dropbox/Projects/Brillo/spleen-2.1.0/spleen-32x64.pcf"
+                case renderPCFText pcf str of
+                        Just (PCFText _ w h img) ->
+                                GL.preservingMatrix $ do
+                                        GL.translate
+                                                (GL.Vector3
+                                                        (gf (fromIntegral w / 2))
+                                                        (gf (fromIntegral h / 2))
+                                                        0
+                                                )
+                                        drawPicture state circScale $ fromImage8 (Image w h img :: Image Pixel8)
+                        Nothing ->
+                                putStrLn $ "ERROR: Unable to render input text \"" <> str <> "\""
+
 
 
 

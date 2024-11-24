@@ -43,7 +43,9 @@ library
         , bmp                           == 1.2.*
         , bytestring                    == 0.11.*
         , containers                    >= 0.5 && < 0.7
+        , JuicyPixels                   >= 3.3.8 && < 4
         , OpenGL                        >= 2.12 && < 3.1
+        , pcf-font                      >= 0.2.2 && < 0.3
         , vector                        >= 0.13 && < 0.14
 
   ghc-options:

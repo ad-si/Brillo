@@ -88,6 +88,9 @@ data Picture
         -- | Text to draw with a vector font
         | Text          String
 
+        -- | Text to draw with a bitmap font
+        | BitmapText    String
+
         -- | A bitmap image.
         | Bitmap        BitmapData
 
