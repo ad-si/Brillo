@@ -1,11 +1,33 @@
 # Changelog
 
-## For 1.11.1:
+## 2024-11-? - 1.14
+
+- Remove support for deprecated backends GLUT and SDL and use GLFW instead
+  - High DPI / Retina display support
+  - (x) button can be used to close the window
+  - Re-implement support for vector font and improve several character glyphs:
+      <table>
+        <tr style="text-align: center"><td>Old</td><td>New</td><tr>
+        <tr>
+          <td><img src="brillo-examples/images/hello_world_old.png"/></td>
+          <td><img src="brillo-examples/images/hello_world_new.png"/></td>
+        </tr>
+      </table>
+- Remove broken `gloss-raster` due to unmaintained dependency "repa"
+- In-source `brillo-juicy` package
+- Remove broken Travis CI scripts
+- Add screenshots for all examples
+- Manage issues and discussions on GitHub
+- Format all code with Fourmolu
+
+
+## 1.11.1
 
 Thanks to Lars Wyssard
 - Use default display resolution in full-screen mode.
 
-## For 1.10.1:
+
+## 1.10.1
 
 - Gloss no longer consumes CPU time when displaying static pictures.
 - Added displayIO wrapper for mostly static pictures, eg when
@@ -20,17 +42,20 @@ Thanks to Thomas DuBuisson
 Thanks to Gabriel Gonzalez
 - Package definitions for building with Stack.
 
-## For 1.9.1:
+
+## 1.9.1
 
 Thanks to Elise Huard
 - Split rendering code into gloss-rendering package.
 
-## For 1.8.0:
+
+## 1.8
 
 Thanks to Francesco Mazzoli
 - Factored out ViewPort and ViewState handling into user visible modules.
 
-## For 1.7.0:
+
+## 1.7
 
 - Tweaked circle level-of-detail reduction code.
 - Increased frame rate cap to 100hz.
@@ -39,18 +64,21 @@ Thanks to Doug Burke
 Thanks to Thomas DuBuisson
 - IO versions of animate, simplate and play.
 
-## For 1.6.0:
+
+## 1.6
 
 Thanks to Anthony Cowley
 - Full screen mode display mode.
 
-## For 1.5.0:
+
+## 1.5
 
 - O(1) Conversion of ForeignPtrs to bitmaps.
 - An extra flag on the Bitmap constructor allows bitmaps to be cached
   in texture memory between frames.
 
-## For 1.4.0:
+
+## 1.4
 
 - Added texture caching.
 Thanks to Christiaan Baaij:
@@ -59,13 +87,15 @@ Thanks to Christiaan Baaij:
     GLUT is still the default, but to use GLFW install gloss with:
       cabal install gloss --flags=\"GLFW -GLUT\"
 
-## For 1.3.0:
+
+## 1.3
 
 - Various wibbles for GHC 7.1
 Thanks to Ben Lambert-Smith:
 - New support for displaying bitmap files.
 
-## For 1.2.0:
+
+## 1.2
 
 - Cleaned up module hierarchy.
 - Added line-line intersection utils.
@@ -76,7 +106,8 @@ Thanks to Thomas DuBuisson:
 Thanks to Stephan Maka:
 - Fixed a space leak in simulate mode when the window was hidden.
 
-## For 1.1.0:
+
+## 1.1
 
 - Added game mode.
 - Added QuadTree and Extent structures.
