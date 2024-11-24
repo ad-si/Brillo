@@ -1,47 +1,61 @@
 {-# LANGUAGE PackageImports #-}
-import "GLFW-b" Graphics.UI.GLFW as GLFW
+
+import Brillo (Picture (Circle), white)
+import Brillo.Rendering (displayPicture, initState)
 import Control.Concurrent (threadDelay)
-import Control.Monad (when, unless)
-import Brillo.Rendering
-import Brillo
+import Control.Monad (unless, when)
+import "GLFW-b" Graphics.UI.GLFW as GLFW (
+  Key (Key'Escape),
+  KeyState (KeyState'Pressed, KeyState'Repeating),
+  Window,
+  createWindow,
+  destroyWindow,
+  getKey,
+  init,
+  makeContextCurrent,
+  pollEvents,
+  setErrorCallback,
+  swapBuffers,
+  terminate,
+ )
 
 
 main :: IO ()
 main = do
-    let width  = 200
-        height = 200
+  let width = 200
+      height = 200
 
-    state  <- initState
+  state <- initState
 
-    withWindow width height "Render" $ \win -> do
-        loop state win (width, height)
-
-    where loop state window (w, h) = do
-            threadDelay 20000
-            pollEvents
-            displayPicture (w, h) white state 1.0 (Circle 80)
-            swapBuffers window
-            k <- keyIsPressed window Key'Escape
-            unless k $ loop state window (w, h)
+  withWindow width height "Render" $ \win -> do
+    loop state win (width, height)
+  where
+    loop state window (w, h) = do
+      threadDelay 20000
+      pollEvents
+      displayPicture (w, h) white state 1.0 (Circle 80)
+      swapBuffers window
+      k <- keyIsPressed window Key'Escape
+      unless k $ loop state window (w, h)
 
 
 withWindow :: Int -> Int -> String -> (GLFW.Window -> IO ()) -> IO ()
 withWindow width height title f = do
-    GLFW.setErrorCallback $ Just simpleErrorCallback
-    r <- GLFW.init
-    when r $ do
-        m <- GLFW.createWindow width height title Nothing Nothing
-        case m of
-          (Just win) -> do
-              GLFW.makeContextCurrent m
-              f win
-              GLFW.setErrorCallback $ Just simpleErrorCallback
-              GLFW.destroyWindow win
-          Nothing -> return ()
-        GLFW.terminate
+  GLFW.setErrorCallback $ Just simpleErrorCallback
+  r <- GLFW.init
+  when r $ do
+    m <- GLFW.createWindow width height title Nothing Nothing
+    case m of
+      (Just win) -> do
+        GLFW.makeContextCurrent m
+        f win
+        GLFW.setErrorCallback $ Just simpleErrorCallback
+        GLFW.destroyWindow win
+      Nothing -> return ()
+    GLFW.terminate
   where
     simpleErrorCallback e s =
-        putStrLn $ unwords [show e, show s]
+      putStrLn $ unwords [show e, show s]
 
 
 keyIsPressed :: Window -> Key -> IO Bool
@@ -49,6 +63,6 @@ keyIsPressed win key = isPress `fmap` GLFW.getKey win key
 
 
 isPress :: KeyState -> Bool
-isPress KeyState'Pressed   = True
+isPress KeyState'Pressed = True
 isPress KeyState'Repeating = True
-isPress _                  = False
+isPress _ = False

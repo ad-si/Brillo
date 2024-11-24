@@ -26,3 +26,9 @@ test:
 	stack run brillo-visibility && \
 	stack run brillo-zen && \
 	stack run brillo-render  # Must be last as it can't be closed
+
+
+
+.PHONY: clean
+clean:
+	-rm -rf .stack-work

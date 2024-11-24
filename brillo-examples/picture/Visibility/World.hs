@@ -1,54 +1,54 @@
-
-module World
-        ( Segment
-        , World(..)
-        , initialWorld
-        , normaliseWorld)
+module World (
+  Segment,
+  World (..),
+  initialWorld,
+  normaliseWorld,
+)
 where
-import Brillo
-import Geometry.Randomish
-import Geometry.Segment
-import qualified Data.Vector.Unboxed as V
+
+import Brillo (Point)
+import Data.Vector.Unboxed qualified as V
+import Geometry.Randomish (randomishPoints)
+import Geometry.Segment (Segment, splitSegmentsOnY, translateSegment)
 
 
 -- We keep this unpacked so we can use unboxed vector.
 -- index, x1, y1, x2, y2
-data World
-        = World
-        { worldSegments :: V.Vector Segment }
+newtype World = World {worldSegments :: V.Vector Segment}
 
 
 -- | Generate the initial world.
 initialWorld :: IO World
-initialWorld
- = do   let n           = 100
-        let minZ        = -300
-        let maxZ        = 300
+initialWorld = do
+  let
+    n = 100
+    minZ = -300
+    maxZ = 300
 
-        let minDelta    = -100
-        let maxDelta    =  100
+    minDelta = -100
+    maxDelta = 100
 
-        let centers     = randomishPoints 1234 n minZ     maxZ
-        let deltas      = randomishPoints 4321 n minDelta maxDelta
+    centers = randomishPoints 1234 n minZ maxZ
+    deltas = randomishPoints 4321 n minDelta maxDelta
 
-        let makePoint n' (cX, cY) (dX, dY)
-                        = (n', (cX, cY), (cX + dX, cY + dY))
+    makePoint n' (cX, cY) (dX, dY) =
+      (n', (cX, cY), (cX + dX, cY + dY))
 
-        let segs        = V.zipWith3 makePoint (V.enumFromTo 0 (n - 1)) centers deltas
+    segs = V.zipWith3 makePoint (V.enumFromTo 0 (n - 1)) centers deltas
 
-        return $ World segs
+  return $ World segs
 
 
--- | Normalise the world so that the given point is at the origin,
---   and split segements that cross the y=0 line.
+{-| Normalise the world so that the given point is at the origin,
+  and split segements that cross the y=0 line.
+-}
 normaliseWorld :: Point -> World -> World
-normaliseWorld (px, py) world
- = let  segments_trans  = V.map (translateSegment (-px) (-py))
-                        $ worldSegments world
+normaliseWorld (px, py) world = do
+  let
+    segments_trans =
+      V.map (translateSegment (-px) (-py)) $
+        worldSegments world
+    segments_split =
+      splitSegmentsOnY 0 segments_trans
 
-        segments_split  = splitSegmentsOnY 0 segments_trans
-
-   in   world { worldSegments = segments_split }
-
-
-
+  world{worldSegments = segments_split}

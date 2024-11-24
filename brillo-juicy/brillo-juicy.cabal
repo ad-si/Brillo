@@ -35,3 +35,4 @@ executable brillo-juicy-viewer
                        JuicyPixels,
                        vector
   ghc-options:         -O2 -Wall -threaded
+  other-modules:       Brillo.Juicy

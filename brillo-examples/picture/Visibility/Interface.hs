@@ -1,72 +1,93 @@
 {-# LANGUAGE PatternGuards #-}
-module Interface
-        ( handleInput
-        , stepState)
+
+module Interface (
+  handleInput,
+  stepState,
+)
 where
-import State
-import qualified Brillo.Interface.Pure.Game     as G
+
+import Brillo.Interface.Pure.Game qualified as G
+import State (
+  ModeDisplay (ModeDisplayNormalised, ModeDisplayWorld),
+  ModeInterface (ModeInterfaceIdle, ModeInterfaceMove),
+  ModeOverlay (ModeOverlayNone, ModeOverlayVisApprox),
+  State (
+    stateModeDisplay,
+    stateModeInterface,
+    stateModeOverlay,
+    stateTargetPos,
+    stateViewPos
+  ),
+ )
+
 
 -- Input ------------------------------------------------------------------------------------------
+
 -- | Handle an input event.
 handleInput :: G.Event -> State -> State
-
 handleInput (G.EventKey key keyState _ (x, y)) state
-        -- move the view position.
-        | G.MouseButton G.LeftButton    <- key
-        , G.Down                        <- keyState
-        = state { stateModeInterface    = ModeInterfaceMove
-                , stateViewPos
-                        = ( fromRational $ toRational x
-                          , fromRational $ toRational y) }
-
-        -- set the target position.
-        | G.MouseButton G.RightButton   <- key
-        , G.Down                        <- keyState
-        = state { stateTargetPos
-                        = Just ( fromRational $ toRational x
-                               , fromRational $ toRational y) }
-
-        | G.MouseButton G.LeftButton    <- key
-        , G.Up                          <- keyState
-        = state { stateModeInterface    = ModeInterfaceIdle }
-
+  -- move the view position.
+  | G.MouseButton G.LeftButton <- key
+  , G.Down <- keyState =
+      state
+        { stateModeInterface = ModeInterfaceMove
+        , stateViewPos =
+            ( fromRational $ toRational x
+            , fromRational $ toRational y
+            )
+        }
+  -- set the target position.
+  | G.MouseButton G.RightButton <- key
+  , G.Down <- keyState =
+      state
+        { stateTargetPos =
+            Just
+              ( fromRational $ toRational x
+              , fromRational $ toRational y
+              )
+        }
+  | G.MouseButton G.LeftButton <- key
+  , G.Up <- keyState =
+      state{stateModeInterface = ModeInterfaceIdle}
 handleInput (G.EventMotion (x, y)) state
-        | stateModeInterface state == ModeInterfaceMove
-        = state { stateViewPos
-                        = ( fromRational $ toRational x
-                          , fromRational $ toRational y) }
-
+  | stateModeInterface state == ModeInterfaceMove =
+      state
+        { stateViewPos =
+            ( fromRational $ toRational x
+            , fromRational $ toRational y
+            )
+        }
 -- t : Turn target indicator off.
 handleInput (G.EventKey key keyState _ _) state
-        | G.Char 't'                    <- key
-        , G.Down                        <- keyState
-        = state { stateTargetPos        = Nothing }
-
+  | G.Char 't' <- key
+  , G.Down <- keyState =
+      state{stateTargetPos = Nothing}
 -- w : Display the whole world.
 handleInput (G.EventKey key keyState _ _) state
-        | G.Char 'w'                    <- key
-        , G.Down                        <- keyState
-        = state { stateModeDisplay      = ModeDisplayWorld }
-
+  | G.Char 'w' <- key
+  , G.Down <- keyState =
+      state{stateModeDisplay = ModeDisplayWorld}
 -- n : Display the normalised world.
 handleInput (G.EventKey key keyState _ _) state
-        | G.Char 'n'                    <- key
-        , G.Down                        <- keyState
-        = state { stateModeDisplay      = ModeDisplayNormalised }
-
+  | G.Char 'n' <- key
+  , G.Down <- keyState =
+      state{stateModeDisplay = ModeDisplayNormalised}
 -- a : Toggle approximate visibility
 handleInput (G.EventKey key keyState _ _) state
-        | G.Char 'a'                    <- key
-        , G.Down                        <- keyState
-        = state { stateModeOverlay
-                        = case stateModeOverlay state of
-                                ModeOverlayVisApprox    -> ModeOverlayNone
-                                _                       -> ModeOverlayVisApprox }
+  | G.Char 'a' <- key
+  , G.Down <- keyState =
+      state
+        { stateModeOverlay =
+            case stateModeOverlay state of
+              ModeOverlayVisApprox -> ModeOverlayNone
+              _ -> ModeOverlayVisApprox
+        }
+handleInput _ state =
+  state
 
-handleInput _ state
-        = state
 
 -- Step -------------------------------------------------------------------------------------------
+
 -- | Advance the state one iteration
 stepState :: Float -> State -> State
 stepState _ state = state
