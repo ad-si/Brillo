@@ -28,6 +28,11 @@ test:
 	stack run brillo-render  # Must be last as it can't be closed
 
 
+.PHONY: format
+format:
+	fourmolu --mode=inplace .
+	find . -iname '*.cabal' | xargs cabal-fmt --inplace
+
 
 .PHONY: clean
 clean:

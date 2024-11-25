@@ -1,44 +1,40 @@
-Name:                brillo-algorithms
-Version:             1.13.0.3
-License:             MIT
-License-file:        LICENSE
-Author:              Ben Lippmeier, Adrian Sieber
-Maintainer:          brillo@ad-si.com
-Build-Type:          Simple
-Cabal-Version:       >=1.10
-Stability:           stable
-Category:            Graphics
-Homepage:            https://github.com/ad-si/Brillo
-Description:
-        Data structures and algorithms for working with 2D graphics.
+cabal-version: 3.0
+name:          brillo-algorithms
+version:       1.13.0.3
+license:       MIT
+license-file:  LICENSE
+author:        Ben Lippmeier, Adrian Sieber
+maintainer:    brillo@ad-si.com
+build-type:    Simple
+stability:     stable
+category:      Graphics
+homepage:      https://github.com/ad-si/Brillo
+description:
+  Data structures and algorithms for working with 2D graphics.
 
-Synopsis:
-        Data structures and algorithms for working with 2D graphics.
+synopsis:
+  Data structures and algorithms for working with 2D graphics.
 
 source-repository head
-  type:           git
-  location:       https://github.com/ad-si/Brillo
+  type:     git
+  location: https://github.com/ad-si/Brillo
 
 source-repository this
-  type:         git
-  tag:          v1.12.0.0
-  location:     https://github.com/ad-si/Brillo
+  type:     git
+  tag:      v1.12.0.0
+  location: https://github.com/ad-si/Brillo
 
-Library
-  Build-Depends:
-          base                          >= 4.8 && < 5
-        , ghc-prim
-        , containers                    >= 0.5 && < 0.7
-        , brillo                         == 1.13.*
+library
+  default-language: GHC2021
+  build-depends:
+    , base        >=4.8  && <5
+    , brillo      >=1.13 && <1.14
+    , containers  >=0.5  && <0.7
+    , ghc-prim
 
-  Default-Language: GHC2021
-
-  ghc-options:
-        -O2
-        -Wall
-
-  Exposed-modules:
-        Brillo.Algorithms.RayCast
-        Brillo.Data.Extent
-        Brillo.Data.Quad
-        Brillo.Data.QuadTree
+  ghc-options:      -O2 -Wall
+  exposed-modules:
+    Brillo.Algorithms.RayCast
+    Brillo.Data.Extent
+    Brillo.Data.Quad
+    Brillo.Data.QuadTree
