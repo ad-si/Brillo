@@ -41,8 +41,20 @@ docs:
 
 .PHONY: release
 release: docs
-		stack upload .
-		stack upload --documentation .
+	stack upload brillo
+	stack upload --documentation brillo
+
+	stack upload brillo-algorithms
+	stack upload --documentation brillo-algorithms
+
+	stack upload brillo-examples
+	# stack upload --documentation brillo-examples
+
+	stack upload brillo-juicy
+	stack upload --documentation brillo-juicy
+
+	stack upload brillo-rendering
+	stack upload --documentation brillo-rendering
 
 
 .PHONY: clean
