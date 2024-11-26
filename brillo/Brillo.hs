@@ -45,39 +45,6 @@
   Brillo programs should be compiled with @-threaded@, otherwise the GHC runtime
   will limit the frame-rate to around 20Hz.
 
-@
-Release Notes:
-
- For 1.13.1:
-  Thanks to Thaler Jonathan
-  * Repaired GLFW backend.
-  Thanks to Samuel Gfrörer
-  * Support for bitmap sections.
-  Thanks to Basile Henry
-  * Handle resize events in playField driver.
-
- For 1.12.1:
-  Thanks to Trevor McDonell
-  * Travis CI integration, general cleanups.
-
- For 1.11.1:
-  Thanks to Lars Wyssard
-  * Use default display resolution in full-screen mode.
-
- For 1.10.1:
-  * Brillo no longer consumes CPU time when displaying static pictures.
-  * Added displayIO wrapper for mostly static pictures, eg when
-    plotting graphs generated from infrequently updated files.
-  * Allow viewport to be scaled with control-left-click drag.
-  * Rotation of viewport changed to alt-left-click drag.
-  * Preserve current colour when rendering bitmpaps.
-  * Changed to proper sum-of-squares colour mixing, rather than naive
-    addition of components which was causing mixed colours to be too dark.
- Thanks to Thomas DuBuisson
-  * Allow bitmaps to be specified in RGBA byte order as well as ABGR.
- Thanks to Gabriel Gonzalez
-  * Package definitions for building with Stack.
-@
 
 For more information, check out <https://github.com/ad-si/Brillo>.
 -}

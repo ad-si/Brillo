@@ -34,6 +34,17 @@ format:
 	find . -iname '*.cabal' | xargs cabal-fmt --inplace
 
 
+.PHONY: docs
+docs:
+		stack haddock --haddock-for-hackage
+
+
+.PHONY: release
+release: docs
+		stack upload .
+		stack upload --documentation .
+
+
 .PHONY: clean
 clean:
 	-rm -rf .stack-work

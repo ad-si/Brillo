@@ -1,6 +1,6 @@
 # Changelog
 
-## 2024-11-? - 1.14
+## 2024-11-26 - 1.13.3
 
 - Remove support for deprecated backends GLUT and SDL and use GLFW instead
   - High DPI / Retina display support

@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-algorithms
-version:       1.13.0.3
+version:       1.13.3
 license:       MIT
 license-file:  LICENSE
 author:        Ben Lippmeier, Adrian Sieber
@@ -19,17 +19,12 @@ source-repository head
   type:     git
   location: https://github.com/ad-si/Brillo
 
-source-repository this
-  type:     git
-  tag:      v1.12.0.0
-  location: https://github.com/ad-si/Brillo
-
 library
   default-language: GHC2021
   build-depends:
-    , base        >=4.8  && <5
-    , brillo      >=1.13 && <1.14
-    , containers  >=0.5  && <0.7
+    , base        >=4.8    && <5
+    , brillo      >=1.13.3 && <1.14
+    , containers  >=0.5    && <0.7
     , ghc-prim
 
   ghc-options:      -O2 -Wall
