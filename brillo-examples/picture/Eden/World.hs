@@ -34,7 +34,7 @@ genesis' gen =
 
 -- Consume some random numbers to advance the simulation
 evolve :: ViewPort -> Float -> World -> World
-evolve vp step world@(World comm gen steps)
+evolve _vp _step world@(World comm gen steps)
   | steps < maxSteps =
       let (genThis, genNext) = split gen
           (genA, genS) = split genThis
@@ -47,6 +47,6 @@ evolve vp step world@(World comm gen steps)
 
 -- Converting the world to a picture is just converting the community component
 render :: World -> Picture
-render (World comm gen steps) =
+render (World comm _gen _steps) =
   Color (makeColor 0.3 0.3 0.6 1.0) $
     Community.render comm

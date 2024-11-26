@@ -65,43 +65,43 @@ applyContact
   -- ^ the old world
   -> Map Index Actor
   -- ^ the new world
-applyContact time force (ix1, ix2) actors =
-  let
-    -- use the indicies to lookup the data for each actor from the map
-    Just a1 = Map.lookup ix1 actors
-    Just a2 = Map.lookup ix2 actors
-
-    resultActors
-      -- handle a collision between bead and a wall
-      | Bead _ _ r1 p1 v1 <- a1
-      , Wall{} <- a2 =
-          let a1' = collideBeadWall a1 a2
-          in  Map.insert ix1 a1' actors
-      -- handle a collision between two beads
-      | Bead ix1 m1 r1 p1 v1 <- a1
-      , Bead ix2 m2 r2 p2 v2 <- a2 =
-          let
-            (a1', a2')
-              -- if one of the beads is stuck then do a safer, static collision.
-              -- with this method the beads don't transfer energy into each other
-              -- so there is less of a chance of lots of beads being crushed
-              -- together if there are many in the same place.
-              | m1 >= beadStuckCount || m2 >= beadStuckCount =
-                  let a1' = collideBeadBeadStatic a1 a2
-                      a2' = collideBeadBeadStatic a2 a1
-                  in  (a1', a2')
-              -- otherwise do the real elastic collision
-              --      this is much more realistic.
-              | otherwise =
-                  collideBeadBeadElastic a1 a2
-          in
-            -- write the new data for the actors back into the map
-            Map.insert ix1 a1' $
-              Map.insert ix2 a2' actors
-      | otherwise =
-          actors
-  in
-    resultActors
+applyContact _time _force (ix1, ix2) actors =
+  -- use the indicies to lookup the data for each actor from the map
+  case (Map.lookup ix1 actors, Map.lookup ix2 actors) of
+    (Just a1, Just a2) ->
+      let
+        resultActors
+          -- handle a collision between bead and a wall
+          | Bead _ _ _r1 _p1 _v1 <- a1
+          , Wall{} <- a2 =
+              let a1' = collideBeadWall a1 a2
+              in  Map.insert ix1 a1' actors
+          -- handle a collision between two beads
+          | Bead _ix1 m1 _r1 _p1 _v1 <- a1
+          , Bead _ix2 m2 _r2 _p2 _v2 <- a2 =
+              let
+                (a1', a2')
+                  -- if one of the beads is stuck then do a safer, static collision.
+                  -- with this method the beads don't transfer energy into each other
+                  -- so there is less of a chance of lots of beads being crushed
+                  -- together if there are many in the same place.
+                  | m1 >= beadStuckCount || m2 >= beadStuckCount =
+                      let a1'' = collideBeadBeadStatic a1 a2
+                          a2'' = collideBeadBeadStatic a2 a1
+                      in  (a1'', a2'')
+                  -- otherwise do the real elastic collision
+                  --      this is much more realistic.
+                  | otherwise =
+                      collideBeadBeadElastic a1 a2
+              in
+                -- write the new data for the actors back into the map
+                Map.insert ix1 a1' $
+                  Map.insert ix2 a2' actors
+          | otherwise =
+              actors
+      in
+        resultActors
+    _ -> actors
 
 
 -- | Move a bead which isn't in contact with anything else.

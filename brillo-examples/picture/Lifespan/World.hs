@@ -47,6 +47,6 @@ evolve _ _ world@(World comm gen step)
 
 -- Converting the world to a picture is just converting the community component
 render :: World -> Picture
-render (World comm gen _) =
+render (World comm _gen _) =
   Color (makeColor 0.3 0.3 0.6 1.0) $
     Community.render comm

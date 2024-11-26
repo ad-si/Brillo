@@ -22,10 +22,10 @@ spawn = zipWith4 offspring
 
 
 zipWith4 :: (a -> b -> c -> d -> e) -> [a] -> [b] -> [c] -> [d] -> [e]
-zipWith4 f [] _ _ _ = []
-zipWith4 f _ [] _ _ = []
-zipWith4 f _ _ [] _ = []
-zipWith4 f _ _ _ [] = []
+zipWith4 _f [] _ _ _ = []
+zipWith4 _f _ [] _ _ = []
+zipWith4 _f _ _ [] _ = []
+zipWith4 _f _ _ _ [] = []
 zipWith4 f (b : bs) (c : cs) (d : ds) (e : es) =
   f b c d e : zipWith4 f bs cs ds es
 
@@ -43,7 +43,7 @@ survive (cell : cells) comm
 
 age :: Community -> Community
 age [] = []
-age (Cell c r 0 : cells) = age cells
+age (Cell _c _r 0 : cells) = age cells
 age (Cell c r life : cells) = Cell c r (life - 1) : age cells
 
 
