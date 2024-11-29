@@ -1,1 +1,1 @@
-apt: libglfw3-dev libglu1-mesa-dev libxxf86vm-dev
+apt: libglfw3-dev libglu1-mesa-dev libxxf86vm-dev libx11-dev
