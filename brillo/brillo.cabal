@@ -30,7 +30,7 @@ library
   build-depends:
     , base              >=4.8    && <5
     , brillo-rendering  >=1.13.3 && <1.15
-    , containers        >=0.5    && <0.7
+    , containers        >=0.5    && <0.8
     , GLFW-b            >=3.3    && <4
     , OpenGL            >=2.12   && <3.1
 
