@@ -22,10 +22,8 @@ source-repository head
 library
   default-language: GHC2021
   build-depends:
-    , base        >=4.8    && <5
-    , brillo      >=1.13.3 && <1.14
-    , containers  >=0.5    && <0.7
-    , ghc-prim
+    , base    >=4.8    && <5
+    , brillo  >=1.13.3 && <1.14
 
   ghc-options:      -O2 -Wall
   exposed-modules:
