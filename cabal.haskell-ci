@@ -1,0 +1,7 @@
+apt:
+    libglfw3-dev
+    libglu1-mesa-dev
+    libxcursor-dev
+    libxi-dev
+    libxinerama-dev
+    libxxf86vm-dev
