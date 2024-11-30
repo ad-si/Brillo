@@ -80,6 +80,23 @@ Once the window is open you can use the following:
 - See the [brillo-examples](./brillo-examples/README.md) directory for more.
 
 
+## Installation
+
+Install necessary native dependencies like this:
+
+### Fedora
+
+```sh
+sudo dnf install glfw-devel libXxf86vm-devel
+```
+
+### Arch
+
+```sh
+sudo pacman -S glfw libxxf86vm
+```
+
+
 ## Contributing
 
 Contributions are very welcome!
