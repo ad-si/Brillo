@@ -6,6 +6,7 @@ module Brillo.Internals.Interface.Callback (
   DisplayCallback,
   KeyboardMouseCallback,
   MotionCallback,
+  DropCallback,
   IdleCallback,
   ReshapeCallback,
 )

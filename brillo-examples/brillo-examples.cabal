@@ -98,6 +98,16 @@ executable brillo-draw
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
+executable brillo-dropfiles
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/DropFiles
+  build-depends:
+    , base    >=4.8    && <5
+    , brillo  >=1.13.3 && <1.15
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-easy
   default-language: GHC2021
   main-is:          Main.hs

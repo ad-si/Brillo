@@ -1,4 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
+{-# HLINT ignore "Use list comprehension" #-}
 
 module Brillo.Internals.Interface.Game (
   playWithBackendIO,
@@ -105,11 +108,12 @@ playWithBackendIO
                     animateSR
                     (readIORef viewSR)
                     worldSR
-                    (\_ -> worldAdvance)
+                    (const worldAdvance)
                     singleStepTime
                 )
             , callback_keyMouse worldSR viewSR worldHandleEvent
             , callback_motion worldSR worldHandleEvent
+            , callback_drop worldSR worldHandleEvent
             , callback_reshape worldSR worldHandleEvent
             ]
 
@@ -170,6 +174,25 @@ handle_motion worldRef eventFn backendRef pos =
     world <- readIORef worldRef
     world' <- eventFn ev world
     writeIORef worldRef world'
+
+
+callback_drop
+  :: IORef world
+  -> (Event -> world -> IO world)
+  -> Callback
+callback_drop worldRef eventFn =
+  Drop (handle_drop worldRef eventFn)
+
+
+handle_drop
+  :: IORef a
+  -> (Event -> a -> IO a)
+  -> DropCallback
+handle_drop worldRef eventFn backendRef paths = do
+  ev <- dropEvent backendRef paths
+  world <- readIORef worldRef
+  world' <- eventFn ev world
+  writeIORef worldRef world'
 
 
 -- | Callback for Handle reshape event.

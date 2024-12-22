@@ -14,7 +14,16 @@ import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL qualified as GL
 import Graphics.UI.GLFW qualified as GLFW
 
-import Brillo.Internals.Interface.Backend.Types
+import Brillo.Internals.Interface.Backend.Types (
+  Backend (..),
+  Callback (..),
+  Display (..),
+  Key (..),
+  KeyState (..),
+  Modifiers (..),
+  MouseButton (..),
+  SpecialKey (..),
+ )
 
 
 -- | State of the GLFW backend library.
@@ -70,13 +79,14 @@ instance Backend GLFWState where
   installReshapeCallback = installReshapeCallbackGLFW
   installKeyMouseCallback = installKeyMouseCallbackGLFW
   installMotionCallback = installMotionCallbackGLFW
+  installDropCallback = installDropCallbackGLFW
   installIdleCallback = installIdleCallbackGLFW
   runMainLoop = runMainLoopGLFW
   postRedisplay = postRedisplayGLFW
-  getWindowDimensions = (\ref -> windowHandle ref >>= \win -> GLFW.getWindowSize win)
+  getWindowDimensions ref = windowHandle ref >>= \win -> GLFW.getWindowSize win
   getScreenSize = getScreenSizeGLFW
-  elapsedTime = (\_ -> GLFW.getTime >>= \mt -> return $ fromJust mt)
-  sleep = (\_ sec -> threadDelay (floor (sec * 1000000.0))) -- GLFW.sleep sec)
+  elapsedTime _ = GLFW.getTime >>= \mt -> return $ fromJust mt
+  sleep _ sec = threadDelay (floor (sec * 1000000.0)) -- GLFW.sleep sec)
 
 
 -- Initialise -----------------------------------------------------------------
@@ -93,8 +103,8 @@ initializeGLFW _ debug =
     glfwVersion <- GLFW.getVersion
 
     when debug $
-      putStr $
-        "  glfwVersion        = " ++ show glfwVersion ++ "\n"
+      putStrLn $
+        "  glfwVersion        = " ++ show glfwVersion
 
 
 -- Exit -----------------------------------------------------------------------
@@ -247,24 +257,21 @@ callbackDisplay
   :: IORef GLFWState
   -> [Callback]
   -> IO ()
-callbackDisplay stateRef callbacks =
-  do
-    -- clear the display
-    GL.clear [GL.ColorBuffer, GL.DepthBuffer]
-    GL.color $ GL.Color4 0 0 0 (1 :: GL.GLfloat)
+callbackDisplay stateRef callbacks = do
+  -- clear the display
+  GL.clear [GL.ColorBuffer, GL.DepthBuffer]
+  GL.color $ GL.Color4 0 0 0 (1 :: GL.GLfloat)
 
-    -- set the OpenGL viewport to account for any HiDPI discrepancy
-    (width, height) <- windowHandle stateRef >>= GLFW.getFramebufferSize
-    GL.viewport
-      $= ( GL.Position 0 0
-         , GL.Size (fromIntegral width) (fromIntegral height)
-         )
+  -- set the OpenGL viewport to account for any HiDPI discrepancy
+  (width, height) <- windowHandle stateRef >>= GLFW.getFramebufferSize
+  GL.viewport
+    $= ( GL.Position 0 0
+       , GL.Size (fromIntegral width) (fromIntegral height)
+       )
 
-    -- get the display callbacks from the chain
-    let funs = [f stateRef | (Display f) <- callbacks]
-    sequence_ funs
-
-    return ()
+  -- get the display callbacks from the chain
+  let funs = [f stateRef | (Display f) <- callbacks]
+  sequence_ funs
 
 
 -- Close Callback -------------------------------------------------------------
@@ -300,10 +307,9 @@ callbackReshape
   -> [Callback]
   -> GLFW.WindowSizeCallback -- = Window -> Int -> Int -> IO ()
 callbackReshape glfwState callbacks _win sizeX sizeY =
-  sequence_ $
-    map
-      (\f -> f (sizeX, sizeY))
-      [f glfwState | Reshape f <- callbacks]
+  mapM_
+    (\f -> f (sizeX, sizeY))
+    ([f glfwState | Reshape f <- callbacks])
 
 
 -- KeyMouse -----------------------------------------------------------------------
@@ -326,6 +332,7 @@ installKeyMouseCallbackGLFW stateRef callbacks =
     GLFW.setCharCallback win (Just $ callbackChar stateRef callbacks)
     GLFW.setMouseButtonCallback win (Just $ callbackMouseButton stateRef callbacks)
     GLFW.setScrollCallback win (Just $ callbackMouseWheel stateRef callbacks)
+    GLFW.setDropCallback win (Just $ callbackDrop stateRef callbacks)
 
 
 -- GLFW calls this on a non-character keyboard action.
@@ -347,10 +354,9 @@ callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
 
     -- Call the Brillo KeyMouse actions with the new state.
     unless (modsSet || isCharKey key' && keystate) $
-      sequence_ $
-        map
-          (\f -> f key' keystate' mods pos)
-          [f stateRef | KeyMouse f <- callbacks]
+      mapM_
+        (\f -> f key' keystate' mods pos)
+        ([f stateRef | KeyMouse f <- callbacks])
 
 
 setModifiers
@@ -368,7 +374,7 @@ setModifiers stateRef key pressed =
           GLFW.Key'LeftAlt -> mods{alt = if pressed then Down else Up}
           _ -> mods
 
-    if (mods' /= mods)
+    if mods' /= mods
       then do
         let glfwState' = glfwState{modifiers = mods'}
         writeIORef stateRef glfwState'
@@ -402,10 +408,9 @@ callbackChar stateRef callbacks _win char -- keystate
     let keystate' = if keystate then Down else Up
 
     -- Call all the Brillo KeyMouse actions with the new state.
-    sequence_ $
-      map
-        (\f -> f key' keystate' mods pos)
-        [f stateRef | KeyMouse f <- callbacks]
+    mapM_
+      (\f -> f key' keystate' mods pos)
+      ([f stateRef | KeyMouse f <- callbacks])
 
 
 -- GLFW calls on this when the user clicks or releases a mouse button.
@@ -420,10 +425,9 @@ callbackMouseButton stateRef callbacks _win key keystate _modifier =
     let keystate' = if keystate == GLFW.MouseButtonState'Pressed then Down else Up
 
     -- Call all the Brillo KeyMouse actions with the new state.
-    sequence_ $
-      map
-        (\f -> f key' keystate' mods pos)
-        [f stateRef | KeyMouse f <- callbacks]
+    mapM_
+      (\f -> f key' keystate' mods pos)
+      ([f stateRef | KeyMouse f <- callbacks])
 
 
 -- GLFW calls on this when the user moves the mouse wheel.
@@ -440,10 +444,9 @@ callbackMouseWheel stateRef callbacks _win x _y =
     (GLFWState mods pos _ _ _ _ _) <- readIORef stateRef
 
     -- Call all the Brillo KeyMouse actions with the new state.
-    sequence_ $
-      map
-        (\f -> f key keystate mods pos)
-        [f stateRef | KeyMouse f <- callbacks]
+    mapM_
+      (\f -> f key keystate mods pos)
+      ([f stateRef | KeyMouse f <- callbacks])
 
 
 setMouseWheel
@@ -460,6 +463,17 @@ setMouseWheel stateRef w =
       EQ -> return (SpecialKey KeyUnknown, Up)
 
 
+-- | GLFW calls this when the user drops files/directories onto the window
+callbackDrop
+  :: IORef GLFWState
+  -> [Callback]
+  -> GLFW.DropCallback
+callbackDrop stateRef callbacks _win paths = do
+  mapM_
+    (\f -> f paths)
+    ([f stateRef | Drop f <- callbacks])
+
+
 -- Motion Callback ------------------------------------------------------------
 
 -- | Callback for when the user moves the mouse.
@@ -473,6 +487,18 @@ installMotionCallbackGLFW stateRef callbacks =
     GLFW.setCursorPosCallback win (Just $ callbackMotion stateRef callbacks)
 
 
+-- Drop Paths Callback ---------------------------------------------------------
+
+-- | Callback for when the user drops files/directories onto the window.
+installDropCallbackGLFW
+  :: IORef GLFWState
+  -> [Callback]
+  -> IO ()
+installDropCallbackGLFW stateRef callbacks = do
+  win <- windowHandle stateRef
+  GLFW.setDropCallback win (Just $ callbackDrop stateRef callbacks)
+
+
 -- CursorPosCallback = Window -> Double -> Double -> IO ()
 
 callbackMotion
@@ -484,10 +510,9 @@ callbackMotion stateRef callbacks _win x y =
     pos <- setMousePos stateRef (floor x) (floor y)
 
     -- Call all the Brillo Motion actions with the new state.
-    sequence_ $
-      map
-        (\f -> f pos)
-        [f stateRef | Motion f <- callbacks]
+    mapM_
+      (\f -> f pos)
+      ([f stateRef | Motion f <- callbacks])
 
 
 setMousePos
@@ -696,7 +721,7 @@ instance GLFWKey GLFW.Key where
   binding GLFW-b 0.2.*
 -}
 charToSpecial :: Char -> Key
-charToSpecial c = case (fromEnum c) of
+charToSpecial c = case fromEnum c of
   32 -> SpecialKey KeySpace
   63232 -> SpecialKey KeyUp
   63233 -> SpecialKey KeyDown

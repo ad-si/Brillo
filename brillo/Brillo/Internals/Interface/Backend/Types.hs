@@ -8,7 +8,7 @@ module Brillo.Internals.Interface.Backend.Types (
 where
 
 import Brillo.Data.Display
-import Data.IORef
+import Data.IORef ( IORef )
 
 
 {-| The functions every backend window managed backend needs to support.
@@ -64,6 +64,10 @@ class Backend a where
   installMotionCallback :: IORef a -> [Callback] -> IO ()
 
 
+  -- | Install the mouse motion callbacks.
+  installDropCallback :: IORef a -> [Callback] -> IO ()
+
+
   -- | Install the idle callbacks.
   installIdleCallback :: IORef a -> [Callback] -> IO ()
 
@@ -107,20 +111,24 @@ type KeyboardMouseCallback =
   forall a. (Backend a) => IORef a -> Key -> KeyState -> Modifiers -> (Int, Int) -> IO ()
 
 
--- | Arguments: (PosX,PosY) in pixels.
-type MotionCallback =
-  forall a. (Backend a) => IORef a -> (Int, Int) -> IO ()
-
-
 -- | No arguments.
 type IdleCallback =
   forall a. (Backend a) => IORef a -> IO ()
 
 
+-- | Arguments: (PosX,PosY) in pixels.
+type MotionCallback =
+  forall a. (Backend a) => IORef a -> (Int, Int) -> IO ()
+
+
+-- | Arguments: [FilePath] of dropped files.
+type DropCallback =
+  forall a. (Backend a) => IORef a -> [FilePath] -> IO ()
+
+
 -- | Arguments: (Width,Height) in pixels.
 type ReshapeCallback =
   forall a. (Backend a) => IORef a -> (Int, Int) -> IO ()
-
 
 -------------------------------------------------------------------------------
 data Callback
@@ -128,6 +136,7 @@ data Callback
   | KeyMouse KeyboardMouseCallback
   | Idle IdleCallback
   | Motion MotionCallback
+  | Drop DropCallback
   | Reshape ReshapeCallback
 
 

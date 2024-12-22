@@ -59,6 +59,7 @@ createWindow
       installReshapeCallback backendStateRef callbacks
       installKeyMouseCallback backendStateRef callbacks
       installMotionCallback backendStateRef callbacks
+      installDropCallback backendStateRef callbacks
       installIdleCallback backendStateRef callbacks
 
       -- we don't need the depth buffer for 2d.

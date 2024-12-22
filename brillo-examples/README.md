@@ -10,6 +10,7 @@ Command | Result
 `stack run brillo-color`      | <img src="picture/Color/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-conway`     | <img src="picture/Conway/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-draw`       | <img src="picture/Draw/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-dropfiles`  | <img src="picture/DropFiles/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-easy`       | <img src="picture/Easy/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-eden`       | <img src="picture/Eden/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-flake`      | <img src="picture/Flake/screenshot.png" style="max-height: 250px"/>

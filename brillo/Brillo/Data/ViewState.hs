@@ -301,7 +301,11 @@ updateViewStateWithEventMaybe (EventMotion pos) viewState =
   motionScale (viewStateScaleMark viewState) pos viewState
     `mplus` motionTranslate (viewStateTranslateMark viewState) pos viewState
     `mplus` motionRotate (viewStateRotateMark viewState) pos viewState
+
 updateViewStateWithEventMaybe (EventResize _) _ =
+  Nothing
+
+updateViewStateWithEventMaybe (EventDrop _) _ =
   Nothing
 
 

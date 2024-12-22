@@ -4,6 +4,7 @@ module Brillo.Internals.Interface.Event (
   Event (..),
   keyMouseEvent,
   motionEvent,
+  dropEvent,
 )
 where
 
@@ -16,6 +17,7 @@ data Event
   = EventKey Key KeyState Modifiers (Float, Float)
   | EventMotion (Float, Float)
   | EventResize (Int, Int)
+  | EventDrop [FilePath]
   deriving (Eq, Show)
 
 
@@ -41,6 +43,15 @@ motionEvent
 motionEvent backendRef pos =
   EventMotion <$> convertPoint backendRef pos
 
+
+dropEvent
+  :: forall a
+   . (Backend a)
+  => IORef a
+  -> [FilePath]
+  -> IO Event
+dropEvent _backendRef paths =
+  return $ EventDrop paths
 
 convertPoint
   :: forall a
