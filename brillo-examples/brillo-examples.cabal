@@ -207,6 +207,16 @@ executable brillo-occlusion
 
   ghc-options:      -O2 -threaded -rtsopts
 
+executable brillo-pickfiles
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/PickFiles
+  build-depends:
+    , base    >=4.8    && <5
+    , brillo  >=1.13.3 && <1.15
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-styrene
   default-language: GHC2021
   main-is:          Main.hs

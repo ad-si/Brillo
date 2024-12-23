@@ -1,5 +1,6 @@
 packages:
   brillo
   brillo-algorithms
-  brillo-rendering
   brillo-examples
+  brillo-juicy
+  brillo-rendering

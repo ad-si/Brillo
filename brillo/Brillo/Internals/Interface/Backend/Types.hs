@@ -8,7 +8,8 @@ module Brillo.Internals.Interface.Backend.Types (
 where
 
 import Brillo.Data.Display
-import Data.IORef ( IORef )
+import Brillo.Data.FileDialog (FileDialog)
+import Data.IORef (IORef)
 
 
 {-| The functions every backend window managed backend needs to support.
@@ -64,7 +65,7 @@ class Backend a where
   installMotionCallback :: IORef a -> [Callback] -> IO ()
 
 
-  -- | Install the mouse motion callbacks.
+  -- | Install the file/directory drop callbacks.
   installDropCallback :: IORef a -> [Callback] -> IO ()
 
 
@@ -86,6 +87,10 @@ class Backend a where
 
   -- | Function that returns (width,height) of a fullscreen window in pixels.
   getScreenSize :: IORef a -> IO (Int, Int)
+
+
+  -- | Open a file dialog to pick files/directories.
+  openFileDialog :: IORef a -> FileDialog -> IO (Maybe [FilePath])
 
 
   -- | Function that reports the time elapsed since the application started.
@@ -129,6 +134,7 @@ type DropCallback =
 -- | Arguments: (Width,Height) in pixels.
 type ReshapeCallback =
   forall a. (Backend a) => IORef a -> (Int, Int) -> IO ()
+
 
 -------------------------------------------------------------------------------
 data Callback

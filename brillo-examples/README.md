@@ -21,6 +21,7 @@ Command | Result
 `stack run brillo-lifespan`   | <img src="picture/Lifespan/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-machina`    | <img src="picture/Machina/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-occlusion`  | <img src="picture/Occlusion/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-pickfiles`  | <img src="picture/PickFiles/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-render`     | <img src="picture/Render/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-styrene`    | <img src="picture/Styrene/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-tree`       | <img src="picture/Tree/screenshot.png" style="max-height: 250px"/>

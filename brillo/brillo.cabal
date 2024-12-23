@@ -1,14 +1,14 @@
-cabal-version: 3.0
-name:          brillo
-version:       1.13.3
-license:       MIT
-license-file:  LICENSE
-author:        Ben Lippmeier, Adrian Sieber
-maintainer:    brillo@ad-si.com
-build-type:    Simple
-stability:     stable
-category:      Graphics
-homepage:      https://github.com/ad-si/Brillo
+cabal-version:      3.0
+name:               brillo
+version:            1.13.3
+license:            MIT
+license-file:       LICENSE
+author:             Ben Lippmeier, Adrian Sieber
+maintainer:         brillo@ad-si.com
+build-type:         Simple
+stability:          stable
+category:           Graphics
+homepage:           https://github.com/ad-si/Brillo
 description:
   Brillo hides the pain of drawing simple vector graphics
   behind a nice data type and a few display functions.
@@ -19,28 +19,37 @@ description:
 synopsis:
   Painless 2D vector graphics, animations, and simulations powered by GLFW
 
-tested-with:   GHC ==9.2.8 || ==9.4.8 || ==9.6.6 || ==9.8.2 || ==9.10.1
+tested-with:
+  GHC ==9.2.8 || ==9.4.8 || ==9.6.6 || ==9.8.2 || ==9.10.1
+
+extra-source-files: cbits/tinyfiledialogs.h
 
 source-repository head
   type:     git
   location: https://github.com/ad-si/Brillo
 
 library
-  default-language: GHC2021
+  default-language:   GHC2021
   build-depends:
     , base              >=4.8    && <5
     , brillo-rendering  >=1.13.3 && <1.15
     , containers        >=0.5    && <0.8
     , GLFW-b            >=3.3    && <4
     , OpenGL            >=2.12   && <3.1
+    , text              >=2.0    && <2.2
 
-  ghc-options:      -O2 -Wall
+  build-tool-depends: c2hs:c2hs
+  include-dirs:       cbits/
+  c-sources:          cbits/tinyfiledialogs.c
+  cc-options:         -DHSFORCECONSOLE=0
+  ghc-options:        -O2 -Wall
   exposed-modules:
     Brillo
     Brillo.Data.Bitmap
     Brillo.Data.Color
     Brillo.Data.Controller
     Brillo.Data.Display
+    Brillo.Data.FileDialog
     Brillo.Data.Picture
     Brillo.Data.Point
     Brillo.Data.Point.Arithmetic
@@ -82,5 +91,4 @@ library
     Brillo.Internals.Interface.ViewState.Motion
     Brillo.Internals.Interface.ViewState.Reshape
     Brillo.Internals.Interface.Window
-
-  cpp-options:      -DWITHGLFW
+    Brillo.Internals.TinyFileDialogs

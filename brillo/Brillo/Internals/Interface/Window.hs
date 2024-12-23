@@ -78,11 +78,10 @@ createWindow
       eatBackend backendStateRef
 
       when debug $
-        do putStr $ "* entering mainloop..\n"
+        do putStr "* entering mainloop..\n"
 
       -- Start the main backend loop
       runMainLoop backendStateRef
 
       when debug $
-        putStr $
-          "* all done\n"
+        putStr "* all done\n"

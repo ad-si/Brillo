@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 {-# OPTIONS_HADDOCK hide #-}
 
 -- | Support for using GLFW as the window manager backend.
@@ -8,12 +9,16 @@ where
 import Control.Concurrent (threadDelay)
 import Control.Exception qualified as X
 import Control.Monad (unless, when)
+import Data.Functor ((<&>))
 import Data.IORef (IORef, modifyIORef', readIORef, writeIORef)
 import Data.Maybe (fromJust)
+import Data.Text qualified as T
+import GHC.Desugar ((>>>))
 import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL qualified as GL
 import Graphics.UI.GLFW qualified as GLFW
 
+import Brillo.Data.FileDialog (FileDialog (..), SelectionMode (..))
 import Brillo.Internals.Interface.Backend.Types (
   Backend (..),
   Callback (..),
@@ -24,6 +29,8 @@ import Brillo.Internals.Interface.Backend.Types (
   MouseButton (..),
   SpecialKey (..),
  )
+import Brillo.Internals.TinyFileDialogs as TinyFileDialogs
+import Data.List (singleton)
 
 
 -- | State of the GLFW backend library.
@@ -85,6 +92,7 @@ instance Backend GLFWState where
   postRedisplay = postRedisplayGLFW
   getWindowDimensions ref = windowHandle ref >>= \win -> GLFW.getWindowSize win
   getScreenSize = getScreenSizeGLFW
+  openFileDialog = openFileDialogGLFW
   elapsedTime _ = GLFW.getTime >>= \mt -> return $ fromJust mt
   sleep _ sec = threadDelay (floor (sec * 1000000.0)) -- GLFW.sleep sec)
 
@@ -182,6 +190,29 @@ getScreenSizeGLFW _state = do
   let sizeY = GLFW.videoModeHeight (fromJust vmode)
 
   pure (sizeX, sizeY)
+
+
+-- | Open a file dialog. Return `Nothing` if the user cancels the dialog.
+openFileDialogGLFW :: IORef GLFWState -> FileDialog -> IO (Maybe [FilePath])
+openFileDialogGLFW _state fileDialog = do
+  case fileDialog.selectionMode of
+    SingleDirectorySelect -> do
+      dirPathMb <-
+        TinyFileDialogs.selectFolderDialog
+          fileDialog.title
+          fileDialog.defaultPath
+
+      return (dirPathMb <&> T.unpack >>> singleton)
+    _ -> do
+      filePathsMb <-
+        TinyFileDialogs.openFileDialog
+          fileDialog.title
+          fileDialog.defaultPath
+          fileDialog.filterPatterns
+          fileDialog.filterDescription
+          (fileDialog.selectionMode == MultiFileSelect)
+
+      return $ filePathsMb <&> (<&> T.unpack)
 
 
 -- Dump State -----------------------------------------------------------------
