@@ -76,6 +76,12 @@ data Picture
     Polygon Path
   | -- | A line along an arbitrary path.
     Line Path
+  | -- | A smooth line along an arbitrary path.
+    LineSmooth Path
+  | -- | A line along an arbitrary path with a given thickness.
+    ThickLine Path Float
+  | -- | A smooth line along an arbitrary path with a given thickness.
+    ThickLineSmooth Path Float
   | -- | A circle with the given radius.
     Circle Float
   | -- | A circle with the given radius and thickness.
@@ -90,6 +96,8 @@ data Picture
     ThickArc Float Float Float Float
   | -- | Text to draw with a vector font
     Text String
+  | -- | Text to draw with a vector font and a given thickness.
+    ThickText String Float
   | -- | A bitmap image.
     Bitmap BitmapData
   | -- | A subsection of a bitmap image where

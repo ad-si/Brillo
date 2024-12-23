@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# OPTIONS_HADDOCK hide #-}
@@ -12,9 +13,11 @@ import Control.Monad (forM_, when)
 import Data.IORef (IORef, readIORef, writeIORef)
 import Data.List (find)
 import Foreign.ForeignPtr (withForeignPtr)
+import GHC.IO.StdHandles (stderr)
 import Graphics.Rendering.OpenGL (get, ($=))
 import Graphics.Rendering.OpenGL.GL qualified as GL
 import Graphics.Rendering.OpenGL.GLU.Errors qualified as GLU
+import System.IO (hPutStrLn)
 import System.Mem.StableName (makeStableName)
 
 import Brillo.Internals.Data.Color (Color (RGBA))
@@ -58,8 +61,8 @@ renderPicture
 renderPicture state circScale picture =
   do
     -- Setup render state for world
-    setLineSmooth (stateLineSmooth state)
-    setBlendAlpha (stateBlendAlpha state)
+    setLineSmooth state.stateLineSmooth
+    setBlendAlpha state.stateBlendAlpha
 
     -- Draw the picture
     checkErrors "before drawPicture."
@@ -71,16 +74,52 @@ drawPicture :: State -> Float -> Picture -> IO ()
 drawPicture state circScale picture =
   {-# SCC "drawComponent" #-}
   case picture of
-    -- nothin'
+    --
     Blank ->
       return ()
-    -- line
+    --
     Line path ->
       GL.renderPrimitive GL.LineStrip $
         vertexPFs path
-    -- polygon (where?)
+    --
+    LineSmooth path -> do
+      GL.lineSmooth $= GL.Enabled
+      GL.renderPrimitive GL.LineStrip $
+        vertexPFs path
+      GL.lineSmooth $= GL.Disabled
+    --
+    ThickLine path thickness -> do
+      widthRange <- GL.aliasedLineWidthRange
+      when (thickness < fst widthRange || thickness > snd widthRange) $
+        hPutStrLn stderr $
+          "Error: The line width "
+            <> show thickness
+            <> " is outside the supported range of "
+            <> show widthRange
+
+      oldLineWidth <- get GL.lineWidth
+      GL.lineWidth $= gf thickness
+      GL.renderPrimitive GL.LineStrip $ vertexPFs path
+      GL.lineWidth $= oldLineWidth
+    --
+    ThickLineSmooth path thickness -> do
+      widthRange <- GL.smoothLineWidthRange
+      when (thickness < fst widthRange || thickness > snd widthRange) $
+        hPutStrLn stderr $
+          "Error: The line width "
+            <> show thickness
+            <> " is outside the supported range of "
+            <> show widthRange
+
+      oldLineWidth <- get GL.lineWidth
+      GL.lineWidth $= gf thickness
+      GL.lineSmooth $= GL.Enabled
+      GL.renderPrimitive GL.LineStrip $ vertexPFs path
+      GL.lineSmooth $= GL.Disabled
+      GL.lineWidth $= oldLineWidth
+    --
     Polygon path
-      | stateWireframe state ->
+      | state.stateWireframe ->
           GL.renderPrimitive GL.LineLoop $
             vertexPFs path
       | otherwise ->
@@ -102,16 +141,34 @@ drawPicture state circScale picture =
         characters :: [[(Double, Double)]]
         characters = renderSafe canvastextFont str
 
+      oldLineWidth <- get GL.lineWidth
+      GL.lineWidth $= gf 3.0
       GL.preservingMatrix $ do
         GL.scale (gf 5) (gf 5) 0
         forM_ characters $ \stroke -> do
           GL.renderPrimitive GL.LineStrip $ do
             forM_ stroke $ \(x, y) -> do
               GL.vertex $ GL.Vertex2 x y
+      GL.lineWidth $= oldLineWidth
+    --
+    ThickText str thickness -> do
+      let
+        characters :: [[(Double, Double)]]
+        characters = renderSafe canvastextFont str
+
+      oldLineWidth <- get GL.lineWidth
+      GL.lineWidth $= gf thickness
+      GL.preservingMatrix $ do
+        GL.scale (gf 5) (gf 5) 0
+        forM_ characters $ \stroke -> do
+          GL.renderPrimitive GL.LineStrip $ do
+            forM_ stroke $ \(x, y) -> do
+              GL.vertex $ GL.Vertex2 x y
+      GL.lineWidth $= oldLineWidth
 
     -- colors with float components.
     Color col p
-      | stateColor state -> do
+      | state.stateColor -> do
           oldColor <- get GL.currentColor
 
           let RGBA r g b a = col
@@ -220,7 +277,7 @@ drawPicture state circScale picture =
 
           -- Load the image data into a texture,
           -- or grab it from the cache if we've already done that before.
-          tex <- loadTexture (stateTextures state) imgData cacheMe
+          tex <- loadTexture state.stateTextures imgData cacheMe
 
           -- Set up wrap and filtering mode
           GL.textureWrapMode GL.Texture2D GL.S $= (GL.Repeated, GL.Repeat)

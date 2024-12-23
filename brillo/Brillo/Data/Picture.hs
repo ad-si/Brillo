@@ -8,6 +8,7 @@ module Brillo.Data.Picture (
   blank,
   polygon,
   line,
+  thickLine,
   circle,
   thickCircle,
   arc,
@@ -56,6 +57,11 @@ polygon = Polygon
 -- | A line along an arbitrary path.
 line :: Path -> Picture
 line = Line
+
+
+-- | A line along an arbitrary path with a given thickness.
+thickLine :: Path -> Float -> Picture
+thickLine = ThickLine
 
 
 -- | A circle with the given radius.

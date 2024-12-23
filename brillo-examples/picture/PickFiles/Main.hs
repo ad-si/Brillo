@@ -8,7 +8,7 @@ import Brillo.Data.FileDialog (
   FileDialog (..),
   SelectionMode (..),
  )
-import Brillo.Data.Picture (Picture (Pictures, Scale, Text, Translate))
+import Brillo.Data.Picture (Picture (Pictures, Scale, ThickText, Translate))
 import Brillo.Interface.Environment (openFileDialog)
 import Brillo.Interface.IO.Game (
   Event (EventKey),
@@ -47,15 +47,18 @@ makePicture state =
         Pictures
           [ moveToTopLeftWithOffset 50 $
               Scale 0.2 0.2 $
-                Text "Left-click anywhere to pick files or"
+                ThickText "Left-click anywhere to pick files or" 3
           , moveToTopLeftWithOffset 100 $
               Scale 0.2 0.2 $
-                Text "right-click to pick a directory"
+                ThickText "right-click to pick a directory" 3
           ]
     Failure errorMessage ->
       pure $
         Pictures
-          [moveToTopLeftWithOffset 30 $ Scale 0.1 0.1 $ Text errorMessage]
+          [ moveToTopLeftWithOffset 30 $
+              Scale 0.1 0.1 $
+                ThickText errorMessage 2
+          ]
     Success filePaths ->
       pure $
         Pictures $
@@ -63,7 +66,7 @@ makePicture state =
             moveToTopLeftWithOffset 0 $
               Translate 10 (fromIntegral (-(25 * i))) $
                 Scale 0.1 0.1 $
-                  Text filePath
+                  ThickText filePath 2
 
 
 handleEvent :: Event -> State -> IO State
