@@ -1,8 +1,7 @@
 -- | Functions to load bitmap data from various places.
 module Brillo.Data.Bitmap (
   Rectangle (..),
-  BitmapData,
-  bitmapSize,
+  BitmapData (..),
   BitmapFormat (..),
   RowOrder (..),
   PixelFormat (..),

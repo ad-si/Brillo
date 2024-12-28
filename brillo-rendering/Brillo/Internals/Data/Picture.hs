@@ -11,11 +11,10 @@ module Brillo.Internals.Data.Picture (
 
   -- * Bitmaps
   Rectangle (..),
-  BitmapData,
+  BitmapData (..),
   PixelFormat (..),
   BitmapFormat (..),
   RowOrder (..),
-  bitmapSize,
   bitmapOfForeignPtr,
   bitmapDataOfForeignPtr,
   bitmapOfByteString,
@@ -29,7 +28,7 @@ where
 
 import Brillo.Internals.Data.Color (Color)
 import Brillo.Internals.Rendering.Bitmap (
-  BitmapData (BitmapData, bitmapSize),
+  BitmapData (..),
   BitmapFormat (..),
   PixelFormat (..),
   Rectangle (..),

@@ -16,8 +16,7 @@ module Brillo.Rendering (
 
   -- * Bitmaps
   Rectangle (..),
-  BitmapData,
-  bitmapSize,
+  BitmapData (..),
   BitmapFormat (..),
   PixelFormat (..),
   RowOrder (..),
