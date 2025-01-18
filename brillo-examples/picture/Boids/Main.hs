@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- Implementation of the Boids flocking algorithm.
 --   by Matthew Sottile <matt@galois.com> <mjsottile@computer.org>
 --   Described in http://syntacticsalt.com/2011/03/10/functional-flocks/

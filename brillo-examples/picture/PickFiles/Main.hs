@@ -19,6 +19,8 @@ import Brillo.Interface.IO.Game (
  )
 import Data.Function ((&))
 import Data.Functor ((<&>))
+import Data.Text (Text)
+import Data.Text qualified as T
 
 
 size :: (Num width, Num height) => (width, height)
@@ -28,7 +30,7 @@ size = (600, 600)
 data State
   = NotAsked
   | Success [FilePath]
-  | Failure String
+  | Failure Text
 
 
 moveToTopLeftWithOffset :: Float -> Picture -> Picture
@@ -66,7 +68,7 @@ makePicture state =
             moveToTopLeftWithOffset 0 $
               Translate 10 (fromIntegral (-(25 * i))) $
                 Scale 0.1 0.1 $
-                  ThickText filePath 2
+                  ThickText (T.pack filePath) 2
 
 
 handleEvent :: Event -> State -> IO State

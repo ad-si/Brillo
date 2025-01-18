@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 {-| Visibility on the 2D plane.
   Uses an instance of Warnocks algorithm.
   TODO: animate the line segments, make them spin and move around so we can see

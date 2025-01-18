@@ -39,6 +39,7 @@ where
 
 import Brillo.Geometry.Angle
 import Brillo.Rendering
+import Data.Text (Text)
 
 
 -- Constructors ----------------------------------------------------------------
@@ -92,7 +93,7 @@ thickArc = ThickArc
 
 
 -- | Some text to draw with a vector font.
-text :: String -> Picture
+text :: Text -> Picture
 text = Text
 
 

@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | Drag & drop files onto the window to load them
 module Main where
 
@@ -5,7 +7,7 @@ import Brillo
 import Brillo.Interface.Pure.Game
 import Data.Function ((&))
 import Data.Functor ((<&>))
-
+import Data.Text qualified as T
 
 width :: (Num a) => a
 width = 600
@@ -27,7 +29,7 @@ makePicture (State filePaths) =
     filePaths & zip [(1 :: Int) ..] <&> \(i, filePath) ->
       Translate (-width / 2) (fromIntegral (-25 * i) + (height / 2)) $
         Scale 0.1 0.1 $
-          Text filePath
+          Text $ T.pack filePath
 
 
 -- | Handle drag & drop events
