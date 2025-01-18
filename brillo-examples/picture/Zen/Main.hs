@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- A nifty animated fractal of a tree, superimposed on a background
 --      of three red rectangles.
 import Brillo

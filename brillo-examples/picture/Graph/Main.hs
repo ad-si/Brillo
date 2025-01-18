@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- See <http://mazzo.li/posts/graph-drawing.html> for a lengthy
 -- explanation about this code.
 import Data.Map.Strict (Map)

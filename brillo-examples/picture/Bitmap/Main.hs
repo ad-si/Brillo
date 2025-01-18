@@ -1,6 +1,7 @@
 module Main where
 
 import Brillo
+import Data.Text qualified as T
 import System.Environment
 
 
@@ -27,7 +28,7 @@ run fileName =
 
     let (width, height) = bitmapSize bmpData
     animate
-      (InWindow fileName (width, height) (10, 10))
+      (InWindow (T.pack fileName) (width, height) (10, 10))
       black
       (frame width height picture)
 

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternGuards #-}
 
 import Brillo.Data.Extent

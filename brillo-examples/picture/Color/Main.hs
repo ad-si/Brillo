@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ParallelListComp #-}
 
 -- Draw a color wheel.

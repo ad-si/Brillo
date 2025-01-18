@@ -1,8 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- A fractal consisting of circles and lines which looks a bit like
 --      the workings of a clock.
 module Main where
 
 import Brillo
+import Data.Text qualified as T
 import Prelude hiding (lines)
 
 
@@ -65,7 +68,7 @@ clockFractal n s = Pictures [circ1, circ2, circ3, lines]
               Color cyan $
                 Translate (-0.15) 1 $
                   Scale 0.001 0.001 $
-                    Text (show s)
+                    Text (T.show s)
             else Blank
         ]
 

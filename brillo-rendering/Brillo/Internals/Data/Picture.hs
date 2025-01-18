@@ -38,6 +38,7 @@ import Codec.BMP (BMP, bmpDimensions, readBMP, unpackBMPToRGBA32)
 import Data.ByteString (ByteString)
 import Data.ByteString.Unsafe qualified as BSU
 import Data.Data (Data, Typeable)
+import Data.Text (Text)
 import Data.Word (Word8)
 import Foreign.ForeignPtr (ForeignPtr, newForeignPtr)
 import Foreign.Marshal.Alloc (finalizerFree, mallocBytes)
@@ -94,9 +95,9 @@ data Picture
     --   If the thickness is 0 then this is equivalent to `Arc`.
     ThickArc Float Float Float Float
   | -- | Text to draw with a vector font
-    Text String
+    Text Text
   | -- | Text to draw with a vector font and a given thickness.
-    ThickText String Float
+    ThickText Text Float
   | -- | A bitmap image.
     Bitmap BitmapData
   | -- | A subsection of a bitmap image where

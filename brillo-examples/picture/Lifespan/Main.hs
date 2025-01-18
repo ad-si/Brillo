@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- Adapted from ANUPlot version by Clem Baker-Finch
 module Main where
 

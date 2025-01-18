@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | Display "Hello World" in a window.
 module Main where
 

@@ -137,7 +137,7 @@ openWindowGLFW ref (InWindow title (sizeX, sizeY) pos) =
       GLFW.createWindow
         sizeX
         sizeY
-        title
+        (T.unpack title)
         Nothing
         Nothing
 

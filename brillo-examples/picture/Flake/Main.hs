@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 {-| Snowflake Fractal.
      Based on ANUPlot code by Clem Baker-Finch.
 -}

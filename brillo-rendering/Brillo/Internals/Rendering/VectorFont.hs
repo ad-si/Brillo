@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 -- | Inspired by https://hackage.haskell.org/package/VectorFont
 module Brillo.Internals.Rendering.VectorFont (
   VectorFont,
@@ -12,10 +14,13 @@ module Brillo.Internals.Rendering.VectorFont (
 ) where
 
 import Control.Monad (replicateM, (>=>))
+import Data.Bifunctor (first)
 import Data.Either (partitionEithers)
 import Data.List (minimumBy, permutations)
 import Data.Map (Map, findWithDefault, fromList, lookup)
 import Data.Ord (comparing)
+import Data.Text (Text)
+import Data.Text qualified as T
 
 
 type VFWidth = Double
@@ -39,22 +44,22 @@ dist (xa, ya) (xb, yb) =
 newtype VectorFont = VectorFont (Map Char VFGlyph)
 
 
-{-| Given a @VectorFont@ and a @String@, return
-  * @Right@ strokes if the @String@ can be rendered.
+{-| Given a @VectorFont@ and a @Text@, return
+  * @Right@ strokes if the @Text@ can be rendered.
   * @Left@ error otherwise.
 -}
-render :: VectorFont -> String -> Either String [VFStroke]
+render :: VectorFont -> Text -> Either Text [VFStroke]
 render f =
   getGlyphs f >=> (Right . renderLine 0)
 
 
-getGlyphs :: VectorFont -> String -> Either String [VFGlyph]
+getGlyphs :: VectorFont -> Text -> Either Text [VFGlyph]
 getGlyphs f =
-  addErrorMsg . leftsOrRights . map (getGlyph f)
+  addErrorMsg . first T.pack . leftsOrRights . map (getGlyph f) . T.unpack
 
 
-addErrorMsg :: Either String a -> Either String a
-addErrorMsg (Left a) = Left $ "Missing chars: " ++ a
+addErrorMsg :: Either Text a -> Either Text a
+addErrorMsg (Left a) = Left $ "Missing chars: " <> a
 addErrorMsg a = a
 
 
@@ -78,9 +83,9 @@ It is guaranteed to render something, and thus
 useful if you want to ignore the possibility of errors e.g.
 because you're manually checking the output.
 -}
-renderSafe :: VectorFont -> String -> [VFStroke]
+renderSafe :: VectorFont -> Text -> [VFStroke]
 renderSafe f =
-  renderLine 0 . map (getGlyphSafe f)
+  renderLine 0 . map (getGlyphSafe f) . T.unpack
 
 
 getGlyphSafe :: VectorFont -> Char -> VFGlyph
