@@ -15,5 +15,5 @@ main =
     100
     ""
     (\str -> Translate (-340) 0 $ Scale 0.1 0.1 $ Text str)
-    (\event _ -> T.show event)
+    (\event _ -> T.pack $ show event)
     (\_ world -> world)

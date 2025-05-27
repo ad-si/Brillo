@@ -68,7 +68,7 @@ clockFractal n s = Pictures [circ1, circ2, circ3, lines]
               Color cyan $
                 Translate (-0.15) 1 $
                   Scale 0.001 0.001 $
-                    Text (T.show s)
+                    Text (T.pack $ show s)
             else Blank
         ]
 
