@@ -30,7 +30,7 @@ test:
 
 .PHONY: format
 format:
-	fourmolu --mode=inplace .
+	fourmolu --mode=inplace $$(git ls-files '*.hs')
 	find . -iname '*.cabal' | xargs cabal-fmt --inplace
 
 

@@ -15,7 +15,6 @@ import Graphics.Rendering.OpenGL.GL qualified as GL
 import Unsafe.Coerce (unsafeCoerce)
 
 
-
 {-| The OpenGL library doesn't seem to provide a nice way convert
      a Float to a GLfloat, even though they're the same thing
      under the covers.
