@@ -383,11 +383,76 @@ callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
     let isCharKey (Char _) = True
         isCharKey _ = False
 
+    -- Only process key presses for keys that won't generate character events
+    -- or process any key release (since char callback only handles presses)
+    let shouldProcess = not keystate || not (isCharacterKey key)
+
     -- Call the Brillo KeyMouse actions with the new state.
-    unless (modsSet || isCharKey key' && keystate) $
+    unless (modsSet || isCharKey key' && keystate || not shouldProcess) $
       mapM_
         (\f -> f key' keystate' mods pos)
         ([f stateRef | KeyMouse f <- callbacks])
+
+
+{-| Check if a GLFW key will generate a character callback event
+These are keys that produce printable characters and will trigger both
+key and character callbacks, causing duplicate events
+-}
+isCharacterKey :: GLFW.Key -> Bool
+isCharacterKey key = case key of
+  -- Alphabetic keys
+  GLFW.Key'A -> True
+  GLFW.Key'B -> True
+  GLFW.Key'C -> True
+  GLFW.Key'D -> True
+  GLFW.Key'E -> True
+  GLFW.Key'F -> True
+  GLFW.Key'G -> True
+  GLFW.Key'H -> True
+  GLFW.Key'I -> True
+  GLFW.Key'J -> True
+  GLFW.Key'K -> True
+  GLFW.Key'L -> True
+  GLFW.Key'M -> True
+  GLFW.Key'N -> True
+  GLFW.Key'O -> True
+  GLFW.Key'P -> True
+  GLFW.Key'Q -> True
+  GLFW.Key'R -> True
+  GLFW.Key'S -> True
+  GLFW.Key'T -> True
+  GLFW.Key'U -> True
+  GLFW.Key'V -> True
+  GLFW.Key'W -> True
+  GLFW.Key'X -> True
+  GLFW.Key'Y -> True
+  GLFW.Key'Z -> True
+  -- Number keys
+  GLFW.Key'0 -> True
+  GLFW.Key'1 -> True
+  GLFW.Key'2 -> True
+  GLFW.Key'3 -> True
+  GLFW.Key'4 -> True
+  GLFW.Key'5 -> True
+  GLFW.Key'6 -> True
+  GLFW.Key'7 -> True
+  GLFW.Key'8 -> True
+  GLFW.Key'9 -> True
+  -- Printable symbols
+  GLFW.Key'Space -> True
+  GLFW.Key'Apostrophe -> True
+  GLFW.Key'Comma -> True
+  GLFW.Key'Minus -> True
+  GLFW.Key'Period -> True
+  GLFW.Key'Slash -> True
+  GLFW.Key'Semicolon -> True
+  GLFW.Key'Equal -> True
+  GLFW.Key'LeftBracket -> True
+  GLFW.Key'Backslash -> True
+  GLFW.Key'RightBracket -> True
+  GLFW.Key'GraveAccent -> True
+  -- All other keys (function keys, arrows, etc.) don't generate char events
+  _ -> False
 
 
 setModifiers ::
