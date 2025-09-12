@@ -15,6 +15,7 @@ import Graphics.Rendering.OpenGL.GL qualified as GL
 import Unsafe.Coerce (unsafeCoerce)
 
 
+
 {-| The OpenGL library doesn't seem to provide a nice way convert
      a Float to a GLfloat, even though they're the same thing
      under the covers.
@@ -36,12 +37,12 @@ gsizei = unsafeCoerce
 {-| Set up the OpenGL rendering context for orthographic projection and run an
   action to draw the model.
 -}
-withModelview
-  :: (Int, Int)
-  -- ^ Width and height of window.
-  -> IO ()
-  -- ^ Action to perform.
-  -> IO ()
+withModelview ::
+  -- | Width and height of window.
+  (Int, Int) ->
+  -- | Action to perform.
+  IO () ->
+  IO ()
 withModelview (sizeX, sizeY) action =
   do
     GL.matrixMode $= GL.Projection
@@ -64,12 +65,12 @@ withModelview (sizeX, sizeY) action =
 {-| Clear the OpenGL buffer with the given background color and run
   an action to draw the model.
 -}
-withClearBuffer
-  :: Color
-  -- ^ Background color
-  -> IO ()
-  -- ^ Action to perform
-  -> IO ()
+withClearBuffer ::
+  -- | Background color
+  Color ->
+  -- | Action to perform
+  IO () ->
+  IO ()
 withClearBuffer clearColor action =
   do
     -- initialization (done every time in this case)

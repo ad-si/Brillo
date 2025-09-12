@@ -46,16 +46,16 @@ type Coord =
 {-| Construct an extent.
      The north value must be > south, and east > west, else `error`.
 -}
-makeExtent
-  :: Int
-  -- ^ y max (north)
-  -> Int
-  -- ^ y min (south)
-  -> Int
-  -- ^ x max (east)
-  -> Int
-  -- ^ x min (west)
-  -> Extent
+makeExtent ::
+  -- | y max (north)
+  Int ->
+  -- | y min (south)
+  Int ->
+  -- | x max (east)
+  Int ->
+  -- | x min (west)
+  Int ->
+  Extent
 makeExtent n s e w
   | n >= s
   , e >= w =

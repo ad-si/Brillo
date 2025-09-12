@@ -23,53 +23,55 @@ data Event
   deriving (Eq, Show)
 
 
-keyMouseEvent
-  :: forall a
-   . (Backend a)
-  => IORef a
-  -> Key
-  -> KeyState
-  -> Modifiers
-  -> (Int, Int)
-  -> IO Event
+keyMouseEvent ::
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  Key ->
+  KeyState ->
+  Modifiers ->
+  (Int, Int) ->
+  IO Event
 keyMouseEvent backendRef key keyState modifiers pos =
   EventKey key keyState modifiers <$> convertPoint backendRef pos
 
 
-motionEvent
-  :: forall a
-   . (Backend a)
-  => IORef a
-  -> (Int, Int)
-  -> IO Event
+motionEvent ::
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  (Int, Int) ->
+  IO Event
 motionEvent backendRef pos =
   EventMotion <$> convertPoint backendRef pos
 
 
-dropEvent
-  :: forall a
-   . (Backend a)
-  => IORef a
-  -> [FilePath]
-  -> IO Event
+dropEvent ::
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  [FilePath] ->
+  IO Event
 dropEvent _backendRef paths =
   return $ EventDrop paths
 
-pickEvent
-  :: forall a
-   . (Backend a)
-  => IORef a
-  -> [FilePath]
-  -> IO Event
+
+pickEvent ::
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  [FilePath] ->
+  IO Event
 pickEvent _backendRef paths =
   return $ EventPick paths
 
-convertPoint
-  :: forall a
-   . (Backend a)
-  => IORef a
-  -> (Int, Int)
-  -> IO (Float, Float)
+
+convertPoint ::
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  (Int, Int) ->
+  IO (Float, Float)
 convertPoint backendRef pos =
   do
     (sizeX_, sizeY_) <- getWindowDimensions backendRef

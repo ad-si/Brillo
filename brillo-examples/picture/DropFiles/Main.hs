@@ -9,6 +9,7 @@ import Data.Function ((&))
 import Data.Functor ((<&>))
 import Data.Text qualified as T
 
+
 width :: (Num a) => a
 width = 600
 
@@ -29,7 +30,8 @@ makePicture (State filePaths) =
     filePaths & zip [(1 :: Int) ..] <&> \(i, filePath) ->
       Translate (-width / 2) (fromIntegral (-25 * i) + (height / 2)) $
         Scale 0.1 0.1 $
-          Text $ T.pack filePath
+          Text $
+            T.pack filePath
 
 
 -- | Handle drag & drop events

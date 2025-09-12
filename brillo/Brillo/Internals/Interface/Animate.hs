@@ -22,22 +22,22 @@ import GHC.Float (double2Float)
 import System.Mem
 
 
-animateWithBackendIO
-  :: (Backend a)
-  => a
-  -- ^ Initial State of the backend
-  -> Bool
-  -- ^ Whether to allow the image to be panned around.
-  -> Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> (Float -> IO Picture)
-  -- ^ Function to produce the next frame of animation.
+animateWithBackendIO ::
+  (Backend a) =>
+  -- | Initial State of the backend
+  a ->
+  -- | Whether to allow the image to be panned around.
+  Bool ->
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Function to produce the next frame of animation.
   --     It is passed the time in seconds since the program started.
-  -> (Controller -> IO ())
-  -- ^ Eat the controller.
-  -> IO ()
+  (Float -> IO Picture) ->
+  -- | Eat the controller.
+  (Controller -> IO ()) ->
+  IO ()
 animateWithBackendIO
   backend
   pannable

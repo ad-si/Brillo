@@ -27,23 +27,23 @@ type Index = Int
 -- | The actors in the world.
 data Actor
   = Wall
+      -- | unique index of this actor
       !Index
-      -- ^ unique index of this actor
+      -- | wall starting point
       !Position
-      -- ^ wall starting point
+      -- | wall ending point
       !Position
-      -- ^ wall ending point
   | Bead
+      -- | unique index of this actor
       !Index
-      -- ^ unique index of this actor
+      -- | whether the bead is stuck
       !Int
-      -- ^ whether the bead is stuck
+      -- | radius of bead
       !Radius
-      -- ^ radius of bead
+      -- | position of bead
       !Position
-      -- ^ position of bead
+      -- | velocity of bead
       !Velocity
-      -- ^ velocity of bead
   deriving (Show)
 
 

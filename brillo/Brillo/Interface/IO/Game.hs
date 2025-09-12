@@ -25,24 +25,24 @@ import Brillo.Internals.Interface.Game
 
 
 -- | Play a game in a window, using IO actions to build the pictures.
-playIO
-  :: forall world
-   . Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Int
-  -- ^ Number of simulation steps to take for each second of real time.
-  -> world
-  -- ^ The initial world.
-  -> (world -> IO Picture)
-  -- ^ An action to convert the world a picture.
-  -> (Event -> world -> IO world)
-  -- ^ A function to handle input events.
-  -> (Float -> world -> IO world)
-  -- ^ A function to step the world one iteration.
+playIO ::
+  forall world.
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Number of simulation steps to take for each second of real time.
+  Int ->
+  -- | The initial world.
+  world ->
+  -- | An action to convert the world a picture.
+  (world -> IO Picture) ->
+  -- | A function to handle input events.
+  (Event -> world -> IO world) ->
+  -- | A function to step the world one iteration.
   --   It is passed the period of time (in seconds) needing to be advanced.
-  -> IO ()
+  (Float -> world -> IO world) ->
+  IO ()
 playIO
   display
   backColor

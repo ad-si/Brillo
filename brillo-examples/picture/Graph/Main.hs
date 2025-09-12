@@ -165,10 +165,10 @@ charge :: Float
 charge = 100000
 
 
-pushForce
-  :: Point -- Vertex we're calculating the force for
-  -> Point -- Vertex pushing the other away
-  -> Vector
+pushForce ::
+  Point -> -- Vertex we're calculating the force for
+  Point -> -- Vertex pushing the other away
+  Vector
 pushForce v1 v2 =
   -- If we are analysing the same vertex, l = 0
   if l > 0
@@ -189,11 +189,11 @@ pullForce v1 v2 =
 
 
 -- | Apply forces to update the position of a single point.
-updatePosition
-  :: Float -- Time since the last update
-  -> Vertex -- Vertex we are analysing
-  -> Scene
-  -> Point -- New position
+updatePosition ::
+  Float -> -- Time since the last update
+  Vertex -> -- Vertex we are analysing
+  Scene ->
+  Point -- New position
 updatePosition dt v1 sc@Scene{scPoints = pts, scGraph = gr} =
   v1pos Pt.+ pull Pt.+ push
   where
@@ -227,11 +227,11 @@ updatePositions dt sc@Scene{scSelected = sel, scGraph = Graph neighs} =
 
 
 -- | Check if a point is in the given circle.
-inCircle
-  :: Point -- Where the user has clicked
-  -> Float -- The scaling factor in the ViewPort
-  -> Point -- The position of the vertex
-  -> Bool
+inCircle ::
+  Point -> -- Where the user has clicked
+  Float -> -- The scaling factor in the ViewPort
+  Point -> -- The position of the vertex
+  Bool
 inCircle p sca v =
   magV (v Pt.- p) <= vertexRadius * sca
 
@@ -381,7 +381,8 @@ windowSize = (800, 600)
 sceneWindow :: Scene -> IO ()
 sceneWindow sc =
   play
-    (InWindow "Graph Drawing - shift + left mouse button to drag" windowSize (10, 10))
+    ( InWindow "Graph Drawing - shift + left mouse button to drag" windowSize (10, 10)
+    )
     black
     30
     sc

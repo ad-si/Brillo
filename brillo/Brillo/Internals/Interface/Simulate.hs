@@ -24,26 +24,26 @@ import Data.IORef
 import System.Mem
 
 
-simulateWithBackendIO
-  :: forall model a
-   . (Backend a)
-  => a
-  -- ^ Initial state of the backend
-  -> Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Int
-  -- ^ Number of simulation steps to take for each second of real time.
-  -> model
-  -- ^ The initial model.
-  -> (model -> IO Picture)
-  -- ^ A function to convert the model to a picture.
-  -> (ViewPort -> Float -> model -> IO model)
-  -- ^ A function to step the model one iteration. It is passed the
+simulateWithBackendIO ::
+  forall model a.
+  (Backend a) =>
+  -- | Initial state of the backend
+  a ->
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Number of simulation steps to take for each second of real time.
+  Int ->
+  -- | The initial model.
+  model ->
+  -- | A function to convert the model to a picture.
+  (model -> IO Picture) ->
+  -- | A function to step the model one iteration. It is passed the
   --     current viewport and the amount of time for this simulation
   --     step (in seconds).
-  -> IO ()
+  (ViewPort -> Float -> model -> IO model) ->
+  IO ()
 simulateWithBackendIO
   backend
   display

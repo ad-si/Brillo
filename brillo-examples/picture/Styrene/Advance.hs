@@ -22,15 +22,15 @@ import Data.Set qualified as Set
 -- Advance ---------------------------------------------------------------------
 
 -- | Advance all the actors in this world by a certain time.
-advanceWorld
-  :: ViewPort
-  -- ^ current viewport
-  -> Time
-  -- ^ time to advance them for.
-  -> World
-  -- ^ the world to advance.
-  -> World
-  -- ^ the new world.
+advanceWorld ::
+  -- | current viewport
+  ViewPort ->
+  -- | time to advance them for.
+  Time ->
+  -- | the world to advance.
+  World ->
+  -- | the new world.
+  World
 advanceWorld viewport time (World actors tree) =
   let
     rot = viewPortRotate viewport
@@ -54,17 +54,17 @@ advanceWorld viewport time (World actors tree) =
 
 
 -- Move two actors which are known to be in contact.
-applyContact
-  :: Time
-  -- ^ time step
-  -> Force
-  -- ^ ambient force on the actors
-  -> (Index, Index)
-  -- ^ indicies of the the two actors in contact
-  -> Map Index Actor
-  -- ^ the old world
-  -> Map Index Actor
-  -- ^ the new world
+applyContact ::
+  -- | time step
+  Time ->
+  -- | ambient force on the actors
+  Force ->
+  -- | indicies of the the two actors in contact
+  (Index, Index) ->
+  -- | the old world
+  Map Index Actor ->
+  -- | the new world
+  Map Index Actor
 applyContact _time _force (ix1, ix2) actors =
   -- use the indicies to lookup the data for each actor from the map
   case (Map.lookup ix1 actors, Map.lookup ix2 actors) of
@@ -105,15 +105,15 @@ applyContact _time _force (ix1, ix2) actors =
 
 
 -- | Move a bead which isn't in contact with anything else.
-moveActorFree
-  :: Time
-  -- ^ time to move it for
-  -> Force
-  -- ^ ambient force on the actor during this time
-  -> Actor
-  -- ^ the bead to move
-  -> Actor
-  -- ^ the new bead
+moveActorFree ::
+  -- | time to move it for
+  Time ->
+  -- | ambient force on the actor during this time
+  Force ->
+  -- | the bead to move
+  Actor ->
+  -- | the new bead
+  Actor
 moveActorFree time force actor
   -- move a bead
   | Bead ix stuck radius pos vel <- actor =

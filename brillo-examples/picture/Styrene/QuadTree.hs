@@ -44,20 +44,20 @@ treeZero size =
 -- Quadrant --------------------------------------------------------------------
 
 -- | Insert an element with a bounding box into the tree
-treeInsert
-  :: Int
-  -- ^ maximum depth to place a leaf
-  -> Int
-  -- ^ current depth
-  -> Point
-  -- ^ bottom left of bounding box of new element
-  -> Point
-  -- ^ top right of bounding box of new element
-  -> a
-  -- ^ element to insert into tree
-  -> QuadTree a
-  -- ^ current tree
-  -> QuadTree a
+treeInsert ::
+  -- | maximum depth to place a leaf
+  Int ->
+  -- | current depth
+  Int ->
+  -- | bottom left of bounding box of new element
+  Point ->
+  -- | top right of bounding box of new element
+  Point ->
+  -- | element to insert into tree
+  a ->
+  -- | current tree
+  QuadTree a ->
+  QuadTree a
 treeInsert depthMax depth p0@(x0, y0) p1@(x1, y1) a tree =
   case tree of
     QNode p@(x, y) size tNW tNE tSW tSE ->

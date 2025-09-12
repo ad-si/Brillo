@@ -69,16 +69,16 @@ instance Num Color where
 
 
 -- | Make a custom color. All components are clamped to the range  [0..1].
-makeColor
-  :: Float
-  -- ^ Red component.
-  -> Float
-  -- ^ Green component.
-  -> Float
-  -- ^ Blue component.
-  -> Float
-  -- ^ Alpha component.
-  -> Color
+makeColor ::
+  -- | Red component.
+  Float ->
+  -- | Green component.
+  Float ->
+  -- | Blue component.
+  Float ->
+  -- | Alpha component.
+  Float ->
+  Color
 makeColor r g b a =
   clampColor $
     RGBA r g b a

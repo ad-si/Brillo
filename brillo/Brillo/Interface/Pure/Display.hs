@@ -15,14 +15,14 @@ import Brillo.Internals.Interface.Display
 
 
 -- | Open a new window and display the given picture.
-display
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Picture
-  -- ^ The picture to draw.
-  -> IO ()
+display ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | The picture to draw.
+  Picture ->
+  IO ()
 display dis backColor picture =
   displayWithBackend
     defaultBackendState

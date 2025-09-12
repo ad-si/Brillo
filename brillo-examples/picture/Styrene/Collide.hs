@@ -28,13 +28,13 @@ beadWallLoss = 0.8
 
 
 -- | Move a bead which is in contact with a wall.
-collideBeadWall
-  :: Actor
-  -- ^ the bead
-  -> Actor
-  -- ^ the wall that bead is in contact with
-  -> Actor
-  -- ^ the new bead
+collideBeadWall ::
+  -- | the bead
+  Actor ->
+  -- | the wall that bead is in contact with
+  Actor ->
+  -- | the new bead
+  Actor
 collideBeadWall
   bead@(Bead _ix _ _radius pBead _vIn)
   (Wall _ pWall1 pWall2) =
@@ -52,10 +52,10 @@ collideBeadWall _ _ = error "collideBeadWall: not a bead and a wall"
 
 
 -- | Move two beads which have bounced into each other.
-collideBeadBeadElastic
-  :: Actor
-  -> Actor
-  -> (Actor, Actor)
+collideBeadBeadElastic ::
+  Actor ->
+  Actor ->
+  (Actor, Actor)
 collideBeadBeadElastic
   (Bead ix1 mode1 r1 p1 v1)
   (Bead ix2 mode2 r2 p2 v2) =
@@ -102,10 +102,10 @@ collideBeadBeadElastic
 collideBeadBeadElastic _ _ = error "collideBeadBeadElastic: not two beads"
 
 
-collideBeadBeadStatic
-  :: Actor
-  -> Actor
-  -> Actor
+collideBeadBeadStatic ::
+  Actor ->
+  Actor ->
+  Actor
 collideBeadBeadStatic
   bead1@(Bead _ix1 _ radius1 pBead1 _)
   (Bead _ix2 _ radius2 pBead2 _) =
@@ -127,14 +127,14 @@ collideBeadBeadStatic _ _ = error "collideBeadBeadStatic: not two beads"
 
 
 -- | Move a bead which has collided with something.
-collideBeadPointStatic
-  :: Actor
-  -- ^ the bead which collided with something
-  -> Point
-  -- ^ the point of collision (should be near the bead's surface)
-  -> Float
-  -- ^ velocity scaling factor (how much to slow the bead down after the collision)
-  -> Actor
+collideBeadPointStatic ::
+  -- | the bead which collided with something
+  Actor ->
+  -- | the point of collision (should be near the bead's surface)
+  Point ->
+  -- | velocity scaling factor (how much to slow the bead down after the collision)
+  Float ->
+  Actor
 collideBeadPointStatic
   (Bead ix mode radius pBead vIn)
   pCollision

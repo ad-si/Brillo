@@ -49,17 +49,17 @@ import Brillo.Rendering
 -- Color functions ------------------------------------------------------------
 
 -- | Mix two colors with the given ratios.
-mixColors
-  :: Float
-  -- ^ Proportion of first color.
-  -> Float
-  -- ^ Proportion of second color.
-  -> Color
-  -- ^ First color.
-  -> Color
-  -- ^ Second color.
-  -> Color
-  -- ^ Resulting color.
+mixColors ::
+  -- | Proportion of first color.
+  Float ->
+  -- | Proportion of second color.
+  Float ->
+  -- | First color.
+  Color ->
+  -- | Second color.
+  Color ->
+  -- | Resulting color.
+  Color
 mixColors m1 m2 c1 c2 =
   let (r1, g1, b1, a1) = rgbaOfColor c1
       (r2, g2, b2, a2) = rgbaOfColor c2

@@ -49,15 +49,15 @@ import Brillo.Internals.Rendering.VectorFont as VF (canvastextFont, renderSafe)
 
   Assumes that the OpenGL matrix mode is set to @Modelview@
 -}
-renderPicture
-  :: State
-  -- ^ Current rendering state.
-  -> Float
-  -- ^ View port scale, which controls the level of detail.
+renderPicture ::
+  -- | Current rendering state.
+  State ->
+  -- | View port scale, which controls the level of detail.
   --   Use 1.0 to start with.
-  -> Picture
-  -- ^ Picture to render.
-  -> IO ()
+  Float ->
+  -- | Picture to render.
+  Picture ->
+  IO ()
 renderPicture state circScale picture =
   do
     -- Setup render state for world
@@ -265,8 +265,8 @@ drawPicture state circScale picture =
                               ( fst imgSectionPos
                               , snd imgSectionPos + snd imgSectionSize
                               )
-                        ]
-                        :: [(Float, Float)]
+                        ] ::
+                        [(Float, Float)]
                     toFloatVec = vecMap fromIntegral fromIntegral
                     vecMap :: (a -> c) -> (b -> d) -> (a, b) -> (c, d)
                     vecMap f g (x, y) = (f x, g y)
@@ -363,14 +363,14 @@ handleError place err =
 {-| Load a texture into the OpenGL context, or retrieve the existing handle
   from our own cache.
 -}
-loadTexture
-  :: IORef [Texture]
-  -- ^ Existing texture cache.
-  -> BitmapData
-  -- ^ Texture data.
-  -> Bool
-  -- ^ Force cache for newly loaded textures.
-  -> IO Texture
+loadTexture ::
+  -- | Existing texture cache.
+  IORef [Texture] ->
+  -- | Texture data.
+  BitmapData ->
+  -- | Force cache for newly loaded textures.
+  Bool ->
+  IO Texture
 loadTexture refTextures imgData@BitmapData{bitmapSize = (width, height)} cacheMe =
   do
     textures <- readIORef refTextures

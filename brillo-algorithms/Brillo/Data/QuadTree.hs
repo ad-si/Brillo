@@ -52,10 +52,10 @@ emptyNode = TNode TNil TNil TNil TNil
 {-| Get a quadrant from a node.
   If the tree does not have an outer node then `Nothing`.
 -}
-takeQuadOfTree
-  :: Quad
-  -> QuadTree a
-  -> Maybe (QuadTree a)
+takeQuadOfTree ::
+  Quad ->
+  QuadTree a ->
+  Maybe (QuadTree a)
 takeQuadOfTree quad tree =
   case tree of
     TNil -> Nothing
@@ -71,11 +71,11 @@ takeQuadOfTree quad tree =
 {-| Apply a function to a quadrant of a node.
   If the tree does not have an outer node then return the original tree.
 -}
-liftToQuad
-  :: Quad
-  -> (QuadTree a -> QuadTree a)
-  -> QuadTree a
-  -> QuadTree a
+liftToQuad ::
+  Quad ->
+  (QuadTree a -> QuadTree a) ->
+  QuadTree a ->
+  QuadTree a
 liftToQuad quad f tree =
   case tree of
     TNil -> tree
@@ -112,10 +112,10 @@ insertByCoord extent coord x tree =
 
 
 -- | Lookup a node based on a path to it.
-lookupNodeByPath
-  :: [Quad]
-  -> QuadTree a
-  -> Maybe (QuadTree a)
+lookupNodeByPath ::
+  [Quad] ->
+  QuadTree a ->
+  Maybe (QuadTree a)
 lookupNodeByPath [] tree =
   Just tree
 lookupNodeByPath (q : qs) tree =
@@ -137,14 +137,14 @@ lookupByPath path tree =
 
 
 -- | Lookup a node if a tree given a coordinate which it contains.
-lookupByCoord
-  :: forall a
-   . Extent
-  -- ^ Extent that covers the whole tree.
-  -> Coord
-  -- ^ Coordinate of the value of interest.
-  -> QuadTree a
-  -> Maybe a
+lookupByCoord ::
+  forall a.
+  -- | Extent that covers the whole tree.
+  Extent ->
+  -- | Coordinate of the value of interest.
+  Coord ->
+  QuadTree a ->
+  Maybe a
 lookupByCoord extent coord tree =
   do
     path <- pathToCoord extent coord
@@ -152,12 +152,12 @@ lookupByCoord extent coord tree =
 
 
 -- | Flatten a QuadTree into a list of its contained values, with coordinates.
-flattenQuadTree
-  :: forall a
-   . Extent
-  -- ^ Extent that covers the whole tree.
-  -> QuadTree a
-  -> [(Coord, a)]
+flattenQuadTree ::
+  forall a.
+  -- | Extent that covers the whole tree.
+  Extent ->
+  QuadTree a ->
+  [(Coord, a)]
 flattenQuadTree extentInit treeInit =
   flatten' extentInit treeInit
   where
@@ -177,12 +177,12 @@ flattenQuadTree extentInit treeInit =
 
 
 -- | Flatten a QuadTree into a list of its contained values, with extents.
-flattenQuadTreeWithExtents
-  :: forall a
-   . Extent
-  -- ^ Extent that covers the whole tree.
-  -> QuadTree a
-  -> [(Extent, a)]
+flattenQuadTreeWithExtents ::
+  forall a.
+  -- | Extent that covers the whole tree.
+  Extent ->
+  QuadTree a ->
+  [(Extent, a)]
 flattenQuadTreeWithExtents extentInit treeInit =
   flatten' extentInit treeInit
   where

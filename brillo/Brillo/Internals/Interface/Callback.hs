@@ -13,3 +13,4 @@ module Brillo.Internals.Interface.Callback (
 where
 
 import Brillo.Internals.Interface.Backend.Types
+

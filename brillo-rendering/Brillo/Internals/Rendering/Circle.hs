@@ -100,8 +100,8 @@ renderCircleStrip (F# posX) (F# posY) steps r width =
 -- Arc ------------------------------------------------------------------------
 
 -- | Render an arc with the given thickness.
-renderArc
-  :: Float -> Float -> Float -> Float -> Float -> Float -> Float -> IO ()
+renderArc ::
+  Float -> Float -> Float -> Float -> Float -> Float -> Float -> IO ()
 renderArc posX posY scaleFactor radius_ a1 a2 thickness_ =
   go (abs radius_) (abs thickness_)
   where
@@ -118,8 +118,8 @@ renderArc posX posY scaleFactor radius_ a1 a2 thickness_ =
 
 
 -- | Render an arc as a line.
-renderArcLine
-  :: Float -> Float -> Int -> Float -> Float -> Float -> IO ()
+renderArcLine ::
+  Float -> Float -> Int -> Float -> Float -> Float -> IO ()
 renderArcLine (F# posX) (F# posY) steps (F# rad) a1 a2 =
   let n = fromIntegral steps
       !(F# tStep) = (2 * pi) / n
@@ -136,8 +136,8 @@ renderArcLine (F# posX) (F# posY) steps (F# rad) a1 a2 =
 
 
 -- | Render an arc with a given thickness as a triangle strip
-renderArcStrip
-  :: Float -> Float -> Int -> Float -> Float -> Float -> Float -> IO ()
+renderArcStrip ::
+  Float -> Float -> Int -> Float -> Float -> Float -> Float -> IO ()
 renderArcStrip (F# posX) (F# posY) steps r a1 a2 width =
   let n = fromIntegral steps
       tStep = (2 * pi) / n
@@ -192,14 +192,14 @@ renderArcStrip (F# posX) (F# posY) steps r a1 a2 width =
 
 
 -- Step functions -------------------------------------------------------------
-renderCircleLineStep
-  :: Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> IO ()
+renderCircleLineStep ::
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  IO ()
 renderCircleLineStep posX posY tStep tStop rad tt
   | 1# <- tt `geFloat#` tStop =
       return ()
@@ -216,16 +216,16 @@ renderCircleLineStep posX posY tStep tStop rad tt
 {-# INLINE renderCircleLineStep #-}
 
 
-renderCircleStripStep
-  :: Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> Float#
-  -> IO ()
+renderCircleStripStep ::
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  Float# ->
+  IO ()
 renderCircleStripStep posX posY tStep tStop r1 t1 r2 t2
   | 1# <- t1 `geFloat#` tStop =
       return ()

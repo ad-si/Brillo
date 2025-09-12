@@ -17,36 +17,36 @@ import GHC.Float (double2Float)
 {-| The graphics library calls back on this function when it's finished drawing
      and it's time to do some computation.
 -}
-callback_simulate_idle
-  :: IORef SM.State
-  -- ^ the simulation state
-  -> IORef AN.State
-  -- ^ the animation statea
-  -> IO ViewPort
-  -- ^ action to get the 'ViewPort'.  We don't use an 'IORef'
+callback_simulate_idle ::
+  -- | the simulation state
+  IORef SM.State ->
+  -- | the animation statea
+  IORef AN.State ->
+  -- | action to get the 'ViewPort'.  We don't use an 'IORef'
   -- directly because sometimes we hold a ref to a 'ViewPort' (in
   -- Game) and sometimes a ref to a 'ViewState'.
-  -> IORef world
-  -- ^ the current world
-  -> (ViewPort -> Float -> world -> IO world)
-  -- ^ fn to advance the world
-  -> Float
-  -- ^ how much time to advance world by
+  IO ViewPort ->
+  -- | the current world
+  IORef world ->
+  -- | fn to advance the world
+  (ViewPort -> Float -> world -> IO world) ->
+  -- | how much time to advance world by
   --      in single step mode
-  -> IdleCallback
+  Float ->
+  IdleCallback
 callback_simulate_idle simSR animateSR viewSA worldSR worldAdvance _singleStepTime backendRef =
   {-# SCC "callbackIdle" #-}
   do simulate_run simSR animateSR viewSA worldSR worldAdvance backendRef
 
 
 -- take the number of steps specified by controlWarp
-simulate_run
-  :: IORef SM.State
-  -> IORef AN.State
-  -> IO ViewPort
-  -> IORef world
-  -> (ViewPort -> Float -> world -> IO world)
-  -> IdleCallback
+simulate_run ::
+  IORef SM.State ->
+  IORef AN.State ->
+  IO ViewPort ->
+  IORef world ->
+  (ViewPort -> Float -> world -> IO world) ->
+  IdleCallback
 simulate_run simSR _ viewSA worldSR worldAdvance backendRef =
   do
     viewS <- viewSA

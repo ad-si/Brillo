@@ -27,20 +27,20 @@ import Brillo.Internals.Interface.Interact
 
   Similar to `displayIO`, except that you manage your own events.
 -}
-interactIO
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> world
-  -- ^ Initial world state.
-  -> (world -> IO Picture)
-  -- ^ A function to produce the current picture.
-  -> (Event -> world -> IO world)
-  -- ^ A function to handle input events.
-  -> (Controller -> IO ())
-  -- ^ Callback to take the display controller.
-  -> IO ()
+interactIO ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Initial world state.
+  world ->
+  -- | A function to produce the current picture.
+  (world -> IO Picture) ->
+  -- | A function to handle input events.
+  (Event -> world -> IO world) ->
+  -- | Callback to take the display controller.
+  (Controller -> IO ()) ->
+  IO ()
 interactIO dis backColor worldInit makePicture handleEvent eatController =
   interactWithBackend
     defaultBackendState

@@ -14,16 +14,16 @@ import Data.Word (Word64)
 
 
 -- | Some uniformly distributed points
-randomishPoints
-  :: Int
-  -- ^ seed
-  -> Int
-  -- ^ number of points
-  -> Float
-  -- ^ minimum coordinate
-  -> Float
-  -- ^ maximum coordinate
-  -> V.Vector (Float, Float)
+randomishPoints ::
+  -- | seed
+  Int ->
+  -- | number of points
+  Int ->
+  -- | minimum coordinate
+  Float ->
+  -- | maximum coordinate
+  Float ->
+  V.Vector (Float, Float)
 randomishPoints seed' n pointMin pointMax =
   let pts = randomishFloats (n * 2) pointMin pointMax seed'
       xs = G.slice 0 n pts
@@ -40,12 +40,12 @@ randomishPoints seed' n pointMin pointMax =
   Stephen K. Park and Keith W. Miller.
   Communications of the ACM, Oct 1988, Volume 31, Number 10.
 -}
-randomishInts
-  :: Int -- Length of vector.
-  -> Int -- Minumum value in output.
-  -> Int -- Maximum value in output.
-  -> Int -- Random seed.
-  -> V.Vector Int -- Vector of random numbers.
+randomishInts ::
+  Int -> -- Length of vector.
+  Int -> -- Minumum value in output.
+  Int -> -- Maximum value in output.
+  Int -> -- Random seed.
+  V.Vector Int -- Vector of random numbers.
 randomishInts !len !valMin' !valMax' !seed' =
   let
     -- a magic number (don't change it)
@@ -87,12 +87,12 @@ randomishInts !len !valMin' !valMax' !seed' =
 {-| Generate some randomish doubles with terrible statistical properties.
   This is good enough for test data, but not much else.
 -}
-randomishDoubles
-  :: Int -- Length of vector
-  -> Double -- Minimum value in output
-  -> Double -- Maximum value in output
-  -> Int -- Random seed.
-  -> V.Vector Double -- Vector of randomish doubles.
+randomishDoubles ::
+  Int -> -- Length of vector
+  Double -> -- Minimum value in output
+  Double -> -- Maximum value in output
+  Int -> -- Random seed.
+  V.Vector Double -- Vector of randomish doubles.
 randomishDoubles !len !valMin !valMax !seed =
   let range = valMax - valMin
 
@@ -105,12 +105,12 @@ randomishDoubles !len !valMin !valMax !seed =
 {-| Generate some randomish doubles with terrible statistical properties.
   This is good enough for test data, but not much else.
 -}
-randomishFloats
-  :: Int -- Length of vector
-  -> Float -- Minimum value in output
-  -> Float -- Maximum value in output
-  -> Int -- Random seed.
-  -> V.Vector Float -- Vector of randomish doubles.
+randomishFloats ::
+  Int -> -- Length of vector
+  Float -> -- Minimum value in output
+  Float -> -- Maximum value in output
+  Int -> -- Random seed.
+  V.Vector Float -- Vector of randomish doubles.
 randomishFloats !len !valMin !valMax !seed =
   let range = valMax - valMin
 

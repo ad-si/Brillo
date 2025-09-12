@@ -30,22 +30,22 @@ import Brillo.Internals.Interface.Simulate
 
   Once the window is open you can use the same commands as with `display`.
 -}
-simulate
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Int
-  -- ^ Number of simulation steps to take for each second of real time.
-  -> model
-  -- ^ The initial model.
-  -> (model -> Picture)
-  -- ^ A function to convert the model to a picture.
-  -> (ViewPort -> Float -> model -> model)
-  -- ^ A function to step the model one iteration. It is passed the
+simulate ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Number of simulation steps to take for each second of real time.
+  Int ->
+  -- | The initial model.
+  model ->
+  -- | A function to convert the model to a picture.
+  (model -> Picture) ->
+  -- | A function to step the model one iteration. It is passed the
   --     current viewport and the amount of time for this simulation
   --     step (in seconds).
-  -> IO ()
+  (ViewPort -> Float -> model -> model) ->
+  IO ()
 simulate
   display
   backColor

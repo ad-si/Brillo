@@ -18,19 +18,19 @@ import Data.IORef
 import System.Mem
 
 
-displayWithBackend
-  :: (Backend a)
-  => a
-  -- ^ Initial state of the backend.
-  -> Display
-  -- ^ Display config.
-  -> Color
-  -- ^ Background color.
-  -> IO Picture
-  -- ^ Make the picture to draw.
-  -> (Controller -> IO ())
-  -- ^ Eat the controller
-  -> IO ()
+displayWithBackend ::
+  (Backend a) =>
+  -- | Initial state of the backend.
+  a ->
+  -- | Display config.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Make the picture to draw.
+  IO Picture ->
+  -- | Eat the controller
+  (Controller -> IO ()) ->
+  IO ()
 displayWithBackend
   backend
   displayMode

@@ -24,21 +24,21 @@ import Brillo.Internals.Interface.Backend
 import Brillo.Internals.Interface.Simulate
 
 
-simulateIO
-  :: forall model
-   . Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Int
-  -- ^ Number of simulation steps to take for each second of real time.
-  -> model
-  -- ^ The initial model.
-  -> (model -> IO Picture)
-  -- ^ A function to convert the model to a picture.
-  -> (ViewPort -> Float -> model -> IO model)
-  -- ^ A function to step the model one iteration. It is passed the
+simulateIO ::
+  forall model.
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Number of simulation steps to take for each second of real time.
+  Int ->
+  -- | The initial model.
+  model ->
+  -- | A function to convert the model to a picture.
+  (model -> IO Picture) ->
+  -- | A function to step the model one iteration. It is passed the
   --     current viewport and the amount of time for this simulation
   --     step (in seconds).
-  -> IO ()
+  (ViewPort -> Float -> model -> IO model) ->
+  IO ()
 simulateIO = simulateWithBackendIO defaultBackendState

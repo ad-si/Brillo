@@ -13,9 +13,9 @@ import Data.IORef
 {-| Callback to handle keyboard and mouse button events
      for controlling the 'ViewState'.
 -}
-callback_viewState_keyMouse
-  :: IORef ViewState
-  -> Callback
+callback_viewState_keyMouse ::
+  IORef ViewState ->
+  Callback
 callback_viewState_keyMouse viewStateRef =
   KeyMouse (viewState_keyMouse viewStateRef)
 

@@ -146,7 +146,8 @@ instance Semigroup Picture where
   the image for each frame then use `False`. If you have loaded it
   from a file then use `True`.
 -}
-bitmapOfForeignPtr :: Int -> Int -> BitmapFormat -> ForeignPtr Word8 -> Bool -> Picture
+bitmapOfForeignPtr ::
+  Int -> Int -> BitmapFormat -> ForeignPtr Word8 -> Bool -> Picture
 bitmapOfForeignPtr width height fmt fptr cacheMe =
   Bitmap $
     bitmapDataOfForeignPtr width height fmt fptr cacheMe
@@ -154,7 +155,8 @@ bitmapOfForeignPtr width height fmt fptr cacheMe =
 
 -- Bitmap width height (bitmapDataOfForeignPtr width height fmt fptr) cacheMe
 
-bitmapDataOfForeignPtr :: Int -> Int -> BitmapFormat -> ForeignPtr Word8 -> Bool -> BitmapData
+bitmapDataOfForeignPtr ::
+  Int -> Int -> BitmapFormat -> ForeignPtr Word8 -> Bool -> BitmapData
 bitmapDataOfForeignPtr width height fmt fptr cacheMe =
   let len = width * height * 4
   in  BitmapData len fmt (width, height) cacheMe fptr
@@ -168,13 +170,15 @@ bitmapDataOfForeignPtr width height fmt fptr cacheMe =
   the image for each frame then use `False`. If you have loaded it
   from a file then use `True`.
 -}
-bitmapOfByteString :: Int -> Int -> BitmapFormat -> ByteString -> Bool -> Picture
+bitmapOfByteString ::
+  Int -> Int -> BitmapFormat -> ByteString -> Bool -> Picture
 bitmapOfByteString width height fmt bs cacheMe =
   Bitmap $
     bitmapDataOfByteString width height fmt bs cacheMe
 
 
-bitmapDataOfByteString :: Int -> Int -> BitmapFormat -> ByteString -> Bool -> BitmapData
+bitmapDataOfByteString ::
+  Int -> Int -> BitmapFormat -> ByteString -> Bool -> BitmapData
 bitmapDataOfByteString width height fmt bs cacheMe =
   unsafePerformIO $
     do
@@ -210,7 +214,8 @@ bitmapDataOfBMP bmp =
       BSU.unsafeUseAsCString bs $
         \cstr -> copyBytes ptr (castPtr cstr) len
 
-      return $ BitmapData len (BitmapFormat BottomToTop PxRGBA) (width, height) True fptr
+      return $
+        BitmapData len (BitmapFormat BottomToTop PxRGBA) (width, height) True fptr
 {-# NOINLINE bitmapDataOfBMP #-}
 
 

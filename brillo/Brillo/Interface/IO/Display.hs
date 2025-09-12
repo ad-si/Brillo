@@ -50,16 +50,16 @@ import Brillo.Internals.Interface.Display
     storing your current picture in an IORef, passing an action that just
     reads this IORef, and forking a new thread that watches your files for updates.
 -}
-displayIO
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> IO Picture
-  -- ^ Action to produce the current picture.
-  -> (Controller -> IO ())
-  -- ^ Callback to take the display controller.
-  -> IO ()
+displayIO ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Action to produce the current picture.
+  IO Picture ->
+  -- | Callback to take the display controller.
+  (Controller -> IO ()) ->
+  IO ()
 displayIO dis backColor makePicture eatController =
   displayWithBackend
     defaultBackendState

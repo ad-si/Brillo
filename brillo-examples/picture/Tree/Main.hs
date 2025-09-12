@@ -41,11 +41,11 @@ stump colr =
 
 
 -- Make a tree fractal.
-tree
-  :: Int -- Fractal degree
-  -> Float -- time
-  -> Color -- Color for the stump
-  -> Picture
+tree ::
+  Int -> -- Fractal degree
+  Float -> -- time
+  Color -> -- Color for the stump
+  Picture
 tree 0 _time colr = stump colr
 tree n time colr =
   let smallTree =

@@ -21,17 +21,17 @@ import Brillo.Internals.Interface.Backend
 
   Once the window is open you can use the same commands as with @display@.
 -}
-animateIO
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> (Float -> IO Picture)
-  -- ^ Function to produce the next frame of animation.
+animateIO ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Function to produce the next frame of animation.
   --      It is passed the time in seconds since the program started.
-  -> (Controller -> IO ())
-  -- ^ Callback to take the display controller.
-  -> IO ()
+  (Float -> IO Picture) ->
+  -- | Callback to take the display controller.
+  (Controller -> IO ()) ->
+  IO ()
 animateIO
   display
   backColor
@@ -47,17 +47,17 @@ animateIO
 
 
 -- | Like `animateIO` but don't allow the display to be panned around.
-animateFixedIO
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> (Float -> IO Picture)
-  -- ^ Function to produce the next frame of animation.
+animateFixedIO ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Function to produce the next frame of animation.
   --      It is passed the time in seconds since the program started.
-  -> (Controller -> IO ())
-  -- ^ Callback to take the display controller.
-  -> IO ()
+  (Float -> IO Picture) ->
+  -- | Callback to take the display controller.
+  (Controller -> IO ()) ->
+  IO ()
 animateFixedIO
   display
   backColor

@@ -15,18 +15,18 @@ import Graphics.Rendering.OpenGL.GL qualified as GL
 
 
 -- | Open a window and use the supplied callbacks to handle window events.
-createWindow
-  :: (Backend a)
-  => a
-  -> Display
-  -> Color
-  -- ^ Color to use when clearing.
-  -> [Callback]
-  -- ^ Callbacks to use.
-  -> (IORef a -> IO ())
-  -- ^ Give the backend back to the caller before
+createWindow ::
+  (Backend a) =>
+  a ->
+  Display ->
+  -- | Color to use when clearing.
+  Color ->
+  -- | Callbacks to use.
+  [Callback] ->
+  -- | Give the backend back to the caller before
   --   entering the main loop.
-  -> IO ()
+  (IORef a -> IO ()) ->
+  IO ()
 createWindow
   backend
   display

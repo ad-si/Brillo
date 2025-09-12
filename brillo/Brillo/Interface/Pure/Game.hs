@@ -28,23 +28,23 @@ import Brillo.Internals.Interface.Game
 
 
 -- | Play a game in a window. Like `simulate`, but you manage your own input events.
-play
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Int
-  -- ^ Number of simulation steps to take for each second of real time.
-  -> world
-  -- ^ The initial world.
-  -> (world -> Picture)
-  -- ^ A function to convert the world a picture.
-  -> (Event -> world -> world)
-  -- ^ A function to handle input events.
-  -> (Float -> world -> world)
-  -- ^ A function to step the world one iteration.
+play ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Number of simulation steps to take for each second of real time.
+  Int ->
+  -- | The initial world.
+  world ->
+  -- | A function to convert the world a picture.
+  (world -> Picture) ->
+  -- | A function to handle input events.
+  (Event -> world -> world) ->
+  -- | A function to step the world one iteration.
   --   It is passed the period of time (in seconds) needing to be advanced.
-  -> IO ()
+  (Float -> world -> world) ->
+  IO ()
 play
   display
   backColor

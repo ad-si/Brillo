@@ -127,10 +127,10 @@ exitGLFW ref = do
 -- Open Window ----------------------------------------------------------------
 
 -- | Open a new window.
-openWindowGLFW
-  :: IORef GLFWState
-  -> Display
-  -> IO ()
+openWindowGLFW ::
+  IORef GLFWState ->
+  Display ->
+  IO ()
 openWindowGLFW ref (InWindow title (sizeX, sizeY) pos) =
   do
     win <-
@@ -275,8 +275,8 @@ dumpStateGLFW ref =
 -- Display Callback -----------------------------------------------------------
 
 -- | Callback for when GLFW needs us to redraw the contents of the window.
-installDisplayCallbackGLFW
-  :: IORef GLFWState -> [Callback] -> IO ()
+installDisplayCallbackGLFW ::
+  IORef GLFWState -> [Callback] -> IO ()
 installDisplayCallbackGLFW stateRef callbacks =
   modifyIORef' stateRef $ \s ->
     s
@@ -284,10 +284,10 @@ installDisplayCallbackGLFW stateRef callbacks =
       }
 
 
-callbackDisplay
-  :: IORef GLFWState
-  -> [Callback]
-  -> IO ()
+callbackDisplay ::
+  IORef GLFWState ->
+  [Callback] ->
+  IO ()
 callbackDisplay stateRef callbacks = do
   -- clear the display
   GL.clear [GL.ColorBuffer, GL.DepthBuffer]
@@ -310,8 +310,8 @@ callbackDisplay stateRef callbacks = do
 {-| Callback for when the user closes the window.
   We can do some cleanup here.
 -}
-installWindowCloseCallbackGLFW
-  :: IORef GLFWState -> IO ()
+installWindowCloseCallbackGLFW ::
+  IORef GLFWState -> IO ()
 installWindowCloseCallbackGLFW ref =
   do
     win <- windowHandle ref
@@ -325,18 +325,18 @@ installWindowCloseCallbackGLFW ref =
 -- Reshape --------------------------------------------------------------------
 
 -- | Callback for when the user reshapes the window.
-installReshapeCallbackGLFW
-  :: IORef GLFWState -> [Callback] -> IO ()
+installReshapeCallbackGLFW ::
+  IORef GLFWState -> [Callback] -> IO ()
 installReshapeCallbackGLFW stateRef callbacks =
   do
     win <- windowHandle stateRef
     GLFW.setWindowSizeCallback win (Just $ callbackReshape stateRef callbacks)
 
 
-callbackReshape
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.WindowSizeCallback -- = Window -> Int -> Int -> IO ()
+callbackReshape ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.WindowSizeCallback -- = Window -> Int -> Int -> IO ()
 callbackReshape glfwState callbacks _win sizeX sizeY =
   mapM_
     (\f -> f (sizeX, sizeY))
@@ -352,10 +352,10 @@ callbackReshape glfwState callbacks _win sizeX sizeY =
   slot for character keys, arrow keys, mouse buttons and mouse wheel movement,
   while GLFW provides a single slot for each.
 -}
-installKeyMouseCallbackGLFW
-  :: IORef GLFWState
-  -> [Callback]
-  -> IO ()
+installKeyMouseCallbackGLFW ::
+  IORef GLFWState ->
+  [Callback] ->
+  IO ()
 installKeyMouseCallbackGLFW stateRef callbacks =
   do
     win <- windowHandle stateRef
@@ -367,10 +367,10 @@ installKeyMouseCallbackGLFW stateRef callbacks =
 
 
 -- GLFW calls this on a non-character keyboard action.
-callbackKeyboard
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.KeyCallback -- = Window -> Key -> Int -> KeyState -> ModifierKeys -> IO ()
+callbackKeyboard ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.KeyCallback -- = Window -> Key -> Int -> KeyState -> ModifierKeys -> IO ()
   -- -> GLFW.Key -> Bool
   -- -> IO ()
 callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
@@ -390,11 +390,11 @@ callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
         ([f stateRef | KeyMouse f <- callbacks])
 
 
-setModifiers
-  :: IORef GLFWState
-  -> GLFW.Key
-  -> Bool
-  -> IO (Bool, GLFWState)
+setModifiers ::
+  IORef GLFWState ->
+  GLFW.Key ->
+  Bool ->
+  IO (Bool, GLFWState)
 setModifiers stateRef key pressed =
   do
     glfwState <- readIORef stateRef
@@ -414,10 +414,10 @@ setModifiers stateRef key pressed =
 
 
 -- GLFW calls this on a when the user presses or releases a character key.
-callbackChar
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.CharCallback
+callbackChar ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.CharCallback
 -- Window -> Char -> IO ()
 -- -> Char -> Bool -> IO ()
 
@@ -445,10 +445,10 @@ callbackChar stateRef callbacks _win char -- keystate
 
 
 -- GLFW calls on this when the user clicks or releases a mouse button.
-callbackMouseButton
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.MouseButtonCallback -- = Window -> MouseButton -> MouseButtonState -> ModifierKeys -> IO ()
+callbackMouseButton ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.MouseButtonCallback -- = Window -> MouseButton -> MouseButtonState -> ModifierKeys -> IO ()
 callbackMouseButton stateRef callbacks _win key keystate _modifier =
   do
     (GLFWState mods pos _ _ _ _ _) <- readIORef stateRef
@@ -462,10 +462,10 @@ callbackMouseButton stateRef callbacks _win key keystate _modifier =
 
 
 -- GLFW calls on this when the user moves the mouse wheel.
-callbackMouseWheel
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.ScrollCallback
+callbackMouseWheel ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.ScrollCallback
 -- -> Int
 -- -> IO ()
 -- ScrollCallback = Window -> Double -> Double -> IO ()
@@ -480,10 +480,10 @@ callbackMouseWheel stateRef callbacks _win x _y =
       ([f stateRef | KeyMouse f <- callbacks])
 
 
-setMouseWheel
-  :: IORef GLFWState
-  -> Int
-  -> IO (Key, KeyState)
+setMouseWheel ::
+  IORef GLFWState ->
+  Int ->
+  IO (Key, KeyState)
 setMouseWheel stateRef w =
   do
     glfwState <- readIORef stateRef
@@ -495,10 +495,10 @@ setMouseWheel stateRef w =
 
 
 -- | GLFW calls this when the user drops files/directories onto the window
-callbackDrop
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.DropCallback
+callbackDrop ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.DropCallback
 callbackDrop stateRef callbacks _win paths = do
   mapM_
     (\f -> f paths)
@@ -508,10 +508,10 @@ callbackDrop stateRef callbacks _win paths = do
 -- Motion Callback ------------------------------------------------------------
 
 -- | Callback for when the user moves the mouse.
-installMotionCallbackGLFW
-  :: IORef GLFWState
-  -> [Callback]
-  -> IO ()
+installMotionCallbackGLFW ::
+  IORef GLFWState ->
+  [Callback] ->
+  IO ()
 installMotionCallbackGLFW stateRef callbacks =
   do
     win <- windowHandle stateRef
@@ -521,10 +521,10 @@ installMotionCallbackGLFW stateRef callbacks =
 -- Drop Paths Callback ---------------------------------------------------------
 
 -- | Callback for when the user drops files/directories onto the window.
-installDropCallbackGLFW
-  :: IORef GLFWState
-  -> [Callback]
-  -> IO ()
+installDropCallbackGLFW ::
+  IORef GLFWState ->
+  [Callback] ->
+  IO ()
 installDropCallbackGLFW stateRef callbacks = do
   win <- windowHandle stateRef
   GLFW.setDropCallback win (Just $ callbackDrop stateRef callbacks)
@@ -532,10 +532,10 @@ installDropCallbackGLFW stateRef callbacks = do
 
 -- CursorPosCallback = Window -> Double -> Double -> IO ()
 
-callbackMotion
-  :: IORef GLFWState
-  -> [Callback]
-  -> GLFW.CursorPosCallback
+callbackMotion ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.CursorPosCallback
 callbackMotion stateRef callbacks _win x y =
   do
     pos <- setMousePos stateRef (floor x) (floor y)
@@ -546,11 +546,11 @@ callbackMotion stateRef callbacks _win x y =
       ([f stateRef | Motion f <- callbacks])
 
 
-setMousePos
-  :: IORef GLFWState
-  -> Int
-  -> Int
-  -> IO (Int, Int)
+setMousePos ::
+  IORef GLFWState ->
+  Int ->
+  Int ->
+  IO (Int, Int)
 setMousePos stateRef x y =
   do
     let pos = (x, y)
@@ -568,10 +568,10 @@ setMousePos stateRef x y =
 {-| Callback for when GLFW has finished its jobs and it's time for us to do
   something for our application.
 -}
-installIdleCallbackGLFW
-  :: IORef GLFWState
-  -> [Callback]
-  -> IO ()
+installIdleCallbackGLFW ::
+  IORef GLFWState ->
+  [Callback] ->
+  IO ()
 installIdleCallbackGLFW stateRef callbacks =
   modifyIORef' stateRef $ \s ->
     s
@@ -579,10 +579,10 @@ installIdleCallbackGLFW stateRef callbacks =
       }
 
 
-callbackIdle
-  :: IORef GLFWState
-  -> [Callback]
-  -> IO ()
+callbackIdle ::
+  IORef GLFWState ->
+  [Callback] ->
+  IO ()
 callbackIdle stateRef callbacks =
   sequence_ $
     [f stateRef | Idle f <- callbacks]
@@ -641,9 +641,9 @@ runMainLoopGLFW stateRef = do
 
 
 -- Redisplay ------------------------------------------------------------------
-postRedisplayGLFW
-  :: IORef GLFWState
-  -> IO ()
+postRedisplayGLFW ::
+  IORef GLFWState ->
+  IO ()
 postRedisplayGLFW stateRef =
   modifyIORef' stateRef $ \s ->
     s

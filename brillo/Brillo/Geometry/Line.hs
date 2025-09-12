@@ -33,16 +33,16 @@ import Brillo.Data.Vector
 
 
 -- | Check if line segment (P1-P2) clears a box (P3-P4) by being well outside it.
-segClearsBox
-  :: Point
-  -- ^ P1 First point of segment.
-  -> Point
-  -- ^ P2 Second point of segment.
-  -> Point
-  -- ^ P3 Lower left point of box.
-  -> Point
-  -- ^ P4 Upper right point of box.
-  -> Bool
+segClearsBox ::
+  -- | P1 First point of segment.
+  Point ->
+  -- | P2 Second point of segment.
+  Point ->
+  -- | P3 Lower left point of box.
+  Point ->
+  -- | P4 Upper right point of box.
+  Point ->
+  Bool
 segClearsBox (x1, y1) (x2, y2) (xa, ya) (xb, yb)
   | x1 < xa, x2 < xa = True
   | x1 > xb, x2 > xb = True
@@ -54,15 +54,15 @@ segClearsBox (x1, y1) (x2, y2) (xa, ya) (xb, yb)
 {-| Given an infinite line which intersects `P1` and `P1`,
      return the point on that line that is closest to `P3`
 -}
-closestPointOnLine
-  :: Point
-  -- ^ `P1`
-  -> Point
-  -- ^ `P2`
-  -> Point
-  -- ^ `P3`
-  -> Point
-  -- ^ the point on the line P1-P2 that is closest to `P3`
+closestPointOnLine ::
+  -- | `P1`
+  Point ->
+  -- | `P2`
+  Point ->
+  -- | `P3`
+  Point ->
+  -- | the point on the line P1-P2 that is closest to `P3`
+  Point
 {-# INLINE closestPointOnLine #-}
 closestPointOnLine p1 p2 p3 =
   p1 Pt.+ (u `mulSV` (p2 Pt.- p1))
@@ -92,14 +92,14 @@ closestPointOnLine p1 p2 p3 =
 @
 -}
 {-# INLINE closestPointOnLineParam #-}
-closestPointOnLineParam
-  :: Point
-  -- ^ `P1`
-  -> Point
-  -- ^ `P2`
-  -> Point
-  -- ^ `P3`
-  -> Float
+closestPointOnLineParam ::
+  -- | `P1`
+  Point ->
+  -- | `P2`
+  Point ->
+  -- | `P3`
+  Point ->
+  Float
 closestPointOnLineParam p1 p2 p3 =
   (p3 Pt.- p1) `dotV` (p2 Pt.- p1)
     / (p2 Pt.- p1) `dotV` (p2 Pt.- p1)
@@ -121,16 +121,16 @@ closestPointOnLineParam p1 p2 p3 =
     /     \\
 @
 -}
-intersectLineLine
-  :: Point
-  -- ^ `P1`
-  -> Point
-  -- ^ `P2`
-  -> Point
-  -- ^ `P3`
-  -> Point
-  -- ^ `P4`
-  -> Maybe Point
+intersectLineLine ::
+  -- | `P1`
+  Point ->
+  -- | `P2`
+  Point ->
+  -- | `P3`
+  Point ->
+  -- | `P4`
+  Point ->
+  Maybe Point
 intersectLineLine (x1, y1) (x2, y2) (x3, y3) (x4, y4) =
   let dx12 = x1 - x2
       dx34 = x3 - x4
@@ -157,16 +157,16 @@ intersectLineLine (x1, y1) (x2, y2) (x3, y3) (x4, y4) =
 {-| Get the point where a segment @P1-P2@ crosses an infinite line @P3-P4@,
   if any.
 -}
-intersectSegLine
-  :: Point
-  -- ^ `P1`
-  -> Point
-  -- ^ `P2`
-  -> Point
-  -- ^ `P3`
-  -> Point
-  -- ^ `P4`
-  -> Maybe Point
+intersectSegLine ::
+  -- | `P1`
+  Point ->
+  -- | `P2`
+  Point ->
+  -- | `P3`
+  Point ->
+  -- | `P4`
+  Point ->
+  Maybe Point
 intersectSegLine p1 p2 p3 p4
   -- TODO: merge closest point check with intersection, reuse subterms.
   | Just p0 <- intersectLineLine p1 p2 p3 p4
@@ -187,14 +187,14 @@ intersectSegLine p1 p2 p3 p4
         P2 +
 @
 -}
-intersectSegHorzLine
-  :: Point
-  -- ^ P1 First point of segment.
-  -> Point
-  -- ^ P2 Second point of segment.
-  -> Float
-  -- ^ y value of line.
-  -> Maybe Point
+intersectSegHorzLine ::
+  -- | P1 First point of segment.
+  Point ->
+  -- | P2 Second point of segment.
+  Point ->
+  -- | y value of line.
+  Float ->
+  Maybe Point
 intersectSegHorzLine (x1, y1) (x2, y2) y0
   -- seg is on line
   | y1 == y0, y2 == y0 = Nothing
@@ -226,14 +226,14 @@ intersectSegHorzLine (x1, y1) (x2, y2) y0
              | x0
 @
 -}
-intersectSegVertLine
-  :: Point
-  -- ^ P1 First point of segment.
-  -> Point
-  -- ^ P2 Second point of segment.
-  -> Float
-  -- ^ x value of line.
-  -> Maybe Point
+intersectSegVertLine ::
+  -- | P1 First point of segment.
+  Point ->
+  -- | P2 Second point of segment.
+  Point ->
+  -- | x value of line.
+  Float ->
+  Maybe Point
 intersectSegVertLine (x1, y1) (x2, y2) x0
   -- seg is on line
   | x1 == x0, x2 == x0 = Nothing
@@ -258,16 +258,16 @@ intersectSegVertLine (x1, y1) (x2, y2) x0
 {-| Get the point where a segment @P1-P2@ crosses another segement @P3-P4@,
   if any.
 -}
-intersectSegSeg
-  :: Point
-  -- ^ `P1`
-  -> Point
-  -- ^ `P2`
-  -> Point
-  -- ^ `P3`
-  -> Point
-  -- ^ `P4`
-  -> Maybe Point
+intersectSegSeg ::
+  -- | `P1`
+  Point ->
+  -- | `P2`
+  Point ->
+  -- | `P3`
+  Point ->
+  -- | `P4`
+  Point ->
+  Maybe Point
 intersectSegSeg p1 p2 p3 p4
   -- TODO: merge closest point checks with intersection, reuse subterms.
   | Just p0 <- intersectLineLine p1 p2 p3 p4
@@ -290,19 +290,19 @@ intersectSegSeg p1 p2 p3 p4
          P1 +
 @
 -}
-intersectSegHorzSeg
-  :: Point
-  -- ^ P1 First point of segment.
-  -> Point
-  -- ^ P2 Second point of segment.
-  -> Float
-  -- ^ (y3) y value of horizontal segment.
-  -> Float
-  -- ^ (xa) Leftmost x value of horizontal segment.
-  -> Float
-  -- ^ (xb) Rightmost x value of horizontal segment.
-  -> Maybe Point
-  -- ^ (x3, y3) Intersection point, if any.
+intersectSegHorzSeg ::
+  -- | P1 First point of segment.
+  Point ->
+  -- | P2 Second point of segment.
+  Point ->
+  -- | (y3) y value of horizontal segment.
+  Float ->
+  -- | (xa) Leftmost x value of horizontal segment.
+  Float ->
+  -- | (xb) Rightmost x value of horizontal segment.
+  Float ->
+  -- | (x3, y3) Intersection point, if any.
+  Maybe Point
 intersectSegHorzSeg p1@(x1, y1) p2@(x2, y2) y0 xa xb
   | segClearsBox p1 p2 (xa, y0) (xb, y0) =
       Nothing
@@ -327,19 +327,19 @@ intersectSegHorzSeg p1@(x1, y1) p2@(x2, y2) y0 xa xb
               + (x3, ya)
 @
 -}
-intersectSegVertSeg
-  :: Point
-  -- ^ P1 First point of segment.
-  -> Point
-  -- ^ P2 Second point of segment.
-  -> Float
-  -- ^ (x3) x value of vertical segment
-  -> Float
-  -- ^ (ya) Lowest y value of vertical segment.
-  -> Float
-  -- ^ (yb) Highest y value of vertical segment.
-  -> Maybe Point
-  -- ^ (x3, y3) Intersection point, if any.
+intersectSegVertSeg ::
+  -- | P1 First point of segment.
+  Point ->
+  -- | P2 Second point of segment.
+  Point ->
+  -- | (x3) x value of vertical segment
+  Float ->
+  -- | (ya) Lowest y value of vertical segment.
+  Float ->
+  -- | (yb) Highest y value of vertical segment.
+  Float ->
+  -- | (x3, y3) Intersection point, if any.
+  Maybe Point
 intersectSegVertSeg p1@(x1, y1) p2@(x2, y2) x0 ya yb
   | segClearsBox p1 p2 (x0, ya) (x0, yb) =
       Nothing

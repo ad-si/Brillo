@@ -32,13 +32,13 @@ import World (World (..), insertActor)
 
 
 -- Find all pairs of actors in the world that are in contact with each other.
-findContacts
-  :: World
-  -> ( -- a set of all pairs of actors that are in contact.
-       Set (Index, Index)
-     , -- also return the quadtree so we can draw it in the window.
-       QuadTree Actor
-     )
+findContacts ::
+  World ->
+  ( -- a set of all pairs of actors that are in contact.
+    Set (Index, Index)
+  , -- also return the quadtree so we can draw it in the window.
+    QuadTree Actor
+  )
 findContacts (World actors _) =
   let
     -- the initial tree has no actors in it and has a

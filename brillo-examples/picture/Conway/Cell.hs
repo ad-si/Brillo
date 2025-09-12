@@ -54,12 +54,12 @@ ageColor oldAge age =
 {-| Standard Hot -> Cold hypsometric color ramp.
      Sequence is red, yellow, green, cyan, blue.
 -}
-rampColorHotToCold
-  :: (Ord a, Floating a)
-  => a
-  -> a
-  -> a
-  -> (a, a, a)
+rampColorHotToCold ::
+  (Ord a, Floating a) =>
+  a ->
+  a ->
+  a ->
+  (a, a, a)
 rampColorHotToCold vmin vmax vNotNorm =
   let
     v

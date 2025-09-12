@@ -183,12 +183,12 @@ sectorWire a1 a2 r_ =
 --       arguments to reduce the amount of noise in the extracted docs.
 
 -- | A path representing a rectangle centered about the origin
-rectanglePath
-  :: Float
-  -- ^ width of rectangle
-  -> Float
-  -- ^ height of rectangle
-  -> Path
+rectanglePath ::
+  -- | width of rectangle
+  Float ->
+  -- | height of rectangle
+  Float ->
+  Path
 rectanglePath sizeX sizeY =
   let sx = sizeX / 2
       sy = sizeY / 2

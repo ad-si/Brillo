@@ -29,9 +29,9 @@ main =
 
 
 -- | Convert a world to a picture.
-drawWorld
-  :: World
-  -> Picture
+drawWorld ::
+  World ->
+  Picture
 drawWorld world =
   let (windowWidth, windowHeight) =
         windowSizeOfWorld world

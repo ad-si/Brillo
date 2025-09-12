@@ -307,9 +307,9 @@ findNeighbors w b =
   in  b : map snd (filter (\(d, _) -> d <= epsilon) dists)
 
 
-splitBoxHoriz
-  :: (Vec2, Vec2, Double, Double)
-  -> [(Vec2, Vec2, Double, Double)]
+splitBoxHoriz ::
+  (Vec2, Vec2, Double, Double) ->
+  [(Vec2, Vec2, Double, Double)]
 splitBoxHoriz (lo@(Vec2 lx ly), hi@(Vec2 hx hy), ax, ay)
   | hx - lx > w =
       [(Vec2 minx ly, Vec2 maxx hy, ax, ay)]
@@ -327,9 +327,9 @@ splitBoxHoriz (lo@(Vec2 lx ly), hi@(Vec2 hx hy), ax, ay)
     w = maxx - minx
 
 
-splitBoxVert
-  :: (Vec2, Vec2, Double, Double)
-  -> [(Vec2, Vec2, Double, Double)]
+splitBoxVert ::
+  (Vec2, Vec2, Double, Double) ->
+  [(Vec2, Vec2, Double, Double)]
 splitBoxVert (lo@(Vec2 lx ly), hi@(Vec2 hx hy), ax, ay)
   | hy - ly > h =
       [(Vec2 lx miny, Vec2 hx maxy, ax, ay)]

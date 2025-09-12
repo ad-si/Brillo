@@ -1,5 +1,6 @@
 {-# LANGUAGE RankNTypes #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Use camelCase" #-}
 {-# HLINT ignore "Use list comprehension" #-}
 
@@ -27,29 +28,29 @@ import Data.IORef
 import System.Mem
 
 
-playWithBackendIO
-  :: forall world a
-   . (Backend a)
-  => a
-  -- ^ Initial state of the backend
-  -> Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> Int
-  -- ^ Number of simulation steps to take for each second of real time.
-  -> world
-  -- ^ The initial world.
-  -> (world -> IO Picture)
-  -- ^ A function to convert the world to a picture.
-  -> (Event -> world -> IO world)
-  -- ^ A function to handle input events.
-  -> (Float -> world -> IO world)
-  -- ^ A function to step the world one iteration.
+playWithBackendIO ::
+  forall world a.
+  (Backend a) =>
+  -- | Initial state of the backend
+  a ->
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Number of simulation steps to take for each second of real time.
+  Int ->
+  -- | The initial world.
+  world ->
+  -- | A function to convert the world to a picture.
+  (world -> IO Picture) ->
+  -- | A function to handle input events.
+  (Event -> world -> IO world) ->
+  -- | A function to step the world one iteration.
   --   It is passed the period of time (in seconds) needing to be advanced.
-  -> Bool
-  -- ^ Whether to use the callback_exit or not.
-  -> IO ()
+  (Float -> world -> IO world) ->
+  -- | Whether to use the callback_exit or not.
+  Bool ->
+  IO ()
 playWithBackendIO
   backend
   display
@@ -129,22 +130,22 @@ playWithBackendIO
 
 
 -- | Callback for KeyMouse events.
-callback_keyMouse
-  :: IORef world
-  -- ^ ref to world state
-  -> IORef ViewPort
-  -> (Event -> world -> IO world)
-  -- ^ fn to handle input events
-  -> Callback
+callback_keyMouse ::
+  -- | ref to world state
+  IORef world ->
+  IORef ViewPort ->
+  -- | fn to handle input events
+  (Event -> world -> IO world) ->
+  Callback
 callback_keyMouse worldRef viewRef eventFn =
   KeyMouse (handle_keyMouse worldRef viewRef eventFn)
 
 
-handle_keyMouse
-  :: IORef a
-  -> t
-  -> (Event -> a -> IO a)
-  -> KeyboardMouseCallback
+handle_keyMouse ::
+  IORef a ->
+  t ->
+  (Event -> a -> IO a) ->
+  KeyboardMouseCallback
 handle_keyMouse worldRef _ eventFn backendRef key keyState keyMods pos =
   do
     ev <- keyMouseEvent backendRef key keyState keyMods pos
@@ -154,20 +155,20 @@ handle_keyMouse worldRef _ eventFn backendRef key keyState keyMods pos =
 
 
 -- | Callback for Motion events.
-callback_motion
-  :: IORef world
-  -- ^ ref to world state
-  -> (Event -> world -> IO world)
-  -- ^ fn to handle input events
-  -> Callback
+callback_motion ::
+  -- | ref to world state
+  IORef world ->
+  -- | fn to handle input events
+  (Event -> world -> IO world) ->
+  Callback
 callback_motion worldRef eventFn =
   Motion (handle_motion worldRef eventFn)
 
 
-handle_motion
-  :: IORef a
-  -> (Event -> a -> IO a)
-  -> MotionCallback
+handle_motion ::
+  IORef a ->
+  (Event -> a -> IO a) ->
+  MotionCallback
 handle_motion worldRef eventFn backendRef pos =
   do
     ev <- motionEvent backendRef pos
@@ -176,18 +177,18 @@ handle_motion worldRef eventFn backendRef pos =
     writeIORef worldRef world'
 
 
-callback_drop
-  :: IORef world
-  -> (Event -> world -> IO world)
-  -> Callback
+callback_drop ::
+  IORef world ->
+  (Event -> world -> IO world) ->
+  Callback
 callback_drop worldRef eventFn =
   Drop (handle_drop worldRef eventFn)
 
 
-handle_drop
-  :: IORef a
-  -> (Event -> a -> IO a)
-  -> DropCallback
+handle_drop ::
+  IORef a ->
+  (Event -> a -> IO a) ->
+  DropCallback
 handle_drop worldRef eventFn backendRef paths = do
   ev <- dropEvent backendRef paths
   world <- readIORef worldRef
@@ -196,18 +197,18 @@ handle_drop worldRef eventFn backendRef paths = do
 
 
 -- | Callback for Handle reshape event.
-callback_reshape
-  :: IORef world
-  -> (Event -> world -> IO world)
-  -> Callback
+callback_reshape ::
+  IORef world ->
+  (Event -> world -> IO world) ->
+  Callback
 callback_reshape worldRef eventFN =
   Reshape (handle_reshape worldRef eventFN)
 
 
-handle_reshape
-  :: IORef world
-  -> (Event -> world -> IO world)
-  -> ReshapeCallback
+handle_reshape ::
+  IORef world ->
+  (Event -> world -> IO world) ->
+  ReshapeCallback
 handle_reshape worldRef eventFn stateRef (width, height) =
   do
     world <- readIORef worldRef

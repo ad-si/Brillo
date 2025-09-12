@@ -109,8 +109,8 @@ drawVisGrid cellSize pView world = do
 
   Pictures $
     [ if visible (x, y)
-        then Color (dim green) $ Translate x y $ rectangleSolid cellSize cellSize
-        else Color (greyN 0.2) $ Translate x y $ rectangleSolid cellSize cellSize
+      then Color (dim green) $ Translate x y $ rectangleSolid cellSize cellSize
+      else Color (greyN 0.2) $ Translate x y $ rectangleSolid cellSize cellSize
     | x <- [-400, -400 + cellSize .. 400]
     , y <- [-400, -400 + cellSize .. 400]
     ]

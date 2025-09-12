@@ -144,19 +144,19 @@ loadJuicyPNG = loadWith readPng
 {-# INLINE loadJuicyPNG #-}
 
 
-loadWith
-  :: (FilePath -> IO (Either String DynamicImage))
-  -> FilePath
-  -> IO (Maybe Picture)
+loadWith ::
+  (FilePath -> IO (Either String DynamicImage)) ->
+  FilePath ->
+  IO (Maybe Picture)
 loadWith reader fp = do
   eImg <- reader fp
   return $ either (const Nothing) fromDynamicImage eImg
 
 
-loadWithMetadata
-  :: (FilePath -> IO (Either String (DynamicImage, Metadatas)))
-  -> FilePath
-  -> IO (Maybe (Picture, Metadatas))
+loadWithMetadata ::
+  (FilePath -> IO (Either String (DynamicImage, Metadatas))) ->
+  FilePath ->
+  IO (Maybe (Picture, Metadatas))
 loadWithMetadata reader fp = do
   eImg <- reader fp
   return $

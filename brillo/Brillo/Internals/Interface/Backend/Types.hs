@@ -113,7 +113,14 @@ type DisplayCallback =
 
 -- | Arguments: KeyType, Key Up \/ Down, Ctrl \/ Alt \/ Shift pressed, latest mouse location.
 type KeyboardMouseCallback =
-  forall a. (Backend a) => IORef a -> Key -> KeyState -> Modifiers -> (Int, Int) -> IO ()
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  Key ->
+  KeyState ->
+  Modifiers ->
+  (Int, Int) ->
+  IO ()
 
 
 -- | No arguments.

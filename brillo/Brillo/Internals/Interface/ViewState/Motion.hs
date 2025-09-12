@@ -14,9 +14,9 @@ import Data.IORef
 {-| Callback to handle keyboard and mouse button events
      for controlling the viewport.
 -}
-callback_viewState_motion
-  :: IORef ViewState
-  -> Callback
+callback_viewState_motion ::
+  IORef ViewState ->
+  Callback
 callback_viewState_motion portRef =
   Motion (viewState_motion portRef)
 

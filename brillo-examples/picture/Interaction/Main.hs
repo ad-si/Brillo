@@ -3,6 +3,7 @@ module Main where
 import Brillo
 import Brillo.Interface.IO.Interact
 
+
 handleEvent :: Event -> Int -> IO Int
 handleEvent e eventIdx =
   case e of
@@ -11,6 +12,7 @@ handleEvent e eventIdx =
       print e
       return $ eventIdx + 1
     _ -> return eventIdx
+
 
 -- | Count the events as they are received.
 main :: IO ()

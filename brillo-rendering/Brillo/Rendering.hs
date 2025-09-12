@@ -56,19 +56,19 @@ import Brillo.Internals.Rendering.State qualified as RS
   and set that to the active context. If you don't want to do your own window
   management then use the @brillo@ package instead.
 -}
-displayPicture
-  :: (Int, Int)
-  -- ^ Window width and height.
-  -> Color
-  -- ^ Color to clear the window with.
-  -> RS.State
-  -- ^ Current rendering state.
-  -> Float
-  -- ^ View port scale, which controls the level of detail.
+displayPicture ::
+  -- | Window width and height.
+  (Int, Int) ->
+  -- | Color to clear the window with.
+  Color ->
+  -- | Current rendering state.
+  RS.State ->
+  -- | View port scale, which controls the level of detail.
   --   Use 1.0 to start with.
-  -> Picture
-  -- ^ Picture to draw.
-  -> IO ()
+  Float ->
+  -- | Picture to draw.
+  Picture ->
+  IO ()
 displayPicture windowSize colorClear state scale picture =
   withModelview windowSize $
     withClearBuffer colorClear $

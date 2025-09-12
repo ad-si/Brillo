@@ -18,15 +18,15 @@ import Brillo.Internals.Interface.Backend
 
   Once the window is open you can use the same commands as with `display`.
 -}
-animate
-  :: Display
-  -- ^ Display mode.
-  -> Color
-  -- ^ Background color.
-  -> (Float -> Picture)
-  -- ^ Function to produce the next frame of animation.
+animate ::
+  -- | Display mode.
+  Display ->
+  -- | Background color.
+  Color ->
+  -- | Function to produce the next frame of animation.
   --      It is passed the time in seconds since the program started.
-  -> IO ()
+  (Float -> Picture) ->
+  IO ()
 animate display backColor frameFun =
   animateWithBackendIO
     defaultBackendState

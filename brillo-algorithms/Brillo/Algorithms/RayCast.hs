@@ -27,18 +27,18 @@ import Data.List
 --         to get the one closest to P1. It'd be better to do a
 --         proper walk over the tree in the direction of the ray.
 --
-castSegIntoCellularQuadTree
-  :: forall a
-   . Point
-  -- ^ (P1) Starting point of seg.
-  -> Point
-  -- ^ (P2) Final point of seg.
-  -> Extent
-  -- ^ Extent convering the whole tree.
-  -> QuadTree a
-  -- ^ The tree.
-  -> Maybe (Point, Extent, a)
-  -- ^ Intersection point, extent of cell, value of cell (if any).
+castSegIntoCellularQuadTree ::
+  forall a.
+  -- | (P1) Starting point of seg.
+  Point ->
+  -- | (P2) Final point of seg.
+  Point ->
+  -- | Extent convering the whole tree.
+  Extent ->
+  -- | The tree.
+  QuadTree a ->
+  -- | Intersection point, extent of cell, value of cell (if any).
+  Maybe (Point, Extent, a)
 castSegIntoCellularQuadTree p1 p2 extent tree
   | cells@(_ : _) <- traceSegIntoCellularQuadTree p1 p2 extent tree
   , c : _ <- sortBy ((compareDistanceTo p1) `on` (\(a, _, _) -> a)) cells =
@@ -65,18 +65,18 @@ distance (x1, y1) (x2, y2) =
   Given a line segment (P1-P2) through the tree, return the list of cells
   that intersect the segment.
 -}
-traceSegIntoCellularQuadTree
-  :: forall a
-   . Point
-  -- ^ (P1) Starting point of seg.
-  -> Point
-  -- ^ (P2) Final point of seg.
-  -> Extent
-  -- ^ Extent covering the whole tree.
-  -> QuadTree a
-  -- ^ The tree.
-  -> [(Point, Extent, a)]
-  -- ^ Intersection point, extent of cell, value of cell.
+traceSegIntoCellularQuadTree ::
+  forall a.
+  -- | (P1) Starting point of seg.
+  Point ->
+  -- | (P2) Final point of seg.
+  Point ->
+  -- | Extent covering the whole tree.
+  Extent ->
+  -- | The tree.
+  QuadTree a ->
+  -- | Intersection point, extent of cell, value of cell.
+  [(Point, Extent, a)]
 traceSegIntoCellularQuadTree p1 p2 extent tree =
   case tree of
     TNil -> []

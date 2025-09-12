@@ -136,12 +136,12 @@ defaultCommandConfig =
 
 
 -- | Check if the provided key combination is some brillo viewport command.
-isCommand
-  :: Map Command [(Key, Maybe Modifiers)]
-  -> Command
-  -> Key
-  -> Modifiers
-  -> Bool
+isCommand ::
+  Map Command [(Key, Maybe Modifiers)] ->
+  Command ->
+  Key ->
+  Modifiers ->
+  Bool
 isCommand commands c key keyMods
   | Just csMatch <- Map.lookup c commands =
       or $ map (isCommand2 c key keyMods) csMatch
@@ -301,7 +301,6 @@ updateViewStateWithEventMaybe (EventMotion pos) viewState =
   motionScale (viewStateScaleMark viewState) pos viewState
     `mplus` motionTranslate (viewStateTranslateMark viewState) pos viewState
     `mplus` motionRotate (viewStateRotateMark viewState) pos viewState
-
 updateViewStateWithEventMaybe (EventDrop _) _ = Nothing
 updateViewStateWithEventMaybe (EventPick _) _ = Nothing
 updateViewStateWithEventMaybe (EventResize _) _ = Nothing
@@ -349,11 +348,11 @@ motionBump
 
 
 -- | Apply a translation to the `ViewState`.
-motionTranslate
-  :: Maybe (Float, Float) -- Location of first mark.
-  -> (Float, Float) -- Current position.
-  -> ViewState
-  -> Maybe ViewState
+motionTranslate ::
+  Maybe (Float, Float) -> -- Location of first mark.
+  (Float, Float) -> -- Current position.
+  ViewState ->
+  Maybe ViewState
 motionTranslate Nothing _ _ = Nothing
 motionTranslate (Just (markX, markY)) (posX, posY) viewState =
   Just $
@@ -373,11 +372,11 @@ motionTranslate (Just (markX, markY)) (posX, posY) viewState =
 
 
 -- | Apply a rotation to the `ViewState`.
-motionRotate
-  :: Maybe (Float, Float) -- Location of first mark.
-  -> (Float, Float) -- Current position.
-  -> ViewState
-  -> Maybe ViewState
+motionRotate ::
+  Maybe (Float, Float) -> -- Location of first mark.
+  (Float, Float) -> -- Current position.
+  ViewState ->
+  Maybe ViewState
 motionRotate Nothing _ _ = Nothing
 motionRotate (Just (markX, _markY)) (posX, posY) viewState =
   Just $
@@ -393,11 +392,11 @@ motionRotate (Just (markX, _markY)) (posX, posY) viewState =
 
 
 -- | Apply a scale to the `ViewState`.
-motionScale
-  :: Maybe (Float, Float) -- Location of first mark.
-  -> (Float, Float) -- Current position.
-  -> ViewState
-  -> Maybe ViewState
+motionScale ::
+  Maybe (Float, Float) -> -- Location of first mark.
+  (Float, Float) -> -- Current position.
+  ViewState ->
+  Maybe ViewState
 motionScale Nothing _ _ = Nothing
 motionScale (Just (_markX, markY)) (posX, posY) viewState =
   Just $

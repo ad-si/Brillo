@@ -14,7 +14,7 @@ description:
   A mixed bag of fractals, particle simulations and cellular automata.
 
 synopsis:      Examples using the Brillo library
-tested-with:   GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.2 || == 9.12.2
+tested-with:   GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.2 || ==9.12.2
 
 flag llvm
   description:
@@ -33,8 +33,8 @@ executable brillo-bitmap
   hs-source-dirs:   picture/Bitmap
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -48,9 +48,9 @@ executable brillo-boids
 
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
     , random  >=1.2    && <1.3
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -threaded -rtsopts
 
@@ -60,8 +60,8 @@ executable brillo-clock
   hs-source-dirs:   picture/Clock
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -71,8 +71,8 @@ executable brillo-color
   hs-source-dirs:   picture/Color
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -86,9 +86,9 @@ executable brillo-conway
 
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
     , random  >=1.2    && <1.3
+    , text    >=2.0    && <2.2
     , vector  >=0.13   && <0.14
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
@@ -99,8 +99,8 @@ executable brillo-draw
   hs-source-dirs:   picture/Draw
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -111,7 +111,7 @@ executable brillo-dropfiles
   build-depends:
     , base    >=4.8    && <5
     , brillo  >=1.13.3 && <1.15
-    , text    >=2.0 && <2.2
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -121,8 +121,8 @@ executable brillo-easy
   hs-source-dirs:   picture/Easy
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -137,9 +137,9 @@ executable brillo-eden
 
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
     , random  >=1.2    && <1.3
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -149,8 +149,8 @@ executable brillo-flake
   hs-source-dirs:   picture/Flake
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -160,8 +160,8 @@ executable brillo-gameevent
   hs-source-dirs:   picture/GameEvent
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -181,8 +181,8 @@ executable brillo-hello
   hs-source-dirs:   picture/Hello
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -197,9 +197,9 @@ executable brillo-lifespan
 
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
     , random  >=1.2    && <1.3
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -219,8 +219,8 @@ executable brillo-machina
   hs-source-dirs:   picture/Machina
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -236,9 +236,9 @@ executable brillo-occlusion
 
   build-depends:
     , base               >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo             >=1.13.3 && <1.15
     , brillo-algorithms  >=1.13.3 && <1.15
+    , text               >=2.0    && <2.2
 
   ghc-options:      -O2 -threaded -rtsopts
 
@@ -249,7 +249,7 @@ executable brillo-pickfiles
   build-depends:
     , base    >=4.8    && <5
     , brillo  >=1.13.3 && <1.15
-    , text    >=2.0 && <2.2
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -268,9 +268,9 @@ executable brillo-styrene
 
   build-depends:
     , base        >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo      >=1.13.3 && <1.15
     , containers  >=0.5    && <0.9
+    , text        >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -280,8 +280,8 @@ executable brillo-tree
   hs-source-dirs:   picture/Tree
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -299,8 +299,8 @@ executable brillo-visibility
 
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
     , vector  >=0.13   && <0.14
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
@@ -311,8 +311,8 @@ executable brillo-zen
   hs-source-dirs:   picture/Zen
   build-depends:
     , base    >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -325,7 +325,7 @@ executable brillo-graph
     , brillo      >=1.13.3 && <1.15
     , containers  >=0.5    && <0.9
     , random      >=1.2    && <1.3
-    , text        >=2.0 && <2.2
+    , text        >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -344,10 +344,10 @@ executable brillo-render
   default-language: GHC2021
   build-depends:
     , base              >=4.8    && <5
-    , text    >=2.0 && <2.2
     , brillo            >=1.13.3 && <1.15
     , brillo-rendering  >=1.13.3 && <1.15
     , GLFW-b            >=3.3    && <4
+    , text              >=2.0    && <2.2
 
   main-is:          Main.hs
   hs-source-dirs:   picture/Render
