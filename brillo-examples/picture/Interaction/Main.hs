@@ -1,7 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import Brillo
 import Brillo.Interface.IO.Interact
+import Data.Text qualified as T
 
 
 handleEvent :: Event -> Int -> IO Int
@@ -21,6 +24,6 @@ main =
     (InWindow "GameEvent" (700, 100) (10, 10))
     white
     0
-    (\str -> return $ Translate (-340) 0 $ Scale 0.3 0.3 $ Text $ show str)
+    (\str -> return $ Translate (-340) 0 $ Scale 0.3 0.3 $ Text $ T.pack $ show str)
     handleEvent
     (const $ return ())
