@@ -378,3 +378,17 @@ executable brillo-gui
     , text       >=2.0    && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
+
+executable brillo-2048
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/2048
+  build-depends:
+    , base   >=4.8    && <5
+    , brillo >=1.13.3 && <1.15
+    , lens   >=5.0    && <6
+    , random >=1.2    && <1.3
+    , split  >=0.2    && <0.3
+    , text   >=2.0    && <2.2
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts

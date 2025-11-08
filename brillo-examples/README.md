@@ -2,6 +2,9 @@
 
 Execute the commands in the root directory of the repository.
 
+
+## Tech Demos
+
 Command | Result
 --------|--------
 `stack run brillo-bitmap`     | <img src="picture/Bitmap/screenshot.png" style="max-height: 250px"/>
@@ -27,3 +30,10 @@ Command | Result
 `stack run brillo-tree`       | <img src="picture/Tree/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-visibility` | <img src="picture/Visibility/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-zen`        | <img src="picture/Zen/screenshot.png" style="max-height: 250px"/>
+
+
+## Games
+
+Command | Result
+--------|--------
+`stack run brillo-2048`       | <img src="picture/2048/screenshot.png" style="max-height: 250px"/>
