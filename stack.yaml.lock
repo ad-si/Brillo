@@ -3,7 +3,25 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/topics/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: storable-offset-0.1.0.0@sha256:1f94d4369daea19cc27e151e90dc652b3074cc565121bb5874f5d8b9e019b3d1,952
+    pantry-tree:
+      sha256: 13cc443c3acabb3c1901c7e6e179b6038e05d56af3e524a7bff2f30f408e289f
+      size: 231
+  original:
+    hackage: storable-offset-0.1.0.0
+- completed:
+    name: freetype2
+    pantry-tree:
+      sha256: 670c4a673afbefc446b91e445fd3b4a801bd5d6c555df5bae7721516739e24b6
+      size: 48451
+    sha256: 596cb18aa753c4286148fa00d772ceacd87fcc72913cadc1a7fcc5ba6e07507b
+    size: 1801828
+    url: https://github.com/dpwiz/freetype2/archive/d2acf926b5c448d8edd60e322862adcf2dbe9146.tar.gz
+    version: 0.2.1
+  original:
+    url: https://github.com/dpwiz/freetype2/archive/d2acf926b5c448d8edd60e322862adcf2dbe9146.tar.gz
 snapshots:
 - completed:
     sha256: 7e724f347d5969cb5e8dde9f9aae30996e3231c29d1dafd45f21f1700d4c4fcb

@@ -6,3 +6,9 @@ packages:
   - brillo-examples
   - brillo-juicy
   - brillo-rendering
+
+extra-deps:
+  - storable-offset-0.1.0.0
+
+  - github: dpwiz/freetype2
+    commit: d2acf926b5c448d8edd60e322862adcf2dbe9146

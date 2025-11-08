@@ -42,6 +42,7 @@ import Brillo.Internals.Rendering.State (
   ),
   Texture (..),
  )
+import Brillo.Internals.Rendering.TrueTypeFont (renderTrueTypeText)
 import Brillo.Internals.Rendering.VectorFont as VF (canvastextFont, renderSafe)
 
 
@@ -165,7 +166,8 @@ drawPicture state circScale picture =
             forM_ stroke $ \(x, y) -> do
               GL.vertex $ GL.Vertex2 x y
       GL.lineWidth $= oldLineWidth
-
+    TrueTypeText fontPath pixelHeight str ->
+      renderTrueTypeText fontPath pixelHeight str
     -- colors with float components.
     Color col p
       | state.stateColor -> do

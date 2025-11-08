@@ -32,6 +32,7 @@ library
     Brillo.Internals.Rendering.Common
     Brillo.Internals.Rendering.Picture
     Brillo.Internals.Rendering.State
+    Brillo.Internals.Rendering.TrueTypeFont
     Brillo.Internals.Rendering.VectorFont
 
   build-depends:
@@ -39,6 +40,8 @@ library
     , bmp         >=1.2  && <1.3
     , bytestring  >=0.11 && <0.13
     , containers  >=0.5  && <0.9
+    , freetype2   >=0.2  && <0.4
+    , GLFW-b      >=3.3  && <4
     , OpenGL      >=2.12 && <3.1
     , text        >=2.0  && <2.2
 

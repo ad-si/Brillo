@@ -28,6 +28,7 @@
             haskellPackages.haskell-language-server
             haskellPackages.hlint
             haskellPackages.stack
+            zlib
           ];
         };
         formatter = pkgs.nixfmt-tree; # Format this file with `nix fmt`

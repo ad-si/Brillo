@@ -14,6 +14,7 @@ module Brillo.Data.Picture (
   arc,
   thickArc,
   text,
+  truetypeText,
   bitmap,
   bitmapSection,
   -- , bitmap
@@ -95,6 +96,11 @@ thickArc = ThickArc
 -- | Some text to draw with a vector font.
 text :: Text -> Picture
 text = Text
+
+
+-- | Some text to draw with a TrueType font, using the given pixel height.
+truetypeText :: FilePath -> Int -> Text -> Picture
+truetypeText = TrueTypeText
 
 
 -- | A bitmap image

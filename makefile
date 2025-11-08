@@ -23,8 +23,10 @@ test:
 	stack run brillo-occlusion && \
 	stack run brillo-styrene && \
 	stack run brillo-tree && \
+	stack run brillo-truetype && \
 	stack run brillo-visibility && \
 	stack run brillo-zen && \
+	stack run brillo-gui && \
 	stack run brillo-render  # Must be last as it can't be closed
 
 

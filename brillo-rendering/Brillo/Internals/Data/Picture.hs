@@ -98,6 +98,9 @@ data Picture
     Text Text
   | -- | Text to draw with a vector font and a given thickness.
     ThickText Text Float
+  | -- | Text to draw with a TrueType font located at the given path,
+    --   rendered at the specified pixel height.
+    TrueTypeText FilePath Int Text
   | -- | A bitmap image.
     Bitmap BitmapData
   | -- | A subsection of a bitmap image where
