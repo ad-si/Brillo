@@ -37,3 +37,4 @@ Command | Result
 Command | Result
 --------|--------
 `stack run brillo-2048`       | <img src="picture/2048/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-tetris`     | <img src="picture/Tetris/screenshot.png" style="max-height: 250px"/>
