@@ -42,7 +42,12 @@ import FreeType (
   pattern FT_LOAD_RENDER,
  )
 import FreeType.Exception (FtError)
-import Graphics.Rendering.OpenGL (TextureFunction (Modulate), get, textureBinding, ($=))
+import Graphics.Rendering.OpenGL (
+  TextureFunction (Modulate),
+  get,
+  textureBinding,
+  ($=),
+ )
 import Graphics.Rendering.OpenGL.GL qualified as GL
 import Graphics.UI.GLFW qualified as GLFW
 import System.IO.Unsafe (unsafePerformIO)
@@ -73,7 +78,7 @@ getContentScale :: IO Float
 getContentScale = do
   mWindow <- GLFW.getCurrentContext
   case mWindow of
-    Nothing -> pure 1.0  -- No window context, assume scale 1.0
+    Nothing -> pure 1.0 -- No window context, assume scale 1.0
     Just win -> do
       (fbWidth, fbHeight) <- GLFW.getFramebufferSize win
       (winWidth, winHeight) <- GLFW.getWindowSize win
@@ -100,7 +105,10 @@ renderTrueTypeText fontPath pixelHeight str
       GL.textureFunction $= Modulate
       GL.preservingMatrix $ do
         -- Scale down by the same factor to maintain logical size
-        GL.scale (1.0 / realToFrac scaleFactor) (1.0 / realToFrac scaleFactor) (1.0 :: GL.GLfloat)
+        GL.scale
+          (1.0 / realToFrac scaleFactor)
+          (1.0 / realToFrac scaleFactor)
+          (1.0 :: GL.GLfloat)
         _ <-
           foldM
             (renderGlyph glyphs fallbackGlyph scaledHeight)
@@ -127,7 +135,8 @@ renderGlyph glyphs fallback lineHeight (penX, penY) = \case
       case glyph of
         Nothing ->
           pure (penX, penY)
-        Just Glyph{glyphTexture, glyphSize = (w, h), glyphBearing = (bx, by), glyphAdvance} ->
+        Just
+          Glyph{glyphTexture, glyphSize = (w, h), glyphBearing = (bx, by), glyphAdvance} ->
           do
             let advance = fromIntegral glyphAdvance / 64
                 xpos = penX + fromIntegral bx
@@ -185,7 +194,9 @@ loadFont fontPath pixelHeight = do
 loadGlyph :: FT_Face -> Int -> IO (Either String (Char, Glyph))
 loadGlyph face codepoint = do
   let ch = toEnum codepoint
-  loadResult <- try (ft_Load_Char face (fromIntegral codepoint) FT_LOAD_RENDER) :: IO (Either FtError ())
+  loadResult <-
+    try (ft_Load_Char face (fromIntegral codepoint) FT_LOAD_RENDER) ::
+      IO (Either FtError ())
   case loadResult of
     Left err ->
       pure . Left $

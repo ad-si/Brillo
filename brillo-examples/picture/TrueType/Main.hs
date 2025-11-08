@@ -12,6 +12,7 @@ import Data.List (foldl1', isPrefixOf)
 import Data.Maybe (listToMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
+import Foreign (peek)
 import FreeType (
   FT_Bitmap (bRows, bWidth),
   FT_Face,
@@ -32,7 +33,6 @@ import FreeType (
   pattern FT_LOAD_RENDER,
  )
 import FreeType.Exception (FtError)
-import Foreign (peek)
 import System.Directory (doesFileExist)
 import System.Environment (getArgs)
 import System.Exit (exitFailure)
@@ -226,12 +226,14 @@ measureTrueTypeBounds fontPath pixelHeight txt
                   glyphBounds =
                     if width <= 0 && height <= 0
                       then Nothing
-                      else Just Bounds
-                        { boundsMinX = xpos
-                        , boundsMaxX = right
-                        , boundsMinY = ypos
-                        , boundsMaxY = top
-                        }
+                      else
+                        Just
+                          Bounds
+                            { boundsMinX = xpos
+                            , boundsMaxX = right
+                            , boundsMinY = ypos
+                            , boundsMaxY = top
+                            }
                   bounds' =
                     case (mbBounds, glyphBounds) of
                       (Nothing, Nothing) -> Nothing

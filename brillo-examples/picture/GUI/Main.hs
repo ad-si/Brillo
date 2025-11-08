@@ -44,23 +44,23 @@ main = do
 -- | Application state
 data AppState
   = AppState
-      { fontPath :: FilePath
-      , mousePos :: Point
-      , lastClicked :: Maybe String
-      , hoveredButton :: Maybe String
-      }
+  { fontPath :: FilePath
+  , mousePos :: Point
+  , lastClicked :: Maybe String
+  , hoveredButton :: Maybe String
+  }
 
 
 -- | Button definition
 data Button
   = Button
-      { buttonId :: String
-      , buttonLabel :: T.Text
-      , buttonX :: Float
-      , buttonY :: Float
-      , buttonWidth :: Float
-      , buttonHeight :: Float
-      }
+  { buttonId :: String
+  , buttonLabel :: T.Text
+  , buttonX :: Float
+  , buttonY :: Float
+  , buttonWidth :: Float
+  , buttonHeight :: Float
+  }
 
 
 -- | Define our buttons
@@ -195,7 +195,9 @@ renderStatusBar font (mx, my) =
           truetypeText
             font
             18
-            (T.pack $ "Mouse: (" ++ show (round mx :: Int) ++ ", " ++ show (round my :: Int) ++ ")")
+            ( T.pack $
+                "Mouse: (" ++ show (round mx :: Int) ++ ", " ++ show (round my :: Int) ++ ")"
+            )
     ]
 
 
@@ -212,7 +214,7 @@ handleEvent event state =
     -- Handle mouse clicks on buttons
     EventKey (MouseButton LeftButton) Down _ pos ->
       case findButtonAt pos buttons of
-        Just btnId -> state {lastClicked = Just btnId}
+        Just btnId -> state{lastClicked = Just btnId}
         Nothing -> state
     -- Other events
     _ -> state
