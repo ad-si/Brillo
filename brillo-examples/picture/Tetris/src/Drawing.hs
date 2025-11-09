@@ -4,18 +4,16 @@ module Drawing (drawWindow) where
 
 import Config
 import Figures
-import Util
 import World
 
 import Control.Monad.Reader
 import Control.Monad.State
-import Data.Text (Text, pack)
-import System.Random
+import Data.Text (pack)
 
 import Brillo
-import Brillo.Interface.Pure.Game
 
 
+toGlossColor :: GameColor -> Color
 toGlossColor Red = makeColorI 224 102 102 255
 toGlossColor Yellow = makeColorI 245 220 116 255
 toGlossColor Green = makeColorI 180 198 104 255
@@ -25,11 +23,27 @@ toGlossColor Violet = makeColorI 190 162 222 255
 
 -- CONSTANT COLORS FOR DRAWING FUNCTIONS
 
+backgroundColor :: Color
 backgroundColor = makeColorI 29 31 33 255
+
+
+textColor :: Color
 textColor = makeColorI 197 200 198 255
+
+
+gridColor :: Color
 gridColor = makeColorI 255 255 255 40
+
+
+cupColor :: Color
 cupColor = makeColorI 85 85 85 255
+
+
+overlayColor :: Color
 overlayColor = makeColorI 10 10 10 200
+
+
+gameOverColor :: Color
 gameOverColor = makeColorI 181 7 7 220
 
 
@@ -38,13 +52,13 @@ gameOverColor = makeColorI 181 7 7 220
 -- | Draws all help components
 drawHelp :: StateT TetrisGame (Reader AppConfig) Picture
 drawHelp = do
-  state <- get
+  gameState <- get
   conf <- ask
   let (x, y) = cupPosition conf
   let w = snd $ cupSize conf
   return $
     Pictures $
-      writeInfo (x - 250, y + w) (-20) (hardness state) (score state)
+      writeInfo (x - 250, y + w) (-20) (hardness gameState) (score gameState)
   where
     writeInfo (x, y) step hard score =
       snd $
@@ -67,7 +81,7 @@ drawHelp = do
 
 -- | Draws a one basic block on the grid
 drawBlock :: Block -> Color -> StateT TetrisGame (Reader AppConfig) Picture
-drawBlock block color = do
+drawBlock block blockColor = do
   conf <- ask
   let cp = cupPosition conf
   let sz = blockSize conf
@@ -75,7 +89,7 @@ drawBlock block color = do
   let byp = snd cp + ((fromIntegral $ snd block) * sz)
   return $
     Color
-      color
+      blockColor
       ( polygon
           [ (bxp + 1, byp + 1)
           , (bxp + sz - 1, byp + 1)
@@ -88,15 +102,16 @@ drawBlock block color = do
 -- | Draws falling figure of the game state
 drawFigure ::
   Color -> GridPosition -> Figure -> StateT TetrisGame (Reader AppConfig) Picture
-drawFigure c p f@(Figure _ _ bs) =
+drawFigure c p f@(Figure _ _ _bs) =
   mapM ((flip drawBlock) c) (getRealCoords f p) >>= return . Pictures
 
 
 -- | Draws a figure on the grid
 drawGrid :: StateT TetrisGame (Reader AppConfig) Picture
 drawGrid = do
-  state <- get
-  pics <- mapM (\(p, c) -> p `drawBlock` (toGlossColor c)) (getGridAsList state)
+  gameState <- get
+  pics <-
+    mapM (\(p, c) -> p `drawBlock` (toGlossColor c)) (getGridAsList gameState)
   return $ Pictures pics
 
 
@@ -159,13 +174,15 @@ drawEmptyGrid conf =
 -- | Draws right sidebar
 drawSidebar :: StateT TetrisGame (Reader AppConfig) Picture
 drawSidebar = do
-  state <- get
+  gameState <- get
   conf <- ask
-  let fColor = toGlossColor $ head $ nextColors state
+  let fColor = toGlossColor $ case nextColors gameState of
+        (c : _) -> c
+        [] -> Red -- Default color if list is empty
   pic <-
     drawNextFigure
       (gridSize conf)
-      (getNextFigure state)
+      (getNextFigure gameState)
       fColor
       (blockSize conf)
       (cupPosition conf)
@@ -191,14 +208,14 @@ drawSidebar = do
 drawGame :: StateT TetrisGame (Reader AppConfig) Picture
 drawGame = do
   cupPic <- drawCup
-  (x, y) <- fmap gamePosition $ ask
+  (_x, _y) <- fmap gamePosition $ ask
   return $ Pictures [cupPic]
 
 
 drawGameOver :: StateT TetrisGame (Reader AppConfig) Picture
 drawGameOver = do
   conf <- ask
-  state <- get
+  gameState <- get
   let (px, py) = cupPosition conf
   let (w, h) = cupSize conf
   let (_winw, _winh) = windowSize conf
@@ -222,14 +239,14 @@ drawGameOver = do
               text $
                 pack $
                   show $
-                    score state
+                    score gameState
       ]
 
 
 drawPauseOverlay :: StateT TetrisGame (Reader AppConfig) Picture
 drawPauseOverlay = do
   conf <- ask
-  state <- get
+  _gameState <- get
   let (px, py) = cupPosition conf
   let (w, h) = cupSize conf
   let (_winw, _winh) = windowSize conf
@@ -271,17 +288,17 @@ drawWindow :: StateT TetrisGame (Reader AppConfig) Picture
 drawWindow = do
   backgroundPic <- drawBackground
   gamePic <- drawGame
-  state <- get
-  let pos = fallingPosition state
-  let fig = fallingFigure state
-  let fColor = toGlossColor $ fallingColor state
+  gameState <- get
+  let pos = fallingPosition gameState
+  let fig = fallingFigure gameState
+  let fColor = toGlossColor $ fallingColor gameState
   figurePic <- drawFigure fColor pos fig
   sidebarPic <- drawSidebar
   helpPic <- drawHelp
   gridPic <- drawGrid
-  gameOverOverlayPic <- drawGO $ gameOver state
-  pauseOverlayPic <- drawPO (isPause state) (gameOver state)
-  linkPic <- drawL (isPause state)
+  gameOverOverlayPic <- drawGO $ gameOver gameState
+  pauseOverlayPic <- drawPO (isPause gameState) (gameOver gameState)
+  linkPic <- drawL (isPause gameState)
   return $
     Pictures
       [ backgroundPic
@@ -300,3 +317,4 @@ drawWindow = do
     drawPO True False = drawPauseOverlay
     drawPO _ _ = return $ Pictures []
     drawL False = return $ Pictures []
+    drawL True = return $ Pictures [] -- Add True case to complete pattern
