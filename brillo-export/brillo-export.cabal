@@ -94,6 +94,7 @@ test-suite brillo-export-test
     , brillo-export
     , directory
     , filepath
+    , GLFW-b         >=1.0.0  && <4
     , JuicyPixels
     , text           >=2.0    && <3
 

@@ -9,11 +9,23 @@ import Codec.Picture
 import Control.Monad
 import Data.Foldable
 import Data.Text (pack)
+import qualified Graphics.UI.GLFW as GLFW
 import System.Directory (createDirectoryIfMissing, getTemporaryDirectory)
 import System.FilePath
 import Text.Printf
 
 import qualified Paths_brillo_export as Paths
+
+
+{-| Check if GLFW can initialize (i.e., we have a display available).
+Returns True if GLFW initialized successfully, False otherwise.
+This is used to skip tests in headless CI environments.
+-}
+canInitializeGLFW :: IO Bool
+canInitializeGLFW = do
+  result <- GLFW.init
+  when result GLFW.terminate
+  pure result
 
 
 -- A variant of 'readImage' which fails with an exception instead of a 'Left'
@@ -140,133 +152,143 @@ size = (1500, 1000)
 
 main :: IO ()
 main = do
-  -- Get the data directory where test fixtures are installed
-  dataDir <- Paths.getDataDir
+  -- Check if we can initialize GLFW (requires a display).
+  -- Skip tests gracefully in headless CI environments.
+  hasDisplay <- canInitializeGLFW
+  unless hasDisplay $ do
+    putStrLn
+      "Skipping brillo-export tests: no display available (GLFW cannot initialize)"
+    putStrLn "This is expected in headless CI environments."
+    pure ()
 
-  -- Create a temporary output directory for generated images
-  tmpDir <- getTemporaryDirectory
-  let outputDir = tmpDir </> "brillo-export-test"
-  createDirectoryIfMissing True outputDir
+  when hasDisplay $ do
+    -- Get the data directory where test fixtures are installed
+    dataDir <- Paths.getDataDir
 
-  -- Helper functions with directories bound
-  let check = exportPictureAndCheck dataDir outputDir
-  let checkMulti = exportPicturesAndCheck dataDir outputDir
-  let shorthand = check exportPictureToPNG size white
+    -- Create a temporary output directory for generated images
+    tmpDir <- getTemporaryDirectory
+    let outputDir = tmpDir </> "brillo-export-test"
+    createDirectoryIfMissing True outputDir
 
-  -- Test multiple Brillo features and multiple export formats.
-  bmp <- loadBMP (dataDir </> "loadme.bmp")
-  let pic =
-        Pictures
-          [ bmp
-          , Color red $ Polygon [(-80, 0), (0, 80), (80, 0)]
-          , Circle 80
-          , Text (pack "text")
-          ]
-  check
-    exportPictureToPNG
-    (400, 400)
-    white
-    "comprehensive.png"
-    pic
-  check
-    exportPictureToBitmap
-    (400, 400)
-    white
-    "comprehensive.bmp"
-    pic
-  check
-    exportPictureToTga
-    (400, 400)
-    white
-    "comprehensive.tga"
-    pic
-  check
-    exportPictureToTiff
-    (400, 400)
-    white
-    "comprehensive.tiff"
-    pic
-  -- display (InWindow "" (100,80) (0, 0)) white pic
-  shorthand "bmp.png" (bmp)
-  shorthand "circle.png" (circle 25)
-  check
-    exportPictureToPNG
-    (500, 500)
-    white
-    "circles.png"
-    (Pictures (map circle [0, 10 .. 250]))
+    -- Helper functions with directories bound
+    let check = exportPictureAndCheck dataDir outputDir
+    let checkMulti = exportPicturesAndCheck dataDir outputDir
+    let shorthand = check exportPictureToPNG size white
 
-  -- Make sure we can export large images. In a previous version, attempting
-  -- to export an image larger than the screen resolution WxH resulted in a
-  -- scaled down image displayed in the lower-left WxH rectantle, with
-  -- transparent pixels everywhere else.
-  let wby2 = 1853 / 2
-  let hby2 = 1025 / 2
-  let p =
-        Pictures
-          [ Translate wby2 hby2 $ ThickCircle 10 80
-          , Translate wby2 hby2 $ ThickCircle 10 80
-          , Color blue $ Line [(-wby2, hby2), (wby2, -hby2)]
-          , ThickCircle 10 80
-          ]
-  check exportPictureToPNG (1900, 1050) white "large_image.png" p
-
-  let stack =
-        ( Pictures
-            [ Color blue $ poly 49 -- 100x100
-            , Color red $ poly 30 -- 60x60
-            , Color yellow $ poly 20 -- 40x40
-            , Color green $ poly 10 -- 20x20
-            , Color white $ poly 5 -- 10x10
+    -- Test multiple Brillo features and multiple export formats.
+    bmp <- loadBMP (dataDir </> "loadme.bmp")
+    let pic =
+          Pictures
+            [ bmp
+            , Color red $ Polygon [(-80, 0), (0, 80), (80, 0)]
+            , Circle 80
+            , Text (pack "text")
             ]
-        )
+    check
+      exportPictureToPNG
+      (400, 400)
+      white
+      "comprehensive.png"
+      pic
+    check
+      exportPictureToBitmap
+      (400, 400)
+      white
+      "comprehensive.bmp"
+      pic
+    check
+      exportPictureToTga
+      (400, 400)
+      white
+      "comprehensive.tga"
+      pic
+    check
+      exportPictureToTiff
+      (400, 400)
+      white
+      "comprehensive.tiff"
+      pic
+    -- display (InWindow "" (100,80) (0, 0)) white pic
+    shorthand "bmp.png" (bmp)
+    shorthand "circle.png" (circle 25)
+    check
+      exportPictureToPNG
+      (500, 500)
+      white
+      "circles.png"
+      (Pictures (map circle [0, 10 .. 250]))
 
-  check exportPictureToPNG (10, 10) white "p10.png" stack
-  check exportPictureToPNG (20, 20) white "p20.png" stack
-  check exportPictureToPNG (40, 40) white "p40.png" stack
-  check exportPictureToPNG (60, 60) white "p60.png" stack
-  check exportPictureToPNG (100, 100) white "p100.png" stack
+    -- Make sure we can export large images. In a previous version, attempting
+    -- to export an image larger than the screen resolution WxH resulted in a
+    -- scaled down image displayed in the lower-left WxH rectantle, with
+    -- transparent pixels everywhere else.
+    let wby2 = 1853 / 2
+    let hby2 = 1025 / 2
+    let p =
+          Pictures
+            [ Translate wby2 hby2 $ ThickCircle 10 80
+            , Translate wby2 hby2 $ ThickCircle 10 80
+            , Color blue $ Line [(-wby2, hby2), (wby2, -hby2)]
+            , ThickCircle 10 80
+            ]
+    check exportPictureToPNG (1900, 1050) white "large_image.png" p
 
-  checkMulti
-    exportPicturesToPNG
-    (1000, 1000)
-    white
-    "growing_polgons%d.png"
-    (Color blue . poly)
-    [200, 250 .. 500]
-  checkMulti
-    exportPicturesToBitmap
-    (1000, 1000)
-    white
-    "growing_polgons%d.bmp"
-    (Color blue . poly)
-    [200, 250 .. 500]
-  checkMulti
-    exportPicturesToTga
-    (1000, 1000)
-    white
-    "growing_polgons%d.tga"
-    (Color blue . poly)
-    [200, 250 .. 500]
-  checkMulti
-    exportPicturesToTiff
-    (1000, 1000)
-    white
-    "growing_polgons%d.tiff"
-    (Color blue . poly)
-    [200, 250 .. 500]
+    let stack =
+          ( Pictures
+              [ Color blue $ poly 49 -- 100x100
+              , Color red $ poly 30 -- 60x60
+              , Color yellow $ poly 20 -- 40x40
+              , Color green $ poly 10 -- 20x20
+              , Color white $ poly 5 -- 10x10
+              ]
+          )
 
-  exportPicturesToGif
-    10
-    LoopingNever
-    (1000, 1000)
-    red
-    (outputDir </> "growing_polgons.gif")
-    (Color blue . poly)
-    [200, 250 .. 500]
-  assertSameGifFiles
-    (outputDir </> "growing_polgons.gif")
-    (dataDir </> "expected_growing_polgons.gif")
+    check exportPictureToPNG (10, 10) white "p10.png" stack
+    check exportPictureToPNG (20, 20) white "p20.png" stack
+    check exportPictureToPNG (40, 40) white "p40.png" stack
+    check exportPictureToPNG (60, 60) white "p60.png" stack
+    check exportPictureToPNG (100, 100) white "p100.png" stack
+
+    checkMulti
+      exportPicturesToPNG
+      (1000, 1000)
+      white
+      "growing_polgons%d.png"
+      (Color blue . poly)
+      [200, 250 .. 500]
+    checkMulti
+      exportPicturesToBitmap
+      (1000, 1000)
+      white
+      "growing_polgons%d.bmp"
+      (Color blue . poly)
+      [200, 250 .. 500]
+    checkMulti
+      exportPicturesToTga
+      (1000, 1000)
+      white
+      "growing_polgons%d.tga"
+      (Color blue . poly)
+      [200, 250 .. 500]
+    checkMulti
+      exportPicturesToTiff
+      (1000, 1000)
+      white
+      "growing_polgons%d.tiff"
+      (Color blue . poly)
+      [200, 250 .. 500]
+
+    exportPicturesToGif
+      10
+      LoopingNever
+      (1000, 1000)
+      red
+      (outputDir </> "growing_polgons.gif")
+      (Color blue . poly)
+      [200, 250 .. 500]
+    assertSameGifFiles
+      (outputDir </> "growing_polgons.gif")
+      (dataDir </> "expected_growing_polgons.gif")
 
 
 textFloats :: [Float]
