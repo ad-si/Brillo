@@ -69,19 +69,19 @@ initialState :: ReaderT AppConfig IO TetrisGame
 initialState = do
   cfg <- ask
   gen <- liftIO getStdGen
-  let fs = randomFigures gen
-  let fc = randoms gen
+  let (f : fs) = randomFigures gen
+  let (c : cs) = randoms gen
   let startPos = startPosition cfg
   return $
     Game
-      (head fs)
+      f
       startPos
       startPos
-      (head fc)
-      (tail fc)
+      c
+      cs
       (fst $ gridSize $ cfg)
       (snd $ gridSize $ cfg)
-      (tail fs)
+      fs
       Map.empty
       minBound
       0
@@ -105,18 +105,19 @@ randomFigures gen = zipWith getFigures (randoms gen) (randoms gen)
 nextFigureGame :: TetrisGame -> TetrisGame
 nextFigureGame g@Game{..}
   | checkingGO = g{gameOver = True}
-  | otherwise =
+  | (nf : nfs) <- nextFigures
+  , (nc : ncs) <- nextColors =
       updateHardness $
         updateScore $
           Game
-            (head nextFigures)
+            nf
             startFalling
             startFalling
-            (head nextColors)
-            (tail nextColors)
+            nc
+            ncs
             width
             height
-            (tail nextFigures)
+            nfs
             updateGrid
             hardness
             score
@@ -124,6 +125,7 @@ nextFigureGame g@Game{..}
             isPause
             checkingGO
             pressedDown
+  | otherwise = g{gameOver = True}
   where
     updateScore gnew = gnew{score = score + (getScore $ countOfBurns g gnew)}
 
@@ -215,23 +217,26 @@ dropFigure game = dropUntilCollision game
 
 
 resetGame :: TetrisGame -> TetrisGame
-resetGame Game{..} =
-  Game
-    ((head . tail) nextFigures)
-    startFalling
-    startFalling
-    ((head . tail) nextColors)
-    ((tail . tail) nextColors)
-    width
-    height
-    ((tail . tail) nextFigures)
-    Map.empty
-    minBound
-    0
-    0
-    False
-    False
-    pressedDown
+resetGame Game{..}
+  | (_ : nf : nfs) <- nextFigures
+  , (_ : nc : ncs) <- nextColors =
+      Game
+        nf
+        startFalling
+        startFalling
+        nc
+        ncs
+        width
+        height
+        nfs
+        Map.empty
+        minBound
+        0
+        0
+        False
+        False
+        pressedDown
+  | otherwise = error "resetGame: insufficient figures or colors"
 
 
 pressedKeyDown :: TetrisGame -> Bool
@@ -251,7 +256,8 @@ goodCoords grid w h = all goodCoord
 
 -- | Returns next figure
 getNextFigure :: TetrisGame -> Figure
-getNextFigure (nextFigures -> fs) = head fs
+getNextFigure (nextFigures -> (f : _)) = f
+getNextFigure _ = error "getNextFigure: no next figure available"
 
 
 getGridAsList :: TetrisGame -> [(GridPosition, GameColor)]
