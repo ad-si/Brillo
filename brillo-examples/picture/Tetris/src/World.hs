@@ -69,8 +69,12 @@ initialState :: ReaderT AppConfig IO TetrisGame
 initialState = do
   cfg <- ask
   gen <- liftIO getStdGen
-  let (f : fs) = randomFigures gen
-  let (c : cs) = randoms gen
+  let (f, fs) = case randomFigures gen of
+        (x : xs) -> (x, xs)
+        [] -> error "initialState: randomFigures returned empty list"
+  let (c, cs) = case randoms gen of
+        (x : xs) -> (x, xs)
+        [] -> error "initialState: randoms returned empty list"
   let startPos = startPosition cfg
   return $
     Game
@@ -138,9 +142,10 @@ nextFigureGame g@Game{..}
     getScore 2 = 300
     getScore 3 = 700
     getScore 4 = 1500
+    getScore _ = 0
 
     updateHardness :: TetrisGame -> TetrisGame
-    updateHardness g@(Game _ _ _ _ _ _ _ _ _ _ scr _ _ _ _) = g{hardness = nextHardness scr}
+    updateHardness game@(Game _ _ _ _ _ _ _ _ _ _ scr _ _ _ _) = game{hardness = nextHardness scr}
 
     nextHardness :: Integer -> Hardness
     nextHardness scr
@@ -165,7 +170,7 @@ nextFigureGame g@Game{..}
       listToGrid
         . concat
         . zipWith
-          (\num list -> map (\((x, y), color) -> ((x, num), color)) list)
+          (\num list -> map (\((x, _), color) -> ((x, num), color)) list)
           [0, 1 ..]
         . filter ((/= width) . length)
         . groupBy (\((_, y1), _) ((_, y2), _) -> y1 == y2)
@@ -245,7 +250,7 @@ pressedKeyDown Game{..} = pressedDown
 
 -- | Checks that the point belongs to the Grid and that it is free
 goodCoords :: Grid -> Int -> Int -> [Block] -> Bool
-goodCoords grid w h = all goodCoord
+goodCoords grid w _h = all goodCoord
   where
     goodCoord pos@(x, y) =
       x >= 0
