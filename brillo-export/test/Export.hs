@@ -9,9 +9,11 @@ import Codec.Picture
 import Control.Monad
 import Data.Foldable
 import Data.Text (pack)
-import System.Directory
+import System.Directory (createDirectoryIfMissing, getTemporaryDirectory)
 import System.FilePath
 import Text.Printf
+
+import qualified Paths_brillo_export as Paths
 
 
 -- A variant of 'readImage' which fails with an exception instead of a 'Left'
@@ -68,29 +70,32 @@ assertSameGifFiles filePath1 filePath2 = do
   unless (length dynamicImages1 == length dynamicImages2) $ do
     error $
       "gifs have a different number of frames: " ++ filePath1 ++ ", " ++ filePath2
-  for_ (zip ([1 ..] :: [Int]) (zipWith eqDynamicImage dynamicImages1 dynamicImages2)) $ \(i, framesMatch) -> do
-    unless framesMatch $ do
-      error $
-        "animations do not match at frame "
-          ++ show i
-          ++ ": "
-          ++ filePath1
-          ++ ", "
-          ++ filePath2
+  for_
+    (zip ([1 ..] :: [Int]) (zipWith eqDynamicImage dynamicImages1 dynamicImages2))
+    $ \(i, framesMatch) -> do
+      unless framesMatch $ do
+        error $
+          "animations do not match at frame "
+            ++ show i
+            ++ ": "
+            ++ filePath1
+            ++ ", "
+            ++ filePath2
 
 
 -- Validates the given image against an expected image, which is assumed to be
--- a png file found at the same location as the given image, but prefixed with
--- "expected_".
-assertSameImageAsExpected :: FilePath -> IO ()
-assertSameImageAsExpected filePath = do
-  let expectedFilePath = replaceExtension ("expected_" ++ filePath) "png"
-  assertSameImageFiles filePath expectedFilePath
+-- a png file found in the data directory, prefixed with "expected_".
+assertSameImageAsExpected :: FilePath -> FilePath -> FilePath -> IO ()
+assertSameImageAsExpected dataDir outputDir filePath = do
+  let expectedFilePath = dataDir </> replaceExtension ("expected_" ++ filePath) "png"
+  assertSameImageFiles (outputDir </> filePath) expectedFilePath
 
 
 -- A wrapper around functions like 'exportPictureToPNG' which also validates
 -- the generated image.
 exportPictureAndCheck ::
+  FilePath ->
+  FilePath ->
   -- | wrapped export function
   (Size -> Color -> FilePath -> Picture -> IO ()) ->
   -- | width, height in pixels
@@ -100,14 +105,16 @@ exportPictureAndCheck ::
   FilePath ->
   Picture ->
   IO ()
-exportPictureAndCheck exportPicture imgSize bg filePath picture = do
-  exportPicture imgSize bg filePath picture
-  assertSameImageAsExpected filePath
+exportPictureAndCheck dataDir outputDir exportPicture imgSize bg filePath picture = do
+  exportPicture imgSize bg (outputDir </> filePath) picture
+  assertSameImageAsExpected dataDir outputDir filePath
 
 
 -- A wrapper around functions like 'exportPicturesToPNG' which also validates
 -- the generated images.
 exportPicturesAndCheck ::
+  FilePath ->
+  FilePath ->
   -- | wrapped export function
   (Size -> Color -> FilePath -> Animation -> [Float] -> IO ()) ->
   -- | width, height in pixels
@@ -120,29 +127,34 @@ exportPicturesAndCheck ::
   -- | list of points in time at which to evaluate the animation
   [Float] ->
   IO ()
-exportPicturesAndCheck exportPictures imgSize bg filePathPattern animation ts = do
-  exportPictures imgSize bg filePathPattern animation ts
+exportPicturesAndCheck dataDir outputDir exportPictures imgSize bg filePathPattern animation ts = do
+  exportPictures imgSize bg (outputDir </> filePathPattern) animation ts
   for_ [1 .. length ts] $ \i -> do
     let filePath = printf filePathPattern i
-    assertSameImageAsExpected filePath
+    assertSameImageAsExpected dataDir outputDir filePath
 
 
 size :: (Int, Int)
 size = (1500, 1000)
 
 
-shorthand :: FilePath -> Picture -> IO ()
-shorthand = exportPictureAndCheck exportPictureToPNG size white
-
-
 main :: IO ()
 main = do
-  -- @stack test@ sets the working directory to the project root, but all the
-  -- filenames are relative to the @test@ folder.
-  setCurrentDirectory "test"
+  -- Get the data directory where test fixtures are installed
+  dataDir <- Paths.getDataDir
+
+  -- Create a temporary output directory for generated images
+  tmpDir <- getTemporaryDirectory
+  let outputDir = tmpDir </> "brillo-export-test"
+  createDirectoryIfMissing True outputDir
+
+  -- Helper functions with directories bound
+  let check = exportPictureAndCheck dataDir outputDir
+  let checkMulti = exportPicturesAndCheck dataDir outputDir
+  let shorthand = check exportPictureToPNG size white
 
   -- Test multiple Brillo features and multiple export formats.
-  bmp <- loadBMP "loadme.bmp"
+  bmp <- loadBMP (dataDir </> "loadme.bmp")
   let pic =
         Pictures
           [ bmp
@@ -150,25 +162,25 @@ main = do
           , Circle 80
           , Text (pack "text")
           ]
-  exportPictureAndCheck
+  check
     exportPictureToPNG
     (400, 400)
     white
     "comprehensive.png"
     pic
-  exportPictureAndCheck
+  check
     exportPictureToBitmap
     (400, 400)
     white
     "comprehensive.bmp"
     pic
-  exportPictureAndCheck
+  check
     exportPictureToTga
     (400, 400)
     white
     "comprehensive.tga"
     pic
-  exportPictureAndCheck
+  check
     exportPictureToTiff
     (400, 400)
     white
@@ -177,7 +189,7 @@ main = do
   -- display (InWindow "" (100,80) (0, 0)) white pic
   shorthand "bmp.png" (bmp)
   shorthand "circle.png" (circle 25)
-  exportPictureAndCheck
+  check
     exportPictureToPNG
     (500, 500)
     white
@@ -197,7 +209,7 @@ main = do
           , Color blue $ Line [(-wby2, hby2), (wby2, -hby2)]
           , ThickCircle 10 80
           ]
-  exportPictureAndCheck exportPictureToPNG (1900, 1050) white "large_image.png" p
+  check exportPictureToPNG (1900, 1050) white "large_image.png" p
 
   let stack =
         ( Pictures
@@ -209,34 +221,34 @@ main = do
             ]
         )
 
-  exportPictureAndCheck exportPictureToPNG (10, 10) white "p10.png" stack
-  exportPictureAndCheck exportPictureToPNG (20, 20) white "p20.png" stack
-  exportPictureAndCheck exportPictureToPNG (40, 40) white "p40.png" stack
-  exportPictureAndCheck exportPictureToPNG (60, 60) white "p60.png" stack
-  exportPictureAndCheck exportPictureToPNG (100, 100) white "p100.png" stack
+  check exportPictureToPNG (10, 10) white "p10.png" stack
+  check exportPictureToPNG (20, 20) white "p20.png" stack
+  check exportPictureToPNG (40, 40) white "p40.png" stack
+  check exportPictureToPNG (60, 60) white "p60.png" stack
+  check exportPictureToPNG (100, 100) white "p100.png" stack
 
-  exportPicturesAndCheck
+  checkMulti
     exportPicturesToPNG
     (1000, 1000)
     white
     "growing_polgons%d.png"
     (Color blue . poly)
     [200, 250 .. 500]
-  exportPicturesAndCheck
+  checkMulti
     exportPicturesToBitmap
     (1000, 1000)
     white
     "growing_polgons%d.bmp"
     (Color blue . poly)
     [200, 250 .. 500]
-  exportPicturesAndCheck
+  checkMulti
     exportPicturesToTga
     (1000, 1000)
     white
     "growing_polgons%d.tga"
     (Color blue . poly)
     [200, 250 .. 500]
-  exportPicturesAndCheck
+  checkMulti
     exportPicturesToTiff
     (1000, 1000)
     white
@@ -249,10 +261,12 @@ main = do
     LoopingNever
     (1000, 1000)
     red
-    "growing_polgons.gif"
+    (outputDir </> "growing_polgons.gif")
     (Color blue . poly)
     [200, 250 .. 500]
-  assertSameGifFiles "growing_polgons.gif" "expected_growing_polgons.gif"
+  assertSameGifFiles
+    (outputDir </> "growing_polgons.gif")
+    (dataDir </> "expected_growing_polgons.gif")
 
 
 textFloats :: [Float]

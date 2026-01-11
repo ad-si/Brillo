@@ -22,6 +22,28 @@ extra-source-files:
   ChangeLog.md
   README.md
 
+data-dir:           test
+data-files:
+  expected_bmp.png
+  expected_circle.png
+  expected_circles.png
+  expected_comprehensive.png
+  expected_growing_polgons.gif
+  expected_growing_polgons1.png
+  expected_growing_polgons2.png
+  expected_growing_polgons3.png
+  expected_growing_polgons4.png
+  expected_growing_polgons5.png
+  expected_growing_polgons6.png
+  expected_growing_polgons7.png
+  expected_large_image.png
+  expected_p10.png
+  expected_p100.png
+  expected_p20.png
+  expected_p40.png
+  expected_p60.png
+  loadme.bmp
+
 source-repository head
   type:     git
   location: https://github.com/ad-si/Brillo
