@@ -7,6 +7,9 @@ description:
   Export Brillo pictures to various image formats including PNG, BMP, TGA, TIFF, and animated GIF.
   Forked from gloss-export and adapted for the Brillo graphics library.
 
+tested-with:
+  GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.2 || ==9.12.2
+
 homepage:           https://github.com/ad-si/Brillo
 bug-reports:        https://github.com/ad-si/Brillo/issues
 author:             Timo A
