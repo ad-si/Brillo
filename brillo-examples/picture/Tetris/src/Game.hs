@@ -12,8 +12,6 @@ import Brillo
 import Brillo.Interface.Pure.Game
 import Control.Monad.Reader
 import Control.Monad.State
-import Data.Map qualified as Map
-import Data.Maybe
 
 
 runGame :: IO ()
@@ -35,6 +33,7 @@ window cfg = InWindow "Tetris" (windowSize cfg) (windowPosition cfg)
 
 
 -- | Smallest common multiple
+fps :: Int
 fps = 24
 
 
@@ -72,10 +71,10 @@ update _ game = movingDown $ case (isPause game, gameOver game) of
   (True, _) -> game
   where
     needUpdate = (== 0) $ mod ((+ 1) $ frapsCounter game) (hardnessMod $ hardness game)
-    movingDown game =
-      if (pressedKeyDown game && (not $ isPause game))
-        then (shiftDownFigure game)
-        else game
+    movingDown game_ =
+      if (pressedKeyDown game_ && (not $ isPause game_))
+        then (shiftDownFigure game_)
+        else game_
 
 
 -- | A function to handle input events.

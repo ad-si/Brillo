@@ -6,7 +6,6 @@ module World where
 import Control.Monad.Reader
 import Data.List
 import Data.Map qualified as Map
-import Data.Maybe
 import Data.Ord
 import System.Random
 
@@ -22,12 +21,31 @@ data Hardness = Noob | Beginner | Average | Skilled | Masterful | Insane | Godli
   deriving (Enum, Bounded, Show)
 
 
+noobBound :: Integer
 noobBound = 0
+
+
+beginnerBound :: Integer
 beginnerBound = 300
+
+
+averageBound :: Integer
 averageBound = 800
+
+
+skilledBound :: Integer
 skilledBound = 1400
+
+
+masterfulBound :: Integer
 masterfulBound = 2200
+
+
+insaneBound :: Integer
 insaneBound = 3500
+
+
+godlikeBound :: Integer
 godlikeBound = 5000
 
 
