@@ -254,6 +254,16 @@ executable brillo-pickfiles
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
+executable brillo-polygons
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/Polygons
+  build-depends:
+    , base    >=4.8    && <5
+    , brillo  >=1.13.3 && <1.15
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-styrene
   default-language: GHC2021
   main-is:          Main.hs

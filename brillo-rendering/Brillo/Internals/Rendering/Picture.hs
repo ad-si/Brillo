@@ -32,6 +32,7 @@ import Brillo.Internals.Data.Picture (
 import Brillo.Internals.Rendering.Bitmap (BitmapData (..), bitmapPath)
 import Brillo.Internals.Rendering.Circle (renderArc, renderCircle)
 import Brillo.Internals.Rendering.Common (gf, gsizei)
+import Brillo.Internals.Rendering.Polygon (renderComplexPolygon)
 import Brillo.Internals.Rendering.State (
   State (
     stateBlendAlpha,
@@ -124,8 +125,7 @@ drawPicture state circScale picture =
           GL.renderPrimitive GL.LineLoop $
             vertexPFs path
       | otherwise ->
-          GL.renderPrimitive GL.Polygon $
-            vertexPFs path
+          renderComplexPolygon path
     -- circle
     Circle radius ->
       renderCircle 0 0 circScale radius 0
