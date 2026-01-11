@@ -25,6 +25,7 @@
             haskellPackages.cabal-fmt
             haskellPackages.cabal-install
             haskellPackages.fourmolu
+            # haskellPackages.haskell-ci # TODO: Readd once 0.19 is available
             haskellPackages.haskell-language-server
             haskellPackages.hlint
             haskellPackages.stack

@@ -8,14 +8,15 @@
 #
 # For more information, see https://github.com/haskell-CI/haskell-ci
 #
-# version: 0.19.20250506
+# version: 0.19.20260104
 #
-# REGENDATA ("0.19.20250506",["github","cabal.project"])
+# REGENDATA ("0.19.20260104",["github","cabal.project"])
 #
 name: Haskell-CI
 on:
   - push
   - pull_request
+  - merge_group
 jobs:
   linux:
     name: Haskell-CI - Linux - ${{ matrix.compiler }}
@@ -67,8 +68,8 @@ jobs:
           chmod a+x "$HOME/.ghcup/bin/ghcup"
       - name: Install cabal-install
         run: |
-          "$HOME/.ghcup/bin/ghcup" install cabal 3.14.2.0 || (cat "$HOME"/.ghcup/logs/*.* && false)
-          echo "CABAL=$HOME/.ghcup/bin/cabal-3.14.2.0 -vnormal+nowrap" >> "$GITHUB_ENV"
+          "$HOME/.ghcup/bin/ghcup" install cabal 3.16.0.0 || (cat "$HOME"/.ghcup/logs/*.* && false)
+          echo "CABAL=$HOME/.ghcup/bin/cabal-3.16.0.0 -vnormal+nowrap" >> "$GITHUB_ENV"
       - name: Install GHC (GHCup)
         if: matrix.setup-method == 'ghcup'
         run: |
@@ -144,7 +145,7 @@ jobs:
           chmod a+x $HOME/.cabal/bin/cabal-plan
           cabal-plan --version
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: source
       - name: initial cabal.project for sdist
@@ -153,6 +154,7 @@ jobs:
           echo "packages: $GITHUB_WORKSPACE/source/brillo" >> cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/brillo-algorithms" >> cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/brillo-examples" >> cabal.project
+          echo "packages: $GITHUB_WORKSPACE/source/brillo-export" >> cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/brillo-juicy" >> cabal.project
           echo "packages: $GITHUB_WORKSPACE/source/brillo-rendering" >> cabal.project
           cat cabal.project
@@ -172,6 +174,8 @@ jobs:
           echo "PKGDIR_brillo_algorithms=${PKGDIR_brillo_algorithms}" >> "$GITHUB_ENV"
           PKGDIR_brillo_examples="$(find "$GITHUB_WORKSPACE/unpacked" -maxdepth 1 -type d -regex '.*/brillo-examples-[0-9.]*')"
           echo "PKGDIR_brillo_examples=${PKGDIR_brillo_examples}" >> "$GITHUB_ENV"
+          PKGDIR_brillo_export="$(find "$GITHUB_WORKSPACE/unpacked" -maxdepth 1 -type d -regex '.*/brillo-export-[0-9.]*')"
+          echo "PKGDIR_brillo_export=${PKGDIR_brillo_export}" >> "$GITHUB_ENV"
           PKGDIR_brillo_juicy="$(find "$GITHUB_WORKSPACE/unpacked" -maxdepth 1 -type d -regex '.*/brillo-juicy-[0-9.]*')"
           echo "PKGDIR_brillo_juicy=${PKGDIR_brillo_juicy}" >> "$GITHUB_ENV"
           PKGDIR_brillo_rendering="$(find "$GITHUB_WORKSPACE/unpacked" -maxdepth 1 -type d -regex '.*/brillo-rendering-[0-9.]*')"
@@ -182,21 +186,48 @@ jobs:
           echo "packages: ${PKGDIR_brillo}" >> cabal.project
           echo "packages: ${PKGDIR_brillo_algorithms}" >> cabal.project
           echo "packages: ${PKGDIR_brillo_examples}" >> cabal.project
+          echo "packages: ${PKGDIR_brillo_export}" >> cabal.project
           echo "packages: ${PKGDIR_brillo_juicy}" >> cabal.project
           echo "packages: ${PKGDIR_brillo_rendering}" >> cabal.project
           echo "package brillo" >> cabal.project
-          echo "    ghc-options: -Werror=missing-methods" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods -Werror=missing-fields" >> cabal.project
           echo "package brillo-algorithms" >> cabal.project
-          echo "    ghc-options: -Werror=missing-methods" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods -Werror=missing-fields" >> cabal.project
           echo "package brillo-examples" >> cabal.project
-          echo "    ghc-options: -Werror=missing-methods" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods -Werror=missing-fields" >> cabal.project
+          echo "package brillo-export" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods -Werror=missing-fields" >> cabal.project
           echo "package brillo-juicy" >> cabal.project
-          echo "    ghc-options: -Werror=missing-methods" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods -Werror=missing-fields" >> cabal.project
           echo "package brillo-rendering" >> cabal.project
-          echo "    ghc-options: -Werror=missing-methods" >> cabal.project
+          echo "    ghc-options: -Werror=missing-methods -Werror=missing-fields" >> cabal.project
+          echo "package brillo" >> cabal.project
+          echo "    ghc-options: -Werror=unused-packages" >> cabal.project
+          echo "package brillo-algorithms" >> cabal.project
+          echo "    ghc-options: -Werror=unused-packages" >> cabal.project
+          echo "package brillo-examples" >> cabal.project
+          echo "    ghc-options: -Werror=unused-packages" >> cabal.project
+          echo "package brillo-export" >> cabal.project
+          echo "    ghc-options: -Werror=unused-packages" >> cabal.project
+          echo "package brillo-juicy" >> cabal.project
+          echo "    ghc-options: -Werror=unused-packages" >> cabal.project
+          echo "package brillo-rendering" >> cabal.project
+          echo "    ghc-options: -Werror=unused-packages" >> cabal.project
+          echo "package brillo" >> cabal.project
+          echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
+          echo "package brillo-algorithms" >> cabal.project
+          echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
+          echo "package brillo-examples" >> cabal.project
+          echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
+          echo "package brillo-export" >> cabal.project
+          echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
+          echo "package brillo-juicy" >> cabal.project
+          echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
+          echo "package brillo-rendering" >> cabal.project
+          echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
           cat >> cabal.project <<EOF
           EOF
-          $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: any.$_ installed\n" unless /^(brillo|brillo-algorithms|brillo-examples|brillo-juicy|brillo-rendering)$/; }' >> cabal.project.local
+          $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: any.$_ installed\n" unless /^(brillo|brillo-algorithms|brillo-examples|brillo-export|brillo-juicy|brillo-rendering)$/; }' >> cabal.project.local
           cat cabal.project
           cat cabal.project.local
       - name: dump install plan
@@ -219,6 +250,9 @@ jobs:
       - name: build
         run: |
           $CABAL v2-build $ARG_COMPILER $ARG_TESTS $ARG_BENCH all --write-ghc-environment-files=always
+      - name: tests
+        run: |
+          $CABAL v2-test $ARG_COMPILER $ARG_TESTS $ARG_BENCH all --test-show-details=direct
       - name: cabal check
         run: |
           cd ${PKGDIR_brillo} || false
@@ -226,6 +260,8 @@ jobs:
           cd ${PKGDIR_brillo_algorithms} || false
           ${CABAL} -vnormal check
           cd ${PKGDIR_brillo_examples} || false
+          ${CABAL} -vnormal check
+          cd ${PKGDIR_brillo_export} || false
           ${CABAL} -vnormal check
           cd ${PKGDIR_brillo_juicy} || false
           ${CABAL} -vnormal check
