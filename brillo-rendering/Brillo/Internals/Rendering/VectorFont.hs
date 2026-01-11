@@ -158,17 +158,20 @@ allDirs strokes = do
 -- preferring (in order):
 score :: [VFStroke] -> (Int, Double, VFPoint)
 score ss | length ss < 2 = (length ss, 0.0, (0.0, 0.0))
-score ss = do
+score ss@((firstPoint : _) : _) = do
   let
-    skips = zipWith (\as bs -> dist (last as) (head bs)) ss (tail ss)
-    firstPoint = head $ head ss
+    skips = zipWith (\as bs -> dist (last as) (safeHead bs)) ss (drop 1 ss)
+    safeHead (x : _) = x
+    safeHead [] = (0.0, 0.0)
   (length ss, sum skips, firstPoint)
+score _ = (0, 0.0, (0.0, 0.0))
 
 
 joinStrokes :: (Eq a) => [[a]] -> [[a]]
-joinStrokes (s0 : s1 : ss)
-  | last s0 == head s1 = joinStrokes $ (s0 ++ tail s1) : ss
+joinStrokes (s0 : s1@(h1 : t1) : ss)
+  | last s0 == h1 = joinStrokes $ (s0 ++ t1) : ss
   | otherwise = s0 : joinStrokes (s1 : ss)
+joinStrokes (s0 : s1 : ss) = s0 : joinStrokes (s1 : ss)
 joinStrokes ss = ss
 
 {- FOURMOLU_DISABLE -}
