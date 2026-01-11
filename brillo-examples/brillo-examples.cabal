@@ -413,7 +413,6 @@ executable brillo-tetris
     World
 
   build-depends:
-    , array       >=0.5    && <0.6
     , base        >=4.8    && <5
     , brillo      >=1.13.3 && <1.15
     , containers  >=0.5    && <0.9
