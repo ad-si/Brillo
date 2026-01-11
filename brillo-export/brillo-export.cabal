@@ -1,0 +1,77 @@
+name:               brillo-export
+version:            0.1.0.4
+synopsis:
+  Export Brillo pictures to png, bmp, tga, tiff, gif and juicy-pixels-image
+
+description:
+  Export Brillo pictures to various image formats including PNG, BMP, TGA, TIFF, and animated GIF.
+  Forked from gloss-export and adapted for the Brillo graphics library.
+
+homepage:           https://github.com/ad-si/Brillo
+bug-reports:        https://github.com/ad-si/Brillo/issues
+author:             Timo A
+maintainer:         timo-a@gmx.ch
+license:            MIT
+build-type:         Simple
+cabal-version:      >=1.10
+category:           Graphics
+extra-source-files:
+  ChangeLog.md
+  README.md
+
+source-repository head
+  type:     git
+  location: https://github.com/ad-si/Brillo
+
+library
+  hs-source-dirs:   src
+  ghc-options:      -fwarn-unused-imports
+  build-depends:
+      base              >=4.7    && <5
+    , brillo-rendering  >=1.13.3 && <1.15
+    , GLFW-b            >=1.0.0  && <4
+    , GLUT              >=2.1.2  && <3
+    , JuicyPixels       >=3.2    && <4
+    , OpenGLRaw         >=3.0    && <4
+    , vector            >=0.9.1  && <1
+
+  exposed-modules:
+    Brillo.Export
+    Brillo.Export.Bitmap
+    Brillo.Export.Gif
+    Brillo.Export.Image
+    Brillo.Export.PNG
+    Brillo.Export.Tga
+    Brillo.Export.Tiff
+
+  other-modules:    Paths_brillo_export
+  default-language: Haskell2010
+
+executable brillo-export-exe
+  main-is:          Demo.hs
+  hs-source-dirs:   app
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base           >=4.7    && <5
+    , brillo         >=1.13.3 && <1.15
+    , brillo-export
+
+  other-modules:    Paths_brillo_export
+  default-language: Haskell2010
+
+test-suite brillo-export-test
+  type:             exitcode-stdio-1.0
+  main-is:          Export.hs
+  hs-source-dirs:   test
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base           >=4.7    && <5
+    , brillo         >=1.13.3 && <1.15
+    , brillo-export
+    , directory
+    , filepath
+    , JuicyPixels
+    , text           >=2.0    && <3
+
+  other-modules:    Paths_brillo_export
+  default-language: Haskell2010

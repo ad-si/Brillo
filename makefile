@@ -5,6 +5,11 @@ help: makefile
 
 .PHONY: test
 test:
+	stack test brillo-algorithms && \
+	stack test brillo-examples && \
+	stack test brillo-export && \
+	stack test brillo-juicy && \
+	stack test brillo-rendering && \
 	stack run brillo-bitmap brillo-examples/picture/Bitmap/lena-101x101.bmp && \
 	stack run brillo-boids && \
 	stack run brillo-clock && \
@@ -13,6 +18,7 @@ test:
 	stack run brillo-draw && \
 	stack run brillo-easy && \
 	stack run brillo-eden && \
+	stack run brillo-export && \
 	stack run brillo-flake && \
 	stack run brillo-gameevent && \
 	stack run brillo-graph && \
@@ -32,7 +38,7 @@ test:
 
 .PHONY: format
 format:
-	fourmolu --mode=inplace $$(git ls-files '*.hs')
+	fourmolu --mode=inplace $$(git ls-files '*.hs' | grep -v 'Brillo/Export/Image.hs')
 	find . -iname '*.cabal' | xargs cabal-fmt --inplace
 
 

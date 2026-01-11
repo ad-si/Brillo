@@ -1,7 +1,8 @@
-.DS_Store
-.stack-work
 *.hi
 *.o
+.direnv
+.DS_Store
+.stack-work
 dist
 dist-newstyle
-.direnv
+/output
