@@ -16,6 +16,7 @@ Command | Result
 `stack run brillo-dropfiles`  | <img src="picture/DropFiles/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-easy`       | <img src="picture/Easy/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-eden`       | <img src="picture/Eden/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-export`     | <img src="picture/Export/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-flake`      | <img src="picture/Flake/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-gameevent`  | <img src="picture/GameEvent/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-graph`      | <img src="picture/Graph/screenshot.png" style="max-height: 250px"/>
