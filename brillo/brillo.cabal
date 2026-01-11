@@ -20,7 +20,7 @@ synopsis:
   Painless 2D vector graphics, animations, and simulations powered by GLFW
 
 tested-with:
-  GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.2 || ==9.12.2
+  GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.3 || ==9.12.2
 
 extra-source-files: cbits/tinyfiledialogs.h
 

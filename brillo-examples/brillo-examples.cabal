@@ -14,7 +14,7 @@ description:
   A mixed bag of fractals, particle simulations and cellular automata.
 
 synopsis:      Examples using the Brillo library
-tested-with:   GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.2 || ==9.12.2
+tested-with:   GHC ==9.4.8 || ==9.6.7 || ==9.8.4 || ==9.10.3 || ==9.12.2
 
 flag llvm
   description:
