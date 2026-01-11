@@ -137,27 +137,27 @@ renderGlyph glyphs fallback lineHeight (penX, penY) = \case
           pure (penX, penY)
         Just
           Glyph{glyphTexture, glyphSize = (w, h), glyphBearing = (bx, by), glyphAdvance} ->
-          do
-            let advance = fromIntegral glyphAdvance / 64
-                xpos = penX + fromIntegral bx
-                ypos = penY + fromIntegral by - fromIntegral h
-                width = fromIntegral w
-                height = fromIntegral h
-            case glyphTexture of
-              Nothing ->
-                pure (penX + advance, penY)
-              Just tex -> do
-                textureBinding GL.Texture2D $= Just tex
-                GL.renderPrimitive GL.Quads $ do
-                  GL.texCoord $ GL.TexCoord2 0 (0 :: GL.GLfloat)
-                  GL.vertex $ GL.Vertex3 (gf xpos) (gf (ypos + height)) 0
-                  GL.texCoord $ GL.TexCoord2 0 (1 :: GL.GLfloat)
-                  GL.vertex $ GL.Vertex3 (gf xpos) (gf ypos) 0
-                  GL.texCoord $ GL.TexCoord2 1 (1 :: GL.GLfloat)
-                  GL.vertex $ GL.Vertex3 (gf (xpos + width)) (gf ypos) 0
-                  GL.texCoord $ GL.TexCoord2 1 (0 :: GL.GLfloat)
-                  GL.vertex $ GL.Vertex3 (gf (xpos + width)) (gf (ypos + height)) 0
-                pure (penX + advance, penY)
+            do
+              let advance = fromIntegral glyphAdvance / 64
+                  xpos = penX + fromIntegral bx
+                  ypos = penY + fromIntegral by - fromIntegral h
+                  width = fromIntegral w
+                  height = fromIntegral h
+              case glyphTexture of
+                Nothing ->
+                  pure (penX + advance, penY)
+                Just tex -> do
+                  textureBinding GL.Texture2D $= Just tex
+                  GL.renderPrimitive GL.Quads $ do
+                    GL.texCoord $ GL.TexCoord2 0 (0 :: GL.GLfloat)
+                    GL.vertex $ GL.Vertex3 (gf xpos) (gf (ypos + height)) 0
+                    GL.texCoord $ GL.TexCoord2 0 (1 :: GL.GLfloat)
+                    GL.vertex $ GL.Vertex3 (gf xpos) (gf ypos) 0
+                    GL.texCoord $ GL.TexCoord2 1 (1 :: GL.GLfloat)
+                    GL.vertex $ GL.Vertex3 (gf (xpos + width)) (gf ypos) 0
+                    GL.texCoord $ GL.TexCoord2 1 (0 :: GL.GLfloat)
+                    GL.vertex $ GL.Vertex3 (gf (xpos + width)) (gf (ypos + height)) 0
+                  pure (penX + advance, penY)
 
 
 -- Font loading --------------------------------------------------------------
