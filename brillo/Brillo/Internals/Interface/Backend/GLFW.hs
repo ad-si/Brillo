@@ -373,6 +373,8 @@ callbackKeyboard ::
   GLFW.KeyCallback -- = Window -> Key -> Int -> KeyState -> ModifierKeys -> IO ()
   -- -> GLFW.Key -> Bool
   -- -> IO ()
+callbackKeyboard _stateRef _callbacks _win _key _scancode GLFW.KeyState'Repeating _modifiers =
+  return ()
 callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
   do
     let keystate = keystateglfw == GLFW.KeyState'Pressed
