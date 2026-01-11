@@ -2,5 +2,6 @@ packages:
   brillo
   brillo-algorithms
   brillo-examples
+  brillo-export
   brillo-juicy
   brillo-rendering
