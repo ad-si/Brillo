@@ -28,7 +28,7 @@ module Brillo.Export (
 
   -- * Writing to Gif
   exportPicturesToGif,
-  GifDelay (..),
+  GifDelay,
   GifLooping (..),
 ) where
 

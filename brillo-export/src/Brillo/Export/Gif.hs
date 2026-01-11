@@ -1,6 +1,6 @@
 module Brillo.Export.Gif (
   exportPicturesToGif,
-  GifDelay (..),
+  GifDelay,
   GifLooping (..),
 ) where
 

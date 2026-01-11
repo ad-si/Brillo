@@ -90,3 +90,4 @@ actorSetIndex actor ix =
 actorSetMode :: Int -> Actor -> Actor
 actorSetMode m (Bead ix _ r p v) =
   Bead ix m r p v
+actorSetMode _ wall@(Wall _ _ _) = wall

@@ -166,11 +166,11 @@ withImage (windowWidth, windowHeight) bgc s p body = do
     let flippedPicture :: Brillo.Picture
         flippedPicture = Brillo.Scale 1 (-1) p
     drawReadBuffer (windowWidth, windowHeight) bgc s flippedPicture
-    allocaArray (windowWidth * windowHeight * bytesPerPixel) $ \imageData -> do
+    allocaArray (windowWidth * windowHeight * bytesPerPixel) $ \imgData -> do
       let wW = fromIntegral windowWidth  :: GHC.Int.Int32
       let wH = fromIntegral windowHeight :: GHC.Int.Int32
-      glReadPixels 0 0 wW wH pixelFormat pixelType imageData 
-      foreignPtr <- newForeignPtr_ imageData
+      glReadPixels 0 0 wW wH pixelFormat pixelType imgData
+      foreignPtr <- newForeignPtr_ imgData
       let vector = unsafeFromForeignPtr0 foreignPtr (windowWidth * windowHeight * bytesPerPixel)
       let image :: Image pixel
           image = Image windowWidth windowHeight vector
