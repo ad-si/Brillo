@@ -2,8 +2,6 @@
 
 module Figures where
 
-import Config
-import Data.Map qualified as Map
 import System.Random
 
 

@@ -4,13 +4,11 @@ module Main (main)
 where
 
 import Brillo
-import Brillo.Data.Color
 import Brillo.Interface.Pure.Game
-import Control.Lens (element, set)
-import Data.List (reverse, transpose)
+import Data.List (transpose)
 import Data.List.Split (chunksOf)
 import Data.Text qualified as T
-import System.Random (StdGen, getStdGen, random, randoms)
+import System.Random (StdGen, getStdGen, random)
 
 
 --------------------------------------------
@@ -20,23 +18,24 @@ import System.Random (StdGen, getStdGen, random, randoms)
 -- aesthetic improvements
 -------------------------------------------
 
-main =
-  do
-    g <- getStdGen
-    play
-      ( InWindow
-          "2048 in Haskell by Maia"
-          (410, 500)
-          (20, 20)
-      )
-      (makeColorI 193 177 156 255) -- background color
-      fps -- simulation steps per second
-      (initPositions g) -- initial world
-      drawWorld -- function to convert world to picture
-      handleInputEvents -- TODO add randomness
-      stepWorld
+main :: IO ()
+main = do
+  g <- getStdGen
+  play
+    ( InWindow
+        "2048 in Haskell by Maia"
+        (410, 500)
+        (20, 20)
+    )
+    (makeColorI 193 177 156 255) -- background color
+    fps -- simulation steps per second
+    (initPositions g) -- initial world
+    drawWorld -- function to convert world to picture
+    handleInputEvents -- TODO add randomness
+    stepWorld
 
 
+fps :: Int
 fps = 20
 
 
@@ -48,26 +47,6 @@ data World = World {board :: [[Tile]], gen :: StdGen, score :: Int}
 
 instance Eq World where
   x == y = board x == board y && score x == score y
-
-
---------------------------------------------
--- Utils for world generation and updating
---------------------------------------------
-
-tileIntFunction :: (Int -> Int) -> Tile -> Tile
-tileIntFunction f t = t{val = f (val t)}
-
-
-setVal :: Tile -> Int -> Tile
-setVal t i = t{val = i}
-
-
-setVals :: [Tile] -> [Int] -> [Tile]
-setVals ts is = zipWith setVal ts is
-
-
-setValss :: [[Tile]] -> [[Int]] -> [[Tile]]
-setValss tss iss = zipWith setVals tss iss
 
 
 ---------------------------------------------
@@ -95,7 +74,7 @@ initPositions g =
 --------------------------------------------
 
 replaceNthZero :: Int -> Int -> [Tile] -> [Tile]
-replaceNthZero v _ [] = []
+replaceNthZero _ _ [] = []
 replaceNthZero v 0 (x : xs) =
   if val x == 0
     then (Tile{val = v, popInTime = 0.5, popOutTime = 0.0} : xs)
@@ -106,6 +85,7 @@ replaceNthZero v n (x : xs) =
     else x : (replaceNthZero v n xs)
 
 
+reciprocalOddsOf4 :: Int
 reciprocalOddsOf4 = 10
 
 
@@ -114,7 +94,7 @@ addTile world =
   let numZeros = (sum . (map toInt) . (map (== 0)) . map val . concat) (board world)
       (rand, newGen) = random (gen world) :: (Int, StdGen)
       n = if numZeros == 0 then 0 else rand `mod` numZeros
-      (rand2, newGen2) = random newGen :: (Int, StdGen)
+      (rand2, _) = random newGen :: (Int, StdGen)
       v = if rand2 `mod` reciprocalOddsOf4 == 0 then 4 else 2
       newBoard = chunksOf 4 $ replaceNthZero v n $ concat (board world)
   in  world{board = newBoard, gen = newGen}
@@ -149,8 +129,8 @@ handleInputEvents _ x = x
 -- Time steps: All they do is update the animations   --
 -- -----------------------------------------------------
 
+popInSpeed :: Float
 popInSpeed = 4
-popOutSpeed = 0.5
 
 
 -- changes animation times for each tile
@@ -179,6 +159,7 @@ stepWorld dt world = world{board = updateTiles dt (board world)}
 --  Drawing and display
 ---------------------------------------------------------
 
+rowHgt :: Float
 rowHgt = 100
 
 
@@ -196,33 +177,39 @@ gameOverMessage =
 
 
 drawWorld :: World -> Picture
-drawWorld w@World{board = [r1, r2, r3, r4], score = s} =
-  translate (150) (150) $
-    pictures $
-      [ drawRow r1
-      , translate 0 (-rowHgt) (drawRow r2)
-      , translate 0 (-rowHgt * 2) (drawRow r3)
-      , translate 0 (-rowHgt * 3) (drawRow r4)
-      , translate (-300) 60 $
-          scale 0.2 0.2 $
-            color white $
-              text $
-                T.pack $
-                  "Score: " ++ (show s)
-      ]
-        ++ gameOverPicture
-  where
-    gameOverPicture = if lost then [gameOverMessage] else []
-    lost =
-      go (Just R) w == w
-        && go (Just L) w == w
-        && go (Just U) w == w
-        && go (Just D) w == w
+drawWorld w = case board w of
+  [r1, r2, r3, r4] ->
+    translate (150) (150) $
+      pictures $
+        [ drawRow r1
+        , translate 0 (-rowHgt) (drawRow r2)
+        , translate 0 (-rowHgt * 2) (drawRow r3)
+        , translate 0 (-rowHgt * 3) (drawRow r4)
+        , translate (-300) 60 $
+            scale 0.2 0.2 $
+              color white $
+                text $
+                  T.pack $
+                    "Score: " ++ (show $ score w)
+        ]
+          ++ gameOverPicture
+    where
+      gameOverPicture = if lost then [gameOverMessage] else []
+      lost =
+        go (Just R) w == w
+          && go (Just L) w == w
+          && go (Just U) w == w
+          && go (Just D) w == w
+  _ -> blank
 
 
 -- debugPicture ])
 
+tileS :: Float
 tileS = 90
+
+
+textScale :: Float
 textScale = 0.2
 
 
@@ -259,10 +246,6 @@ drawQuarterRoundedRect :: Int -> Float -> Float -> Float -> Picture
 drawQuarterRoundedRect n w h r = polygon $ quarterRoundedRect n w h r
 
 
-outlineQuarterRoundedRect :: Int -> Float -> Float -> Float -> Picture
-outlineQuarterRoundedRect n w h r = line $ quarterRoundedRect n w h r
-
-
 -- takes width and height and radius and makes a filled rounded rectangle
 -- the int is the precision / number of points
 roundedRect :: Int -> Float -> Float -> Float -> Picture
@@ -284,15 +267,20 @@ getPoint x y r th = (x + r * cos th, y + r * sin th)
 arcPath :: Int -> (Float, Float) -> Float -> Path
 arcPath n (x, y) r =
   map (getPoint x y r) $
-    [0.0] ++ (map (\x -> pi / 2 / (fromIntegral x)) $ reverse [1 .. n + 1])
+    [0.0] ++ (map (\i -> pi / 2 / (fromIntegral i)) $ reverse [1 .. n + 1])
 
 
+tileRoundness :: Float
 tileRoundness = 4
+
+
+tilePrecision :: Int
 tilePrecision = 10
 
 
 -- Takes x-offset and draws the tile background
 -- maybe unroll this into drawTile?
+tileBackColor :: Color
 tileBackColor = makeColorI 205 192 180 255
 drawTileBack :: Float -> Picture
 drawTileBack x =
@@ -330,17 +318,19 @@ drawTile x tile =
 
 
 drawRow :: Row -> Picture
-drawRow [i, j, k, l] =
-  translate
-    (-300)
-    0
-    ( pictures
-        [ drawTile 0 i
-        , drawTile rowHgt j
-        , drawTile (rowHgt * 2) k
-        , drawTile (rowHgt * 3) l
-        ]
-    )
+drawRow row = case row of
+  [i, j, k, l] ->
+    translate
+      (-300)
+      0
+      ( pictures
+          [ drawTile 0 i
+          , drawTile rowHgt j
+          , drawTile (rowHgt * 2) k
+          , drawTile (rowHgt * 3) l
+          ]
+      )
+  _ -> blank
 
 
 --------------------------------------------
@@ -358,7 +348,8 @@ scootLambda y (x : xs) = if val x == 0 then x : y : xs else y : x : xs
 
 
 -- Takes a row and scoots all numbers through zeroes *once*
--- Example: [2,0,0,2] -> [0,2,0,2] and [0,2,0,2] -> [0,0,2,2] scootRowRightOnce :: [Int] -> [Int]
+-- Example: [2,0,0,2] -> [0,2,0,2] and [0,2,0,2] -> [0,0,2,2]
+scootRowRightOnce :: [Tile] -> [Tile]
 scootRowRightOnce = foldr scootLambda []
 
 

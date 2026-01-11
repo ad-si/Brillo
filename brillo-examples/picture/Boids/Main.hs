@@ -17,27 +17,64 @@ import Vec2
 
 
 -- Parameters -----------------------------------------------------------------
+cParam :: Double
 cParam = 0.0075
 
 
+sParam :: Double
 sParam = 0.1
+
+
+sScale :: Double
 sScale = 1.25
 
 
+aParam :: Double
 aParam = 1.0 / 1.8
+
+
+vLimit :: Double
 vLimit = 0.0025 * max (maxx - minx) (maxy - miny)
+
+
+epsilon :: Double
 epsilon = 0.40
+
+
+maxx :: Double
 maxx = 8.0
+
+
+maxy :: Double
 maxy = 8.0
+
+
+minx :: Double
 minx = -8.0
+
+
+miny :: Double
 miny = -8.0
 
 
 -- Colors ---------------------------------------------------------------------
+boidColor :: Color
 boidColor = makeColor 1.0 1.0 0.0 1.0
+
+
+radiusColor :: Color
 radiusColor = makeColor 0.5 1.0 1.0 0.2
+
+
+cohesionColor :: Color
 cohesionColor = makeColor 1.0 0.0 0.0 1.0
+
+
+separationColor :: Color
 separationColor = makeColor 0.0 1.0 0.0 1.0
+
+
+alignmentColor :: Color
 alignmentColor = makeColor 0.0 0.0 1.0 1.0
 
 
@@ -77,7 +114,7 @@ main =
             }
 
     let bs = initialize 500 10.0 0.5
-    let t = foldl (\t b -> kdtAddPoint t (position b) b) newKDTree bs
+    let t = foldl (\tree b -> kdtAddPoint tree (position b) b) newKDTree bs
 
     simulate
       (InWindow "Boids" (pixWidth w, pixHeight w) (10, 10))
@@ -117,7 +154,6 @@ renderboid :: World -> Boid -> Picture
 renderboid world b =
   let (Vec2 x y) = position b
       (Vec2 vx vy) = velocity b
-      v = velocity b
       (Vec2 dCX dCY) = dbgC b
       (Vec2 dSX dSY) = dbgS b
       (Vec2 dAX dAY) = dbgA b
@@ -148,7 +184,7 @@ renderboid world b =
 -- Initialisation -------------------------------------------------------------
 rnlist :: Int -> IO [Double]
 rnlist n =
-  mapM (\_ -> randomRIO (0.0, 1.0)) [1 .. n]
+  mapM (const $ randomRIO (0.0, 1.0)) [1 .. n]
 
 
 initialize :: Int -> Double -> Double -> [Boid]
@@ -156,10 +192,12 @@ initialize n sp sv =
   let nums = unsafePerformIO $ rnlist (n * 6)
       nums' = map (\i -> (0.5 - i) / 2.0) nums
 
-      makeboids [] [] = []
-      makeboids (a : b : c : d : e : f : rest) (id : ids) =
+      makeboids :: [Double] -> [Int] -> [Boid]
+      makeboids [] _ = []
+      makeboids _ [] = []
+      makeboids (a : b : _c : d : e : _f : rest) (boidId : ids) =
         Boid
-          { identifier = id
+          { identifier = boidId
           , velocity = Vec2 (a * sv) (b * sv)
           , position = Vec2 (d * sp) (e * sp)
           , dbgC = vecZero
@@ -167,6 +205,7 @@ initialize n sp sv =
           , dbgA = vecZero
           }
           : makeboids rest ids
+      makeboids _ _ = []
   in  makeboids nums' [1 .. n]
 
 
@@ -220,7 +259,7 @@ cohesion b boids a = vecScale diff a
 
 -- | separation: avoid neighbours
 separation :: Boid -> [Boid] -> Double -> Vec2
-separation b [] a = vecZero
+separation _ [] _ = vecZero
 separation b boids a =
   let diff_positions = map (\i -> vecSub (position i) (position b)) boids
       closeby = filter (\i -> (vecNorm i) < a) diff_positions
@@ -230,12 +269,12 @@ separation b boids a =
 
 -- | alignment: fly the same way as neighbours
 alignment :: Boid -> [Boid] -> Double -> Vec2
-alignment b [] a = vecZero
-alignment b boids a =
+alignment _ [] _ = vecZero
+alignment b boids _ =
   let v = foldl1 vecAdd (map velocity boids)
       s = 1.0 / (fromIntegral $ length boids)
       v' = vecScale v s
-  in  vecScale (vecSub v' (velocity b)) a
+  in  vecScale (vecSub v' (velocity b)) aParam
 
 
 -- | Move one boid, with respect to its neighbours.
@@ -243,20 +282,20 @@ oneboid :: Boid -> [Boid] -> Boid
 oneboid b boids =
   let c = cohesion b boids cParam
       s = separation b boids sParam
-      a = alignment b boids aParam
+      alignResult = alignment b boids aParam
       p = position b
       v = velocity b
-      id = identifier b
-      v' = vecAdd v (vecScale (vecAdd c (vecAdd s a)) 0.1)
+      boidId = identifier b
+      v' = vecAdd v (vecScale (vecAdd c (vecAdd s alignResult)) 0.1)
       v'' = limiter (vecScale v' 1.0025) vLimit
       p' = vecAdd p v''
   in  Boid
-        { identifier = id
+        { identifier = boidId
         , position = wraparound p'
         , velocity = v''
         , dbgC = c
         , dbgS = s
-        , dbgA = a
+        , dbgA = alignResult
         }
 
 
@@ -290,10 +329,10 @@ findNeighbors w b =
 
       -- adjuster for wraparound
       adj1 ax ay (pos, theboid) =
-        (vecAdd pos av, theboid{position = vecAdd p av})
+        (vecAdd pos av, theboid{position = vecAdd boidPos av})
         where
           av = Vec2 ax ay
-          p = position theboid
+          boidPos = position theboid
 
       adjuster lo hi ax ay =
         let neighbors = kdtRangeSearch w lo hi
@@ -357,13 +396,13 @@ wraparound (Vec2 x y) =
 
 
 iteration :: ViewPort -> Float -> KDTreeNode Boid -> KDTreeNode Boid
-iteration vp step w =
-  let all = kdtreeToList w
-      boids = mapKDTree w (\i -> oneboid i all)
+iteration _ _ kdtree =
+  let allBoids = kdtreeToList kdtree
+      boids = mapKDTree kdtree (\i -> oneboid i allBoids)
   in  foldl (\t b -> kdtAddPoint t (position b) b) newKDTree boids
 
 
 iterationkd :: ViewPort -> Float -> KDTreeNode Boid -> KDTreeNode Boid
-iterationkd vp step w =
-  let boids = mapKDTree w (\i -> oneboid i (findNeighbors w i))
+iterationkd _ _ kdtree =
+  let boids = mapKDTree kdtree (\i -> oneboid i (findNeighbors kdtree i))
   in  foldl (\t b -> kdtAddPoint t (position b) b) newKDTree boids

@@ -27,9 +27,6 @@ import Foreign (newForeignPtr_)
 import Foreign.Marshal.Array (allocaArray)
 import Text.Printf (printf)
 import GHC.Int
-#ifdef linux_HOST_OS
-import qualified Graphics.UI.GLUT as GLUT
-#endif
 import Prelude hiding (concat)
 
 type Size = (Int, Int)
@@ -49,10 +46,6 @@ exportPictureToFormat savefunc size bgc f p = do
 -- This allows the same OpenGL surface (of the given size) to be reused several times, which in turn makes Brillo bitmaps faster to render because their textures are kept in video memory.
 withBrilloState :: Size -> (Brillo.State -> IO a) -> IO a
 withBrilloState size body = do
-#ifdef linux_HOST_OS
-    _ <- GLUT.exit                     -- otherwise 'illegal reinitialization'
-    (_,_) <- GLUT.getArgsAndInitialize -- needed for text  https://github.com/elisehuard/game-in-haskell/pull/3
-#endif
     s <- Brillo.initState
     withGLFW $ do
       GLFW.windowHint (GLFW.WindowHint'Visible False)
@@ -174,7 +167,7 @@ withImage (windowWidth, windowHeight) bgc s p body = do
       let vector = unsafeFromForeignPtr0 foreignPtr (windowWidth * windowHeight * bytesPerPixel)
       let image :: Image pixel
           image = Image windowWidth windowHeight vector
-      
+
       body image
 
 withImages :: OpenGLPixel pixel
@@ -199,4 +192,4 @@ drawReadBuffer (windowWidth, windowHeight) bg s p = do
     Brillo.withClearBuffer bg $ Brillo.withModelview (windowWidth, windowHeight) $ do
                                                            glColor3f 0 0 0
                                                            Brillo.renderPicture s 1 p
-    glReadBuffer GL_BACK 
+    glReadBuffer GL_BACK

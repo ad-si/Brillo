@@ -48,7 +48,7 @@ eqDynamicImage :: DynamicImage -> DynamicImage -> Bool
 eqDynamicImage dynamicImage1 dynamicImage2 =
   eqImage
     (convertRGBA8 dynamicImage1)
-    (convertRGBA8 dynamicImage1)
+    (convertRGBA8 dynamicImage2)
 
 
 assertSameImageFiles :: FilePath -> FilePath -> IO ()
@@ -68,7 +68,7 @@ assertSameGifFiles filePath1 filePath2 = do
   unless (length dynamicImages1 == length dynamicImages2) $ do
     error $
       "gifs have a different number of frames: " ++ filePath1 ++ ", " ++ filePath2
-  for_ (zip [1 ..] (zipWith eqDynamicImage dynamicImages1 dynamicImages2)) $ \(i, framesMatch) -> do
+  for_ (zip ([1 ..] :: [Int]) (zipWith eqDynamicImage dynamicImages1 dynamicImages2)) $ \(i, framesMatch) -> do
     unless framesMatch $ do
       error $
         "animations do not match at frame "
@@ -100,8 +100,8 @@ exportPictureAndCheck ::
   FilePath ->
   Picture ->
   IO ()
-exportPictureAndCheck exportPicture size bg filePath picture = do
-  exportPicture size bg filePath picture
+exportPictureAndCheck exportPicture imgSize bg filePath picture = do
+  exportPicture imgSize bg filePath picture
   assertSameImageAsExpected filePath
 
 
@@ -120,8 +120,8 @@ exportPicturesAndCheck ::
   -- | list of points in time at which to evaluate the animation
   [Float] ->
   IO ()
-exportPicturesAndCheck exportPictures size bg filePathPattern animation ts = do
-  exportPictures size bg filePathPattern animation ts
+exportPicturesAndCheck exportPictures imgSize bg filePathPattern animation ts = do
+  exportPictures imgSize bg filePathPattern animation ts
   for_ [1 .. length ts] $ \i -> do
     let filePath = printf filePathPattern i
     assertSameImageAsExpected filePath
@@ -131,6 +131,7 @@ size :: (Int, Int)
 size = (1500, 1000)
 
 
+shorthand :: FilePath -> Picture -> IO ()
 shorthand = exportPictureAndCheck exportPictureToPNG size white
 
 

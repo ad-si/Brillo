@@ -38,31 +38,32 @@ loadWorld fileName =
 -- | Read a world from a string.
 readWorld :: String -> World
 readWorld str =
-  let ("WORLD" : strWidthHeight : skip : cellLines) =
-        lines str
-
-      [width, height] = map read $ words strWidthHeight
-      rows = take height $ cellLines
-
-      cells =
-        concat $
-          map (readLine width) $
-            reverse rows
-
-      extent = makeExtent height 0 width 0
-  in  World
-        { worldWidth = width
-        , worldHeight = height
-        , worldTree = makeWorldTree extent cells
-        , worldCellSize = 20
-        , worldCellSpace = 0
-        }
+  case lines str of
+    ("WORLD" : strWidthHeight : _ : cellLines) ->
+      case map read $ words strWidthHeight of
+        [width, height] ->
+          let rows = take height cellLines
+              cells =
+                concat $
+                  map (readLine width) $
+                    reverse rows
+              extent = makeExtent height 0 width 0
+          in  World
+                { worldWidth = width
+                , worldHeight = height
+                , worldTree = makeWorldTree extent cells
+                , worldCellSize = 20
+                , worldCellSpace = 0
+                }
+        _ -> error "readWorld: invalid width/height format"
+    _ -> error "readWorld: invalid world format"
 
 
 readLine :: Int -> String -> [Cell]
-readLine width (s : str) =
+readLine width (_ : str) =
   map readCell $
     take width str
+readLine _ [] = []
 
 
 -- | Get the size of the window needed to display a world.
@@ -110,10 +111,10 @@ worldPosOfWindowPos world (x, y) =
       offsetX = fromIntegral $ windowSizeX `div` 2
       offsetY = fromIntegral $ windowSizeY `div` 2
 
-      scale = fromIntegral $ worldCellSize world
+      scaleFactor = fromIntegral $ worldCellSize world
 
-      x' = (x + offsetX) / scale
-      y' = (y + offsetY) / scale
+      x' = (x + offsetX) / scaleFactor
+      y' = (y + offsetY) / scaleFactor
   in  (x', y')
 
 
@@ -146,7 +147,7 @@ cellAtPointIsVisibleFromPoint world p1 p2 =
   let mOccluder = castSegIntoWorld world p1 p2
   in  case mOccluder of
         Nothing -> False
-        Just (pos, extent, cell) -> pointInExtent extent p2
+        Just (_, extent, _) -> pointInExtent extent p2
 
 
 -- | Given a line segment (P1-P2) get the cell closest to P1 that intersects the segment.

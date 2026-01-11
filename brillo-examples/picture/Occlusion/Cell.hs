@@ -28,7 +28,7 @@ readCell c =
 
 -- | The basic shape of a cell.
 cellShape :: Int -> Int -> Int -> Picture
-cellShape cellSize posXi posYi =
+cellShape _cellSize posXi posYi =
   let posX = fromIntegral posXi
       posY = fromIntegral posYi
       x1 = posX

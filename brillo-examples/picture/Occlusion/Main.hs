@@ -71,7 +71,7 @@ drawState state =
       picCellsVisible = Pictures $ map (uncurry (drawCell True world)) cellsVisible
 
       -- How big to draw the cells.
-      scale = fromIntegral $ worldCellSize world
+      scaleFactor = fromIntegral $ worldCellSize world
 
       (windowSizeX, windowSizeY) =
         windowSizeOfWorld $
@@ -81,14 +81,14 @@ drawState state =
       offsetX = -(fromIntegral $ windowSizeX `div` 2)
       offsetY = -(fromIntegral $ windowSizeY `div` 2)
   in  Translate offsetX offsetY $
-        Scale scale scale $
+        Scale scaleFactor scaleFactor $
           Pictures [picCellsAll, picCellsVisible, picCellsHit, picRay]
 
 
 -- | Draw the cell hit by the ray defined by the user.
 drawHitCell :: World -> (Point, Extent, Cell) -> Picture
-drawHitCell world (pos@(px, py), extent, cell) =
-  let (n, s, e, w) = takeExtent extent
+drawHitCell _ (_, extent, _) =
+  let (_, s, _, w) = takeExtent extent
       x = w
       y = s
 
@@ -99,7 +99,7 @@ drawHitCell world (pos@(px, py), extent, cell) =
 
 -- | Draw the ray defined by the user.
 drawRay :: World -> Point -> Point -> Picture
-drawRay world p1@(x, y) p2 =
+drawRay _ p1@(x, y) p2 =
   Pictures
     [ Color red $ Line [p1, p2]
     , Color cyan $

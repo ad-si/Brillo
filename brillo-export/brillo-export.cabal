@@ -33,7 +33,6 @@ library
       base              >=4.7    && <5
     , brillo-rendering  >=1.13.3 && <1.15
     , GLFW-b            >=1.0.0  && <4
-    , GLUT              >=2.1.2  && <3
     , JuicyPixels       >=3.2    && <4
     , OpenGLRaw         >=3.0    && <4
     , vector            >=0.9.1  && <1

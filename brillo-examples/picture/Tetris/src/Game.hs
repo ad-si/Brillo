@@ -5,7 +5,6 @@ module Game (runGame) where
 
 import Config
 import Drawing
-import Figures
 import World
 
 import Brillo
@@ -114,7 +113,7 @@ handler (EventKey (SpecialKey KeySpace) Down _ _) game =
     False -> dropFigure game
     True -> game
 -- \| Handles "esc" button
-handler (EventKey (SpecialKey KeyEsc) Down _ _) game =
+handler (EventKey (SpecialKey KeyEsc) Down _ _) _ =
   error "close game" -- wow!
 
 -- \| Handles the rest input
