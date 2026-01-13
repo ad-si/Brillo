@@ -33,6 +33,7 @@ test:
 	stack run brillo-visibility && \
 	stack run brillo-zen && \
 	stack run brillo-gui && \
+	stack run brillo-pickfiles && \
 	stack run brillo-render  # Must be last as it can't be closed
 
 
