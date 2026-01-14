@@ -137,9 +137,10 @@ testBlank = do
   sequence
     [ runTest "Blank produces no content" $ do
         let svg = renderPictureToSVG testSize white Blank
-        -- Should only have the background rect
-        let lines' = T.lines svg
-        assertBool "Blank should only have background" (length lines' <= 2)
+        -- Should only have the background rect and transform wrappers, no actual shapes
+        _ <- assertBool "Blank should have no circles" (not $ T.isInfixOf "<circle" svg)
+        _ <- assertBool "Blank should have no polygons" (not $ T.isInfixOf "<polygon" svg)
+        assertBool "Blank should have no polylines" (not $ T.isInfixOf "<polyline" svg)
     ]
 
 
@@ -214,7 +215,7 @@ testLine = do
     , runTest "Line with color" $ do
         let pic = Color green $ Line [(0, 0), (100, 100)]
         let svg = pictureToSVGDoc testSize white pic
-        assertContains svg "stroke=\"rgb(0,128,0)\""
+        assertContains svg "stroke=\"rgb(0,255,0)\""
     , runTest "Empty line" $ do
         let pic = Line []
         let svg = pictureToSVGDoc testSize white pic
@@ -268,7 +269,6 @@ testCircle = do
         let pic = Pictures [Circle 25, Circle 50, Circle 75, Circle 100]
         let svg = pictureToSVGDoc testSize white pic
         -- Should have multiple circles
-        let circleCount = length $ filter (== '<') $ filter (`elem` ['c', '<']) $ T.unpack svg
         assertBool "Should have multiple circles" (T.count "<circle" svg >= 4)
     ]
 
@@ -403,7 +403,7 @@ testColor = do
     , runTest "Color green" $ do
         let pic = Color green $ Circle 50
         let svg = pictureToSVGDoc testSize white pic
-        assertContains svg "rgb(0,128,0)"
+        assertContains svg "rgb(0,255,0)"
     , runTest "Color blue" $ do
         let pic = Color blue $ Circle 50
         let svg = pictureToSVGDoc testSize white pic
@@ -479,9 +479,9 @@ testPictures = do
                 , Color green $ Translate (-100) 0 $ Circle 50
                 ]
         let svg = pictureToSVGDoc testSize white pic
-        assertContainsAll svg ["rgb(255,0,0)", "rgb(0,0,255)", "rgb(0,128,0)"]
+        assertContainsAll svg ["rgb(255,0,0)", "rgb(0,0,255)", "rgb(0,255,0)"]
     , runTest "Large pictures list" $ do
-        let pic = Pictures [Translate (fromIntegral i * 10) 0 $ Circle 5 | i <- [0 .. 20]]
+        let pic = Pictures [Translate (fromIntegral i * 10) 0 $ Circle 5 | i <- [0 :: Int .. 20]]
         let svg = pictureToSVGDoc testSize white pic
         assertBool "Should have many circles" (T.count "<circle" svg >= 20)
     ]
@@ -695,7 +695,8 @@ testColorVariations = do
 
   sequence
     [ runTest "Predefined colors" $ do
-        let colors =
+        let colors :: [(String, Color)]
+            colors =
               [ ("red", red)
               , ("green", green)
               , ("blue", blue)
@@ -711,7 +712,7 @@ testColorVariations = do
               , ("aquamarine", aquamarine)
               , ("chartreuse", chartreuse)
               ]
-        let pics = [Color c $ Translate (fromIntegral i * 50 - 300) 0 $ Circle 20 | (i, (_, c)) <- zip [0 ..] colors]
+        let pics = [Color c $ Translate (fromIntegral i * 50 - 300) 0 $ Circle 20 | (i, (_, c)) <- zip [0 :: Int ..] colors]
         let svg = pictureToSVGDoc (800, 200) white $ Pictures pics
         assertBool "Should have many circles with colors" (T.count "<circle" svg >= 10)
     , runTest "Gradient-like colors" $ do

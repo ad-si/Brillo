@@ -204,7 +204,7 @@ renderPicture rs (LineSmooth path) = renderSmoothLine rs path 1.0
 renderPicture rs (ThickLine path thickness) = renderLine rs path thickness
 renderPicture rs (ThickLineSmooth path thickness) = renderSmoothLine rs path thickness
 renderPicture rs (Circle radius) = renderCircle rs radius 1.0
-renderPicture rs (ThickCircle thickness radius) = renderThickCircle rs thickness radius
+renderPicture rs (ThickCircle radius thickness) = renderThickCircle rs radius thickness
 renderPicture rs (Arc startAngle endAngle radius) = renderArc rs startAngle endAngle radius 1.0
 renderPicture rs (ThickArc startAngle endAngle thickness radius) = renderArc rs startAngle endAngle radius thickness
 renderPicture rs (Text txt) = renderText rs txt 1.0
@@ -315,7 +315,7 @@ smoothPathToSVG (p1 : p2 : rest) =
   smoothCurves :: [Point] -> String
   smoothCurves pts
     | length pts < 3 = ""
-    | otherwise = intercalate " " $ zipWith3 makeCurve pts (tail pts) (drop 2 pts)
+    | otherwise = intercalate " " $ zipWith3 makeCurve pts (drop 1 pts) (drop 2 pts)
 
   makeCurve :: Point -> Point -> Point -> String
   makeCurve (_x0, _y0) (x1, y1) (x2, y2) =
@@ -340,26 +340,40 @@ renderCircle rs radius thickness =
     ]
 
 
--- | Render a thick circle (annulus/ring)
+-- | Render a thick circle (annulus/ring or filled disc)
+-- ThickCircle has parameters: radius (center of ring) and thickness (width of ring)
+-- Inner radius = radius - thickness/2, Outer radius = radius + thickness/2
 renderThickCircle :: RenderState -> Float -> Float -> Text
-renderThickCircle rs thickness radius
+renderThickCircle rs radius thickness
   | thickness <= 0 = renderCircle rs radius 1.0
   | otherwise =
-      -- ThickCircle draws a ring with inner radius (radius - thickness/2)
-      -- and outer radius (radius + thickness/2)
-      let innerRadius = max 0 (abs radius - thickness / 2)
+      let innerRadius = abs radius - thickness / 2
           outerRadius = abs radius + thickness / 2
-       in T.concat
-            [ "  <circle cx=\"0\" cy=\"0\" r=\""
-            , T.pack (showFloat ((innerRadius + outerRadius) / 2))
-            , "\" fill=\"none\" stroke=\""
-            , colorToSVG (rsColor rs)
-            , "\" stroke-width=\""
-            , T.pack (showFloat (outerRadius - innerRadius))
-            , "\""
-            , strokeOpacityAttr (rsColor rs)
-            , "/>\n"
-            ]
+       in if innerRadius <= 0
+            then
+              -- Inner radius is zero or negative, render as filled circle
+              T.concat
+                [ "  <circle cx=\"0\" cy=\"0\" r=\""
+                , T.pack (showFloat outerRadius)
+                , "\" fill=\""
+                , colorToSVG (rsColor rs)
+                , "\""
+                , opacityAttr (rsColor rs)
+                , "/>\n"
+                ]
+            else
+              -- Render as a ring (stroke)
+              T.concat
+                [ "  <circle cx=\"0\" cy=\"0\" r=\""
+                , T.pack (showFloat ((innerRadius + outerRadius) / 2))
+                , "\" fill=\"none\" stroke=\""
+                , colorToSVG (rsColor rs)
+                , "\" stroke-width=\""
+                , T.pack (showFloat (outerRadius - innerRadius))
+                , "\""
+                , strokeOpacityAttr (rsColor rs)
+                , "/>\n"
+                ]
 
 
 -- | Render an arc
