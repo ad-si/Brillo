@@ -1,4 +1,6 @@
+{-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 {- | Export Brillo pictures to SVG format.
 
@@ -144,21 +146,18 @@ pictureToSVGDoc size@(width, height) bgColor picture =
     ]
 
 
--- | State for rendering, tracks current color and transformations
+-- | State for rendering, tracks current color
 data RenderState = RenderState
   { rsColor :: Color
   -- ^ Current fill/stroke color
-  , rsStrokeWidth :: Float
-  -- ^ Current stroke width
   }
 
 
--- | Default render state with black color and 1px stroke
+-- | Default render state with black color
 defaultRenderState :: RenderState
 defaultRenderState =
   RenderState
     { rsColor = makeColor 0 0 0 1
-    , rsStrokeWidth = 1.0
     }
 
 
@@ -318,10 +317,8 @@ smoothPathToSVG (p1 : p2 : rest) =
     | otherwise = intercalate " " $ zipWith3 makeCurve pts (tail pts) (drop 2 pts)
 
   makeCurve :: Point -> Point -> Point -> String
-  makeCurve (x0, y0) (x1, y1) (x2, y2) =
-    let cx1 = (x0 + x1) / 2
-        cy1 = (y0 + y1) / 2
-        cx2 = (x1 + x2) / 2
+  makeCurve (_x0, _y0) (x1, y1) (x2, y2) =
+    let cx2 = (x1 + x2) / 2
         cy2 = (y1 + y2) / 2
      in "Q " ++ showFloat x1 ++ " " ++ showFloat y1 ++ " " ++ showFloat cx2 ++ " " ++ showFloat cy2
 
