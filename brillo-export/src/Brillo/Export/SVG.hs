@@ -27,7 +27,7 @@ import Brillo.Rendering (
   makeColor,
   rgbaOfColor,
  )
-import qualified Codec.Picture as JP
+import Codec.Picture qualified as JP
 import Data.ByteString.Lazy qualified as BL
 import Data.List (intercalate)
 import Data.Text (Text)
