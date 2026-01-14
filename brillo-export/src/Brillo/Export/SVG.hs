@@ -36,7 +36,8 @@ import Data.Text.IO qualified as TIO
 import Data.Vector.Storable qualified as V
 import Data.Word (Word8)
 import Foreign.ForeignPtr (withForeignPtr)
-import Foreign.Ptr (Ptr, castPtr, peekElemOff)
+import Foreign.Ptr (Ptr, castPtr)
+import Foreign.Storable (peekElemOff)
 import System.IO.Unsafe (unsafePerformIO)
 import Text.Printf (printf)
 
