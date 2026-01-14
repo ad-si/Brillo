@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-{- | Export Brillo pictures to SVG format.
+{-| Export Brillo pictures to SVG format.
 
 This module provides functions to convert Brillo 'Picture' values
 to SVG (Scalable Vector Graphics) format. SVG is a vector graphics
@@ -66,8 +66,9 @@ exportPictureToSVG size bgColor filePath picture = do
   TIO.writeFile filePath svg
 
 
--- | Export a series of Brillo Pictures to SVG files.
--- The file path pattern should contain "%d" which will be replaced by the frame number.
+{-| Export a series of Brillo Pictures to SVG files.
+The file path pattern should contain "%d" which will be replaced by the frame number.
+-}
 exportPicturesToSVG ::
   -- | (width, height) in pixels
   Size ->
@@ -82,15 +83,16 @@ exportPicturesToSVG ::
   IO ()
 exportPicturesToSVG size bgColor filePathPattern animation times = do
   mapM_ exportFrame (zip [1 ..] times)
- where
-  exportFrame (n :: Int, t) = do
-    let picture = animation t
-    let filePath = printf filePathPattern n
-    exportPictureToSVG size bgColor filePath picture
+  where
+    exportFrame (n :: Int, t) = do
+      let picture = animation t
+      let filePath = printf filePathPattern n
+      exportPictureToSVG size bgColor filePath picture
 
 
--- | Render a Picture to SVG text.
--- Returns just the SVG content without the XML declaration and doctype.
+{-| Render a Picture to SVG text.
+Returns just the SVG content without the XML declaration and doctype.
+-}
 renderPictureToSVG ::
   -- | (width, height) in pixels
   Size ->
@@ -115,7 +117,7 @@ renderPictureToSVG (width, height) bgColor picture =
 
     -- Render the picture content
     content = renderPicture defaultRenderState transformedPicture
-   in
+  in
     T.concat [bgRect, content]
 
 
@@ -183,7 +185,7 @@ colorToSVG color =
       ri = round (r * 255) :: Int
       gi = round (g * 255) :: Int
       bi = round (b * 255) :: Int
-   in if a >= 1.0
+  in  if a >= 1.0
         then T.pack $ printf "rgb(%d,%d,%d)" ri gi bi
         else T.pack $ printf "rgba(%d,%d,%d,%.3f)" ri gi bi a
 
@@ -192,7 +194,7 @@ colorToSVG color =
 colorOpacity :: Color -> Float
 colorOpacity color =
   let (_, _, _, a) = rgbaOfColor color
-   in a
+  in  a
 
 
 -- | Main picture rendering function
@@ -287,7 +289,7 @@ renderSmoothLine _ [] _ = ""
 renderSmoothLine _ [_] _ = ""
 renderSmoothLine rs points thickness =
   let pathData = smoothPathToSVG points
-   in T.concat
+  in  T.concat
         [ "  <path d=\""
         , pathData
         , "\" fill=\"none\" stroke=\""
@@ -311,17 +313,24 @@ smoothPathToSVG (p1 : p2 : rest) =
       ++ showPoint p1
       ++ " "
       ++ smoothCurves (p1 : p2 : rest)
- where
-  smoothCurves :: [Point] -> String
-  smoothCurves pts
-    | length pts < 3 = ""
-    | otherwise = intercalate " " $ zipWith3 makeCurve pts (drop 1 pts) (drop 2 pts)
+  where
+    smoothCurves :: [Point] -> String
+    smoothCurves pts
+      | length pts < 3 = ""
+      | otherwise = intercalate " " $ zipWith3 makeCurve pts (drop 1 pts) (drop 2 pts)
 
-  makeCurve :: Point -> Point -> Point -> String
-  makeCurve (_x0, _y0) (x1, y1) (x2, y2) =
-    let cx2 = (x1 + x2) / 2
-        cy2 = (y1 + y2) / 2
-     in "Q " ++ showFloat x1 ++ " " ++ showFloat y1 ++ " " ++ showFloat cx2 ++ " " ++ showFloat cy2
+    makeCurve :: Point -> Point -> Point -> String
+    makeCurve (_x0, _y0) (x1, y1) (x2, y2) =
+      let cx2 = (x1 + x2) / 2
+          cy2 = (y1 + y2) / 2
+      in  "Q "
+            ++ showFloat x1
+            ++ " "
+            ++ showFloat y1
+            ++ " "
+            ++ showFloat cx2
+            ++ " "
+            ++ showFloat cy2
 
 
 -- | Render a circle outline
@@ -340,16 +349,17 @@ renderCircle rs radius thickness =
     ]
 
 
--- | Render a thick circle (annulus/ring or filled disc)
--- ThickCircle has parameters: radius (center of ring) and thickness (width of ring)
--- Inner radius = radius - thickness/2, Outer radius = radius + thickness/2
+{-| Render a thick circle (annulus/ring or filled disc)
+ThickCircle has parameters: radius (center of ring) and thickness (width of ring)
+Inner radius = radius - thickness/2, Outer radius = radius + thickness/2
+-}
 renderThickCircle :: RenderState -> Float -> Float -> Text
 renderThickCircle rs radius thickness
   | thickness <= 0 = renderCircle rs radius 1.0
   | otherwise =
       let innerRadius = abs radius - thickness / 2
           outerRadius = abs radius + thickness / 2
-       in if innerRadius <= 0
+      in  if innerRadius <= 0
             then
               -- Inner radius is zero or negative, render as filled circle
               T.concat
@@ -415,7 +425,7 @@ renderArc rs startAngle endAngle radius thickness =
         ++ showFloat x2
         ++ " "
         ++ showFloat y2
-   in
+  in
     T.concat
       [ "  <path d=\""
       , T.pack pathData
@@ -483,7 +493,7 @@ renderBitmap _ bitmapData maybeRect =
     -- Center the image at origin (Brillo convention)
     halfW = fromIntegral width / 2 :: Float
     halfH = fromIntegral height / 2 :: Float
-   in
+  in
     T.concat
       [ "  <image x=\""
       , T.pack (showFloat (-halfW))
@@ -517,42 +527,42 @@ renderBitmap _ bitmapData maybeRect =
 -- | Simple base64 encoding
 encodeBase64 :: [Word8] -> String
 encodeBase64 = go
- where
-  go [] = ""
-  go [a] =
-    let (i1, i2) = (fromIntegral a `div` 4, (fromIntegral a `mod` 4) * 16)
-     in [base64Char i1, base64Char i2, '=', '=']
-  go [a, b] =
-    let i1 = fromIntegral a `div` 4
-        i2 = ((fromIntegral a `mod` 4) * 16) + (fromIntegral b `div` 16)
-        i3 = (fromIntegral b `mod` 16) * 4
-     in [base64Char i1, base64Char i2, base64Char i3, '=']
-  go (a : b : c : rest) =
-    let i1 = fromIntegral a `div` 4
-        i2 = ((fromIntegral a `mod` 4) * 16) + (fromIntegral b `div` 16)
-        i3 = ((fromIntegral b `mod` 16) * 4) + (fromIntegral c `div` 64)
-        i4 = fromIntegral c `mod` 64
-     in base64Char i1 : base64Char i2 : base64Char i3 : base64Char i4 : go rest
+  where
+    go [] = ""
+    go [a] =
+      let (i1, i2) = (fromIntegral a `div` 4, (fromIntegral a `mod` 4) * 16)
+      in  [base64Char i1, base64Char i2, '=', '=']
+    go [a, b] =
+      let i1 = fromIntegral a `div` 4
+          i2 = ((fromIntegral a `mod` 4) * 16) + (fromIntegral b `div` 16)
+          i3 = (fromIntegral b `mod` 16) * 4
+      in  [base64Char i1, base64Char i2, base64Char i3, '=']
+    go (a : b : c : rest) =
+      let i1 = fromIntegral a `div` 4
+          i2 = ((fromIntegral a `mod` 4) * 16) + (fromIntegral b `div` 16)
+          i3 = ((fromIntegral b `mod` 16) * 4) + (fromIntegral c `div` 64)
+          i4 = fromIntegral c `mod` 64
+      in  base64Char i1 : base64Char i2 : base64Char i3 : base64Char i4 : go rest
 
-  base64Char :: Int -> Char
-  base64Char n
-    | n < 26 = toEnum (fromEnum 'A' + n)
-    | n < 52 = toEnum (fromEnum 'a' + n - 26)
-    | n < 62 = toEnum (fromEnum '0' + n - 52)
-    | n == 62 = '+'
-    | otherwise = '/'
+    base64Char :: Int -> Char
+    base64Char n
+      | n < 26 = toEnum (fromEnum 'A' + n)
+      | n < 52 = toEnum (fromEnum 'a' + n - 26)
+      | n < 62 = toEnum (fromEnum '0' + n - 52)
+      | n == 62 = '+'
+      | otherwise = '/'
 
 
 -- | Escape XML special characters
 escapeXML :: Text -> Text
 escapeXML = T.concatMap escapeChar
- where
-  escapeChar '<' = "&lt;"
-  escapeChar '>' = "&gt;"
-  escapeChar '&' = "&amp;"
-  escapeChar '"' = "&quot;"
-  escapeChar '\'' = "&apos;"
-  escapeChar c = T.singleton c
+  where
+    escapeChar '<' = "&lt;"
+    escapeChar '>' = "&gt;"
+    escapeChar '&' = "&amp;"
+    escapeChar '"' = "&quot;"
+    escapeChar '\'' = "&apos;"
+    escapeChar c = T.singleton c
 
 
 -- | Show a floating point number with reasonable precision
@@ -574,7 +584,7 @@ showPoint (x, y) = showFloat x ++ " " ++ showFloat y
 opacityAttr :: Color -> Text
 opacityAttr color =
   let a = colorOpacity color
-   in if a < 1.0
+  in  if a < 1.0
         then T.pack $ printf " fill-opacity=\"%.3f\"" a
         else ""
 
@@ -583,6 +593,6 @@ opacityAttr color =
 strokeOpacityAttr :: Color -> Text
 strokeOpacityAttr color =
   let a = colorOpacity color
-   in if a < 1.0
+  in  if a < 1.0
         then T.pack $ printf " stroke-opacity=\"%.3f\"" a
         else ""

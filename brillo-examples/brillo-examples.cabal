@@ -443,3 +443,15 @@ executable brillo-export
     , directory      >=1.3    && <1.4
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
+
+executable brillo-canvas-editor
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/CanvasEditor
+  build-depends:
+    , base           >=4.8    && <5
+    , brillo         >=1.13.3 && <1.15
+    , brillo-export  >=0.1    && <0.2
+    , directory      >=1.3    && <1.4
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts

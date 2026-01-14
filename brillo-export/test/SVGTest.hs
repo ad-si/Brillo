@@ -1,7 +1,7 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{- | Comprehensive test suite for SVG export functionality.
+{-| Comprehensive test suite for SVG export functionality.
 
 This module tests all Picture primitives and SVG features to ensure
 complete coverage of the SVG export functionality.
@@ -15,7 +15,11 @@ import Control.Monad (forM_, unless)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO qualified as TIO
-import System.Directory (createDirectoryIfMissing, doesFileExist, getTemporaryDirectory)
+import System.Directory (
+  createDirectoryIfMissing,
+  doesFileExist,
+  getTemporaryDirectory,
+ )
 import System.Exit (exitFailure, exitSuccess)
 import System.FilePath ((</>))
 import Text.Printf (printf)
@@ -139,7 +143,8 @@ testBlank = do
         let svg = renderPictureToSVG testSize white Blank
         -- Should only have the background rect and transform wrappers, no actual shapes
         _ <- assertBool "Blank should have no circles" (not $ T.isInfixOf "<circle" svg)
-        _ <- assertBool "Blank should have no polygons" (not $ T.isInfixOf "<polygon" svg)
+        _ <-
+          assertBool "Blank should have no polygons" (not $ T.isInfixOf "<polygon" svg)
         assertBool "Blank should have no polylines" (not $ T.isInfixOf "<polyline" svg)
     ]
 
@@ -227,7 +232,9 @@ testLine = do
     , runTest "LineSmooth" $ do
         let pic = LineSmooth [(0, 0), (50, 100), (100, 0), (150, 100)]
         let svg = pictureToSVGDoc testSize white pic
-        assertContainsAll svg ["<path", "stroke-linecap=\"round\"", "stroke-linejoin=\"round\""]
+        assertContainsAll
+          svg
+          ["<path", "stroke-linecap=\"round\"", "stroke-linejoin=\"round\""]
     , runTest "ThickLineSmooth" $ do
         let pic = ThickLineSmooth [(0, 0), (50, 100), (100, 0)] 8.0
         let svg = pictureToSVGDoc testSize white pic
@@ -307,7 +314,9 @@ testArc = do
         let pic = sectorWire 0 90 50
         let svg = pictureToSVGDoc testSize white pic
         -- sectorWire produces arc + two lines
-        assertBool "Should have arc elements" (T.isInfixOf "<path" svg || T.isInfixOf "<polyline" svg)
+        assertBool
+          "Should have arc elements"
+          (T.isInfixOf "<path" svg || T.isInfixOf "<polyline" svg)
     ]
 
 
@@ -342,7 +351,7 @@ testText = do
         let svg = pictureToSVGDoc testSize white pic
         assertContains svg "<text"
     , runTest "Unicode text" $ do
-        let pic = Text "Hello \x4e16\x754c"  -- "Hello 世界"
+        let pic = Text "Hello \x4e16\x754c" -- "Hello 世界"
         let svg = pictureToSVGDoc testSize white pic
         assertContains svg "<text"
     ]
@@ -481,7 +490,8 @@ testPictures = do
         let svg = pictureToSVGDoc testSize white pic
         assertContainsAll svg ["rgb(255,0,0)", "rgb(0,0,255)", "rgb(0,255,0)"]
     , runTest "Large pictures list" $ do
-        let pic = Pictures [Translate (fromIntegral i * 10) 0 $ Circle 5 | i <- [0 :: Int .. 20]]
+        let pic =
+              Pictures [Translate (fromIntegral i * 10) 0 $ Circle 5 | i <- [0 :: Int .. 20]]
         let svg = pictureToSVGDoc testSize white pic
         assertBool "Should have many circles" (T.count "<circle" svg >= 20)
     ]
@@ -712,7 +722,10 @@ testColorVariations = do
               , ("aquamarine", aquamarine)
               , ("chartreuse", chartreuse)
               ]
-        let pics = [Color c $ Translate (fromIntegral i * 50 - 300) 0 $ Circle 20 | (i, (_, c)) <- zip [0 :: Int ..] colors]
+        let pics =
+              [ Color c $ Translate (fromIntegral i * 50 - 300) 0 $ Circle 20
+              | (i, (_, c)) <- zip [0 :: Int ..] colors
+              ]
         let svg = pictureToSVGDoc (800, 200) white $ Pictures pics
         assertBool "Should have many circles with colors" (T.count "<circle" svg >= 10)
     , runTest "Gradient-like colors" $ do
