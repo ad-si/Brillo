@@ -1,10 +1,10 @@
 name:               brillo-export
 version:            0.1.0.4
 synopsis:
-  Export Brillo pictures to png, bmp, tga, tiff, gif and juicy-pixels-image
+  Export Brillo pictures to png, bmp, tga, tiff, gif, svg and juicy-pixels-image
 
 description:
-  Export Brillo pictures to various image formats including PNG, BMP, TGA, TIFF, and animated GIF.
+  Export Brillo pictures to various image formats including PNG, BMP, TGA, TIFF, animated GIF, and SVG.
   Forked from gloss-export and adapted for the Brillo graphics library.
 
 tested-with:
@@ -57,6 +57,7 @@ library
     , GLFW-b            >=1.0.0  && <4
     , JuicyPixels       >=3.2    && <4
     , OpenGLRaw         >=3.0    && <4
+    , text              >=2.0    && <3
     , vector            >=0.9.1  && <1
 
   exposed-modules:
@@ -65,6 +66,7 @@ library
     Brillo.Export.Gif
     Brillo.Export.Image
     Brillo.Export.PNG
+    Brillo.Export.SVG
     Brillo.Export.Tga
     Brillo.Export.Tiff
 
@@ -99,4 +101,19 @@ test-suite brillo-export-test
     , text           >=2.0    && <3
 
   other-modules:    Paths_brillo_export
+  default-language: Haskell2010
+
+test-suite brillo-svg-test
+  type:             exitcode-stdio-1.0
+  main-is:          SVGTest.hs
+  hs-source-dirs:   test
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base           >=4.7    && <5
+    , brillo         >=1.13.3 && <1.15
+    , brillo-export
+    , directory
+    , filepath
+    , text           >=2.0    && <3
+
   default-language: Haskell2010
