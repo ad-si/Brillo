@@ -8,8 +8,12 @@ packages:
   - brillo-juicy
   - brillo-rendering
 
+ghc-options:
+  "$locals": -Wall -Werror -Wunused-matches -Wunused-imports -Wname-shadowing -Wunused-packages
+
 extra-deps:
   - storable-offset-0.1.0.0
+  - FULE-0.3.1.2
 
   - github: dpwiz/freetype2
     commit: d2acf926b5c448d8edd60e322862adcf2dbe9146

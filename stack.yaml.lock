@@ -12,6 +12,13 @@ packages:
   original:
     hackage: storable-offset-0.1.0.0
 - completed:
+    hackage: FULE-0.3.1.2@sha256:cc8fb1360afb3f8b3baae9bf7aa7fa1d024a6ea0e4042cacfe7b16debb5dde7c,2238
+    pantry-tree:
+      sha256: 7268edb90a9519e91001fde56863f1aa98712672b21a0d662ddc7f343c11d721
+      size: 2206
+  original:
+    hackage: FULE-0.3.1.2
+- completed:
     name: freetype2
     pantry-tree:
       sha256: 670c4a673afbefc446b91e445fd3b4a801bd5d6c555df5bae7721516739e24b6
