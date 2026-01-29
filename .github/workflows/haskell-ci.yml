@@ -226,6 +226,10 @@ jobs:
           echo "package brillo-rendering" >> cabal.project
           echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
           cat >> cabal.project <<EOF
+          source-repository-package
+            type: git
+            location: https://github.com/ad-si/FULE.git
+            tag: c2546b4a6c82ce2bc35d8b1ef1e558b0dd560e01
           EOF
           $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: any.$_ installed\n" unless /^(brillo|brillo-algorithms|brillo-examples|brillo-export|brillo-juicy|brillo-rendering)$/; }' >> cabal.project.local
           cat cabal.project
