@@ -5,3 +5,8 @@ packages:
   brillo-export
   brillo-juicy
   brillo-rendering
+
+source-repository-package
+  type: git
+  location: https://github.com/ad-si/FULE.git
+  tag: c2546b4a6c82ce2bc35d8b1ef1e558b0dd560e01
