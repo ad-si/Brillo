@@ -14,6 +14,7 @@ module Brillo.Juicy (
   loadJuicyWithMetadata,
   loadJuicyJPG,
   loadJuicyPNG,
+  loadJuicyWebP,
 
   -- * From brillo, exported here for convenience
   loadBMP,
@@ -54,6 +55,9 @@ import Codec.Picture.Types (
   ColorConvertible (promoteImage),
   ColorSpaceConvertible (convertImage),
  )
+import qualified Codec.Picture.WebP as WebP
+import Control.Exception (SomeException, try)
+import qualified Data.ByteString as BS
 import Data.Vector.Storable (unsafeToForeignPtr)
 
 
@@ -142,6 +146,20 @@ loadJuicyJPG = loadWith readJpeg
 loadJuicyPNG :: FilePath -> IO (Maybe Picture)
 loadJuicyPNG = loadWith readPng
 {-# INLINE loadJuicyPNG #-}
+
+
+{-| Loads a WebP image file into a Picture using the webp library.
+Returns 'Nothing' if the file cannot be read or decoded.
+Requires libwebp to be installed on the system.
+-}
+loadJuicyWebP :: FilePath -> IO (Maybe Picture)
+loadJuicyWebP fp = do
+  result <- try $ do
+    bytes <- BS.readFile fp
+    let !img = WebP.decodeRgba8 bytes
+    return $ fromImageRGBA8 img
+  return $ either (\(_ :: SomeException) -> Nothing) Just result
+{-# INLINE loadJuicyWebP #-}
 
 
 loadWith ::

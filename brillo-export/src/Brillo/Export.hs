@@ -36,6 +36,12 @@ module Brillo.Export (
   exportPicturesToSVG,
   renderPictureToSVG,
   pictureToSVGDoc,
+
+  -- * Writing to WebP
+  exportPictureToWebP,
+  exportPicturesToWebP,
+  exportPictureToWebPLossy,
+  exportPicturesToWebPLossy,
 ) where
 
 import Brillo.Export.Bitmap
@@ -45,4 +51,5 @@ import Brillo.Export.PNG
 import Brillo.Export.SVG
 import Brillo.Export.Tga
 import Brillo.Export.Tiff
+import Brillo.Export.WebP
 

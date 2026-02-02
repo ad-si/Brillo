@@ -60,6 +60,7 @@ library
     , OpenGLRaw         >=3.0    && <4
     , text              >=2.0    && <3
     , vector            >=0.9.1  && <1
+    , webp              >=0.1    && <0.2
 
   exposed-modules:
     Brillo.Export
@@ -70,6 +71,7 @@ library
     Brillo.Export.SVG
     Brillo.Export.Tga
     Brillo.Export.Tiff
+    Brillo.Export.WebP
 
   other-modules:    Paths_brillo_export
   default-language: Haskell2010
@@ -115,6 +117,23 @@ test-suite brillo-svg-test
     , brillo-export
     , directory
     , filepath
+    , text           >=2.0    && <3
+
+  default-language: Haskell2010
+
+test-suite brillo-webp-test
+  type:             exitcode-stdio-1.0
+  main-is:          WebPTest.hs
+  hs-source-dirs:   test
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base           >=4.7    && <5
+    , brillo         >=1.13.3 && <1.15
+    , brillo-export
+    , bytestring     >=0.11   && <0.13
+    , directory
+    , filepath
+    , GLFW-b         >=1.0.0  && <4
     , text           >=2.0    && <3
 
   default-language: Haskell2010

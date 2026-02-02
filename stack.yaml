@@ -13,6 +13,7 @@ ghc-options:
 
 extra-deps:
   - storable-offset-0.1.0.0
+  - webp-0.1.2.0
 
   - github: ad-si/FULE
     commit: c2546b4a6c82ce2bc35d8b1ef1e558b0dd560e01
