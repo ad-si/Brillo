@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-{- | FULE Layout Engine Demo
+{-| FULE Layout Engine Demo
 
 This example demonstrates the key features of FULE (Functional UI Layout Engine):
 
@@ -119,7 +119,7 @@ buildLayout width height =
 initialState :: AppState
 initialState =
   let (ly, comps) = buildLayout initialWidth initialHeight
-   in AppState
+  in  AppState
         { stateLayout = ly
         , stateComponents = comps
         , stateWindowSize = (initialWidth, initialHeight)
@@ -139,7 +139,7 @@ renderState state =
     renderComponent :: ComponentInfo Widget -> Picture
     renderComponent compInfo =
       case componentOf compInfo of
-        WindowResize {} -> Blank -- Invisible resize controller
+        WindowResize{} -> Blank -- Invisible resize controller
         Panel label col ->
           let bounds = boundsOf compInfo
               (x, y, w, h) = boundsToRect bounds
@@ -152,7 +152,7 @@ renderState state =
               borderColor
                 | isSelected = white
                 | otherwise = greyN 0.2
-           in translateToCenter x y w h $
+          in  translateToCenter x y w h $
                 Pictures $
                   [Color bgColor $ rectangleSolid w h]
                     ++ if isSelected
@@ -161,7 +161,7 @@ renderState state =
         StatusIndicator _ ->
           let bounds = boundsOf compInfo
               (x, y, w, h) = boundsToRect bounds
-           in translateToCenter x y w h $
+          in  translateToCenter x y w h $
                 Pictures
                   [ Color (makeColorI 52 168 83 220) $ rectangleSolid w h
                   , Color (greyN 0.1) $ rectangleWire w h
@@ -181,7 +181,7 @@ renderState state =
           (winW, winH) = stateWindowSize state
           x = left + w / 2 - fromIntegral winW / 2
           y = fromIntegral winH / 2 - top - h / 2
-       in (x, y, w, h)
+      in  (x, y, w, h)
 
     translateToCenter :: Float -> Float -> Float -> Float -> Picture -> Picture
     translateToCenter x y _ _ = Translate x y
@@ -189,7 +189,7 @@ renderState state =
     brighten :: Color -> Color
     brighten c =
       let (r, g, b, a) = rgbaOfColor c
-       in makeColor (min 1 (r + 0.15)) (min 1 (g + 0.15)) (min 1 (b + 0.15)) a
+      in  makeColor (min 1 (r + 0.15)) (min 1 (g + 0.15)) (min 1 (b + 0.15)) a
 
 
 -- | Handle events
@@ -200,17 +200,17 @@ handleEvent event state =
     -- FULE layouts respond to window size changes automatically
     EventResize (newW, newH) ->
       let (ly, comps) = buildLayout newW newH
-       in state
+      in  state
             { stateLayout = ly
             , stateComponents = comps
             , stateWindowSize = (newW, newH)
             }
     -- Handle mouse clicks on panels
     EventKey (MouseButton LeftButton) Down _ pos ->
-      state {stateSelectedPanel = findClickedPanel pos state}
+      state{stateSelectedPanel = findClickedPanel pos state}
     -- Handle mouse movement for hover effects
     EventMotion pos ->
-      state {stateHoveredPanel = findHoveredPanel pos state}
+      state{stateHoveredPanel = findHoveredPanel pos state}
     _ -> state
 
 
@@ -226,7 +226,7 @@ findClickedPanel (mx, my) state =
   where
     isPanelClicked compInfo =
       case componentOf compInfo of
-        Panel {} -> pointInBounds (mx, my) (boundsOf compInfo) state
+        Panel{} -> pointInBounds (mx, my) (boundsOf compInfo) state
         _ -> False
 
 
@@ -242,7 +242,7 @@ findHoveredPanel (mx, my) state =
   where
     isPanelHovered compInfo =
       case componentOf compInfo of
-        Panel {} -> pointInBounds (mx, my) (boundsOf compInfo) state
+        Panel{} -> pointInBounds (mx, my) (boundsOf compInfo) state
         _ -> False
 
 
@@ -258,7 +258,7 @@ pointInBounds (mx, my) bounds state =
       -- Convert Brillo coords (center origin) to FULE coords (top-left origin)
       fulex = mx + fromIntegral winW / 2
       fuley = fromIntegral winH / 2 - my
-   in fulex >= left && fulex <= right && fuley >= top && fuley <= bottom
+  in  fulex >= left && fulex <= right && fuley >= top && fuley <= bottom
 
 
 -- | Step function (no animation needed)

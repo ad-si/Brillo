@@ -74,6 +74,8 @@ data Picture
     Blank
   | -- | A polygon filled with a solid color.
     Polygon Path
+  | -- | A polygon filled with a solid color, drawn with anti-aliased edges.
+    PolygonSmooth Path
   | -- | A line along an arbitrary path.
     Line Path
   | -- | A smooth line along an arbitrary path.
@@ -84,20 +86,36 @@ data Picture
     ThickLineSmooth Path Float
   | -- | A circle with the given radius.
     Circle Float
+  | -- | A circle with the given radius, drawn with anti-aliasing.
+    CircleSmooth Float
   | -- | A circle with the given radius and thickness.
     --   If the thickness is 0 then this is equivalent to `Circle`.
     ThickCircle Float Float
+  | -- | A circle with the given radius and thickness, drawn with anti-aliasing.
+    --   If the thickness is 0 then this is equivalent to `CircleSmooth`.
+    ThickCircleSmooth Float Float
   | -- | A circular arc drawn counter-clockwise between two angles
     --  (in degrees) at the given radius.
     Arc Float Float Float
   | -- | A circular arc drawn counter-clockwise between two angles
+    --  (in degrees) at the given radius, drawn with anti-aliasing.
+    ArcSmooth Float Float Float
+  | -- | A circular arc drawn counter-clockwise between two angles
     --  (in degrees), with the given radius and thickness.
     --   If the thickness is 0 then this is equivalent to `Arc`.
     ThickArc Float Float Float Float
+  | -- | A circular arc drawn counter-clockwise between two angles
+    --  (in degrees), with the given radius and thickness, drawn with anti-aliasing.
+    --   If the thickness is 0 then this is equivalent to `ArcSmooth`.
+    ThickArcSmooth Float Float Float Float
   | -- | Text to draw with a vector font
     Text Text
+  | -- | Text to draw with a vector font, drawn with anti-aliasing.
+    TextSmooth Text
   | -- | Text to draw with a vector font and a given thickness.
     ThickText Text Float
+  | -- | Text to draw with a vector font and a given thickness, drawn with anti-aliasing.
+    ThickTextSmooth Text Float
   | -- | Text to draw with a TrueType font located at the given path,
     --   rendered at the specified pixel height.
     TrueTypeText FilePath Int Text

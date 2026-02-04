@@ -216,8 +216,8 @@ renderButton font isHovered =
     Pictures
       [ -- Button background
         Color
-          (if isHovered then makeColor 0.3 0.6 0.9 1.0 else makeColor 0.2 0.5 0.8 1.0) $
-          rectangleSolid 180 buttonHeight
+          (if isHovered then makeColor 0.3 0.6 0.9 1.0 else makeColor 0.2 0.5 0.8 1.0)
+          $ rectangleSolid 180 buttonHeight
       , -- Button border
         Color (greyN 0.2) $ rectangleWire 180 buttonHeight
       , -- Button text

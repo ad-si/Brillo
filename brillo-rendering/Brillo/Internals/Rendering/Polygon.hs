@@ -1,8 +1,12 @@
 {-# OPTIONS_HADDOCK hide #-}
 
-module Brillo.Internals.Rendering.Polygon (renderComplexPolygon) where
+module Brillo.Internals.Rendering.Polygon (
+  renderComplexPolygon,
+  renderComplexPolygonSmooth,
+) where
 
 import Brillo.Internals.Rendering.Common
+import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL.GL qualified as GL
 import Graphics.Rendering.OpenGL.GLU.Tessellation
 
@@ -76,6 +80,19 @@ renderComplexPolygon path =
             ]
       GL.renderPrimitive GL.Triangles (trisToGLVertices ts)
       return ()
+
+
+{-| Render a complex polygon with anti-aliased edges
+  Draws the filled polygon, then overlays anti-aliased edges
+-}
+renderComplexPolygonSmooth :: [(Float, Float)] -> IO ()
+renderComplexPolygonSmooth path = do
+  -- First draw the filled polygon
+  renderComplexPolygon path
+  -- Then draw anti-aliased edges on top
+  GL.lineSmooth $= GL.Enabled
+  GL.renderPrimitive GL.LineLoop $ vertexPFs path
+  GL.lineSmooth $= GL.Disabled
 
 
 trisToGLVertices :: [Triangle a] -> IO ()

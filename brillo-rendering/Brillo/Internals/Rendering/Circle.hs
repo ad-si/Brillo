@@ -5,7 +5,9 @@
 -- | Fast(ish) rendering of circles.
 module Brillo.Internals.Rendering.Circle (
   renderCircle,
+  renderCircleSmooth,
   renderArc,
+  renderArcSmooth,
 )
 where
 
@@ -20,6 +22,7 @@ import GHC.Exts (
   sinFloat#,
   timesFloat#,
  )
+import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL.GL qualified as GL
 
 
@@ -97,6 +100,95 @@ renderCircleStrip (F# posX) (F# posY) steps r width =
 {-# INLINE renderCircleStrip #-}
 
 
+-- | Render a ring with given inner and outer radii as a triangle strip
+renderCircleStripRadii :: Float -> Float -> Int -> Float -> Float -> IO ()
+renderCircleStripRadii (F# posX) (F# posY) steps innerR outerR =
+  let n = fromIntegral steps
+      !(F# tStep) = (2 * pi) / n
+      !(F# tStop) = (2 * pi) + F# tStep / 2
+      !(F# r1) = innerR
+      !(F# r2) = outerR
+  in  GL.renderPrimitive GL.TriangleStrip $
+        renderCircleStripStep
+          posX
+          posY
+          tStep
+          tStop
+          r1
+          0.0#
+          r2
+          (tStep `divideFloat#` 2.0#)
+{-# INLINE renderCircleStripRadii #-}
+
+
+{-| Render a circle with the given thickness, with anti-aliasing.
+  Draws filled shape slightly inset, then anti-aliased edge on boundary.
+-}
+renderCircleSmooth :: Float -> Float -> Float -> Float -> Float -> IO ()
+renderCircleSmooth posX posY scaleFactor radius_ thickness_ =
+  go (abs radius_) (abs thickness_)
+  where
+    go radius thickness
+      -- If the circle is smaller than a pixel, render it as a point.
+      | thickness == 0
+      , radScreen <- scaleFactor * (radius + thickness / 2)
+      , radScreen <= 1 =
+          GL.renderPrimitive GL.Points $
+            GL.vertex $
+              GL.Vertex2 (gf posX) (gf posY)
+      -- Render zero thickness circles with smoothed lines.
+      | thickness == 0
+      , radScreen <- scaleFactor * radius
+      , steps <- circleSteps radScreen =
+          do
+            GL.lineSmooth $= GL.Enabled
+            renderCircleLine posX posY steps radius
+            GL.lineSmooth $= GL.Disabled
+      -- Solid circle (no inner hole): draw fill then smooth edge on top
+      | radius - thickness / 2 <= 0
+      , radScreen <- scaleFactor * (radius + thickness / 2)
+      , steps <- circleSteps radScreen * 2 -- More segments for smoother result
+        =
+          do
+            let outerRadius = radius + thickness / 2
+            -- Draw fill at full size
+            renderCircleFan posX posY steps outerRadius
+            -- Draw anti-aliased edge at exact boundary
+            GL.lineSmooth $= GL.Enabled
+            renderCircleLine posX posY steps outerRadius
+            GL.lineSmooth $= GL.Disabled
+      -- Thick circle with inner hole: draw fill then smooth edges on top
+      | radScreen <- scaleFactor * (radius + thickness / 2)
+      , steps <- circleSteps radScreen * 2 -- More segments for smoother result
+        =
+          do
+            let outerRadius = radius + thickness / 2
+            let innerRadius = radius - thickness / 2
+            -- Draw fill at full size
+            renderCircleStripRadii posX posY steps innerRadius outerRadius
+            -- Draw anti-aliased edges at exact boundaries
+            GL.lineSmooth $= GL.Enabled
+            renderCircleLine posX posY steps outerRadius
+            renderCircleLine posX posY steps innerRadius
+            GL.lineSmooth $= GL.Disabled
+
+
+-- | Render a filled circle as a triangle fan
+renderCircleFan :: Float -> Float -> Int -> Float -> IO ()
+renderCircleFan (F# posX) (F# posY) steps (F# rad) =
+  let n = fromIntegral steps
+      !(F# tStep) = (2 * pi) / n
+      !(F# tStop) = (2 * pi)
+  in  GL.renderPrimitive GL.TriangleFan $ do
+        -- Center vertex
+        GL.vertex $ GL.Vertex2 (gf (F# posX)) (gf (F# posY))
+        -- Edge vertices
+        renderCircleLineStep posX posY tStep tStop rad 0.0#
+        -- Close the fan by repeating the first edge vertex
+        addPointOnCircle posX posY rad 0.0#
+{-# INLINE renderCircleFan #-}
+
+
 -- Arc ------------------------------------------------------------------------
 
 -- | Render an arc with the given thickness.
@@ -117,6 +209,52 @@ renderArc posX posY scaleFactor radius_ a1 a2 thickness_ =
           renderArcStrip posX posY steps radius a1 a2 thickness
 
 
+{-| Render an arc with the given thickness, with anti-aliasing.
+  Draws filled shape slightly inset, then anti-aliased edge on boundary.
+-}
+renderArcSmooth ::
+  Float -> Float -> Float -> Float -> Float -> Float -> Float -> IO ()
+renderArcSmooth posX posY scaleFactor radius_ a1 a2 thickness_ =
+  go (abs radius_) (abs thickness_)
+  where
+    go radius thickness
+      -- Render zero thickness arcs with smoothed lines.
+      | thickness == 0
+      , radScreen <- scaleFactor * radius
+      , steps <- circleSteps radScreen =
+          do
+            GL.lineSmooth $= GL.Enabled
+            renderArcLine posX posY steps radius a1 a2
+            GL.lineSmooth $= GL.Disabled
+      -- Solid arc (no inner hole): draw fill then smooth edge on top
+      | radius - thickness / 2 <= 0
+      , radScreen <- scaleFactor * (radius + thickness / 2)
+      , steps <- circleSteps radScreen * 2 -- More segments for smoother result
+        =
+          do
+            let outerRadius = radius + thickness / 2
+            -- Draw fill at full size
+            renderArcFan posX posY steps outerRadius a1 a2
+            -- Draw anti-aliased edge at exact boundary
+            GL.lineSmooth $= GL.Enabled
+            renderArcLine posX posY steps outerRadius a1 a2
+            GL.lineSmooth $= GL.Disabled
+      -- Thick arc with inner hole: draw fill then smooth edges on top
+      | radScreen <- scaleFactor * (radius + thickness / 2)
+      , steps <- circleSteps radScreen * 2 -- More segments for smoother result
+        =
+          do
+            let outerRadius = radius + thickness / 2
+            let innerRadius = radius - thickness / 2
+            -- Draw fill at full size
+            renderArcStripRadii posX posY steps innerRadius outerRadius a1 a2
+            -- Draw anti-aliased edges at exact boundaries
+            GL.lineSmooth $= GL.Enabled
+            renderArcLine posX posY steps outerRadius a1 a2
+            renderArcLine posX posY steps innerRadius a1 a2
+            GL.lineSmooth $= GL.Disabled
+
+
 -- | Render an arc as a line.
 renderArcLine ::
   Float -> Float -> Int -> Float -> Float -> Float -> IO ()
@@ -133,6 +271,23 @@ renderArcLine (F# posX) (F# posY) steps (F# rad) a1 a2 =
           renderCircleLineStep posX posY tStep tStop rad tStart
           endVertex
 {-# INLINE renderArcLine #-}
+
+
+-- | Render a filled arc (pie slice) as a triangle fan from center
+renderArcFan :: Float -> Float -> Int -> Float -> Float -> Float -> IO ()
+renderArcFan (F# posX) (F# posY) steps (F# rad) a1 a2 =
+  let n = fromIntegral steps
+      !(F# tStep) = (2 * pi) / n
+      !(F# tStart) = degToRad a1
+      !(F# tStop) = degToRad a2 + if a1 >= a2 then 2 * pi else 0
+  in  GL.renderPrimitive GL.TriangleFan $ do
+        -- Center vertex
+        GL.vertex $ GL.Vertex2 (gf (F# posX)) (gf (F# posY))
+        -- Edge vertices along the arc
+        renderCircleLineStep posX posY tStep tStop rad tStart
+        -- Final vertex at exact end angle
+        addPointOnCircle posX posY rad tStop
+{-# INLINE renderArcFan #-}
 
 
 -- | Render an arc with a given thickness as a triangle strip
@@ -189,6 +344,62 @@ renderArcStrip (F# posX) (F# posY) steps r a1 a2 width =
               addPointOnCircle posX posY r1' tStop'
               addPointOnCircle posX posY r2' tStop'
 {-# INLINE renderArcStrip #-}
+
+
+-- | Render an arc with given inner and outer radii as a triangle strip
+renderArcStripRadii ::
+  Float -> Float -> Int -> Float -> Float -> Float -> Float -> IO ()
+renderArcStripRadii (F# posX) (F# posY) steps innerR outerR a1 a2 =
+  let n = fromIntegral steps
+      tStep = (2 * pi) / n
+
+      t1 = normalizeAngle $ degToRad a1
+
+      a2' = normalizeAngle $ degToRad a2
+      t2 = if a2' == 0 then 2 * pi else a2'
+
+      (tStart, tStop) = if t1 <= t2 then (t1, t2) else (t2, t1)
+      tDiff = tStop - tStart
+      tMid = tStart + tDiff / 2
+
+      !(F# tStep') = tStep
+      !(F# tStep2') = tStep / 2
+      !(F# tStart') = tStart
+      !(F# tStop') = tStop
+      !(F# tCut') = tStop - tStep
+      !(F# tMid') = tMid
+      !(F# r1') = innerR
+      !(F# r2') = outerR
+  in  GL.renderPrimitive GL.TriangleStrip $
+        do
+          -- start vector
+          addPointOnCircle posX posY r1' tStart'
+          addPointOnCircle posX posY r2' tStart'
+
+          -- If we don't have a complete step then just drop a point
+          -- between the two ending lines.
+          if tDiff < tStep
+            then do
+              addPointOnCircle posX posY r1' tMid'
+
+              -- end vectors
+              addPointOnCircle posX posY r2' tStop'
+              addPointOnCircle posX posY r1' tStop'
+            else do
+              renderCircleStripStep
+                posX
+                posY
+                tStep'
+                tCut'
+                r1'
+                tStart'
+                r2'
+                (tStart' `plusFloat#` tStep2')
+
+              -- end vectors
+              addPointOnCircle posX posY r1' tStop'
+              addPointOnCircle posX posY r2' tStop'
+{-# INLINE renderArcStripRadii #-}
 
 
 -- Step functions -------------------------------------------------------------

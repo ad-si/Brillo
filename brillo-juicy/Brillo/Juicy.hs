@@ -55,9 +55,9 @@ import Codec.Picture.Types (
   ColorConvertible (promoteImage),
   ColorSpaceConvertible (convertImage),
  )
-import qualified Codec.Picture.WebP as WebP
+import Codec.Picture.WebP qualified as WebP
 import Control.Exception (SomeException, try)
-import qualified Data.ByteString as BS
+import Data.ByteString qualified as BS
 import Data.Vector.Storable (unsafeToForeignPtr)
 
 

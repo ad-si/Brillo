@@ -201,16 +201,23 @@ colorOpacity color =
 renderPicture :: RenderState -> Picture -> Text
 renderPicture _ Blank = ""
 renderPicture rs (Polygon path) = renderPolygon rs path
+renderPicture rs (PolygonSmooth path) = renderPolygonSmooth rs path
 renderPicture rs (Line path) = renderLine rs path 1.0
 renderPicture rs (LineSmooth path) = renderSmoothLine rs path 1.0
 renderPicture rs (ThickLine path thickness) = renderLine rs path thickness
 renderPicture rs (ThickLineSmooth path thickness) = renderSmoothLine rs path thickness
 renderPicture rs (Circle radius) = renderCircle rs radius 1.0
+renderPicture rs (CircleSmooth radius) = renderCircleSmooth rs radius 1.0
 renderPicture rs (ThickCircle radius thickness) = renderThickCircle rs radius thickness
+renderPicture rs (ThickCircleSmooth radius thickness) = renderThickCircleSmooth rs radius thickness
 renderPicture rs (Arc startAngle endAngle radius) = renderArc rs startAngle endAngle radius 1.0
+renderPicture rs (ArcSmooth startAngle endAngle radius) = renderArcSmooth rs startAngle endAngle radius 1.0
 renderPicture rs (ThickArc startAngle endAngle thickness radius) = renderArc rs startAngle endAngle radius thickness
+renderPicture rs (ThickArcSmooth startAngle endAngle thickness radius) = renderArcSmooth rs startAngle endAngle radius thickness
 renderPicture rs (Text txt) = renderText rs txt 1.0
+renderPicture rs (TextSmooth txt) = renderTextSmooth rs txt 1.0
 renderPicture rs (ThickText txt thickness) = renderText rs txt thickness
+renderPicture rs (ThickTextSmooth txt thickness) = renderTextSmooth rs txt thickness
 renderPicture rs (TrueTypeText _fontPath _size txt) = renderText rs txt 1.0
 renderPicture rs (Bitmap bitmapData) = renderBitmap rs bitmapData Nothing
 renderPicture rs (BitmapSection rect bitmapData) = renderBitmap rs bitmapData (Just rect)
@@ -260,6 +267,21 @@ renderPolygon rs points =
     , "\" fill=\""
     , colorToSVG (rsColor rs)
     , "\""
+    , opacityAttr (rsColor rs)
+    , "/>\n"
+    ]
+
+
+-- | Render a filled polygon with anti-aliased edges (uses shape-rendering: geometricPrecision)
+renderPolygonSmooth :: RenderState -> [Point] -> Text
+renderPolygonSmooth _ [] = ""
+renderPolygonSmooth rs points =
+  T.concat
+    [ "  <polygon points=\""
+    , T.pack $ unwords [showFloat x ++ "," ++ showFloat y | (x, y) <- points]
+    , "\" fill=\""
+    , colorToSVG (rsColor rs)
+    , "\" shape-rendering=\"geometricPrecision\""
     , opacityAttr (rsColor rs)
     , "/>\n"
     ]
@@ -349,6 +371,22 @@ renderCircle rs radius thickness =
     ]
 
 
+-- | Render a circle outline with anti-aliasing
+renderCircleSmooth :: RenderState -> Float -> Float -> Text
+renderCircleSmooth rs radius thickness =
+  T.concat
+    [ "  <circle cx=\"0\" cy=\"0\" r=\""
+    , T.pack (showFloat (abs radius))
+    , "\" fill=\"none\" stroke=\""
+    , colorToSVG (rsColor rs)
+    , "\" stroke-width=\""
+    , T.pack (showFloat (max 1.0 thickness))
+    , "\" shape-rendering=\"geometricPrecision\""
+    , strokeOpacityAttr (rsColor rs)
+    , "/>\n"
+    ]
+
+
 {-| Render a thick circle (annulus/ring or filled disc)
 ThickCircle has parameters: radius (center of ring) and thickness (width of ring)
 Inner radius = radius - thickness/2, Outer radius = radius + thickness/2
@@ -381,6 +419,43 @@ renderThickCircle rs radius thickness
                 , "\" stroke-width=\""
                 , T.pack (showFloat (outerRadius - innerRadius))
                 , "\""
+                , strokeOpacityAttr (rsColor rs)
+                , "/>\n"
+                ]
+
+
+{-| Render a thick circle (annulus/ring or filled disc) with anti-aliasing
+ThickCircle has parameters: radius (center of ring) and thickness (width of ring)
+Inner radius = radius - thickness/2, Outer radius = radius + thickness/2
+-}
+renderThickCircleSmooth :: RenderState -> Float -> Float -> Text
+renderThickCircleSmooth rs radius thickness
+  | thickness <= 0 = renderCircleSmooth rs radius 1.0
+  | otherwise =
+      let innerRadius = abs radius - thickness / 2
+          outerRadius = abs radius + thickness / 2
+      in  if innerRadius <= 0
+            then
+              -- Inner radius is zero or negative, render as filled circle
+              T.concat
+                [ "  <circle cx=\"0\" cy=\"0\" r=\""
+                , T.pack (showFloat outerRadius)
+                , "\" fill=\""
+                , colorToSVG (rsColor rs)
+                , "\" shape-rendering=\"geometricPrecision\""
+                , opacityAttr (rsColor rs)
+                , "/>\n"
+                ]
+            else
+              -- Render as a ring (stroke)
+              T.concat
+                [ "  <circle cx=\"0\" cy=\"0\" r=\""
+                , T.pack (showFloat ((innerRadius + outerRadius) / 2))
+                , "\" fill=\"none\" stroke=\""
+                , colorToSVG (rsColor rs)
+                , "\" stroke-width=\""
+                , T.pack (showFloat (outerRadius - innerRadius))
+                , "\" shape-rendering=\"geometricPrecision\""
                 , strokeOpacityAttr (rsColor rs)
                 , "/>\n"
                 ]
@@ -439,6 +514,59 @@ renderArc rs startAngle endAngle radius thickness =
       ]
 
 
+-- | Render an arc with anti-aliasing
+renderArcSmooth :: RenderState -> Float -> Float -> Float -> Float -> Text
+renderArcSmooth rs startAngle endAngle radius thickness =
+  let
+    -- Convert angles from degrees to radians
+    -- Brillo uses counter-clockwise from the positive x-axis
+    -- SVG arcs need special handling
+    r = abs radius
+    startRad = startAngle * pi / 180
+    endRad = endAngle * pi / 180
+
+    -- Calculate start and end points
+    x1 = r * cos startRad
+    y1 = r * sin startRad
+    x2 = r * cos endRad
+    y2 = r * sin endRad
+
+    -- Determine arc sweep (large arc flag and sweep direction)
+    angleDiff = endAngle - startAngle
+    largeArc = if abs angleDiff > 180 then 1 else 0 :: Int
+    sweep = if angleDiff > 0 then 1 else 0 :: Int
+
+    pathData =
+      "M "
+        ++ showFloat x1
+        ++ " "
+        ++ showFloat y1
+        ++ " A "
+        ++ showFloat r
+        ++ " "
+        ++ showFloat r
+        ++ " 0 "
+        ++ show largeArc
+        ++ " "
+        ++ show sweep
+        ++ " "
+        ++ showFloat x2
+        ++ " "
+        ++ showFloat y2
+  in
+    T.concat
+      [ "  <path d=\""
+      , T.pack pathData
+      , "\" fill=\"none\" stroke=\""
+      , colorToSVG (rsColor rs)
+      , "\" stroke-width=\""
+      , T.pack (showFloat (max 1.0 thickness))
+      , "\" stroke-linecap=\"round\" shape-rendering=\"geometricPrecision\""
+      , strokeOpacityAttr (rsColor rs)
+      , "/>\n"
+      ]
+
+
 -- | Render text
 renderText :: RenderState -> Text -> Float -> Text
 renderText rs txt thickness =
@@ -446,6 +574,30 @@ renderText rs txt thickness =
     [ "  <text x=\"0\" y=\"0\" fill=\""
     , colorToSVG (rsColor rs)
     , "\" font-family=\"monospace\" font-size=\"100\""
+    , if thickness > 1.0
+        then
+          T.concat
+            [ " stroke=\""
+            , colorToSVG (rsColor rs)
+            , "\" stroke-width=\""
+            , T.pack (showFloat (thickness - 1.0))
+            , "\""
+            ]
+        else ""
+    , opacityAttr (rsColor rs)
+    , ">"
+    , escapeXML txt
+    , "</text>\n"
+    ]
+
+
+-- | Render text with anti-aliasing
+renderTextSmooth :: RenderState -> Text -> Float -> Text
+renderTextSmooth rs txt thickness =
+  T.concat
+    [ "  <text x=\"0\" y=\"0\" fill=\""
+    , colorToSVG (rsColor rs)
+    , "\" font-family=\"monospace\" font-size=\"100\" text-rendering=\"geometricPrecision\""
     , if thickness > 1.0
         then
           T.concat
