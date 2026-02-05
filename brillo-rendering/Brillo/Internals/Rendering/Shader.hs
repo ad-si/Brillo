@@ -6,6 +6,7 @@ module Brillo.Internals.Rendering.Shader (
   initShaderState,
   renderCircleSDF,
   renderArcSDF,
+  renderThickLineSDF,
 ) where
 
 import Control.Monad (unless)
@@ -18,6 +19,7 @@ import Graphics.Rendering.OpenGL.GL qualified as GL
 data ShaderState = ShaderState
   { circleProgram :: !(IORef (Maybe GL.Program))
   , arcProgram :: !(IORef (Maybe GL.Program))
+  , lineProgram :: !(IORef (Maybe GL.Program))
   }
 
 
@@ -26,10 +28,12 @@ initShaderState :: IO ShaderState
 initShaderState = do
   circleRef <- newIORef Nothing
   arcRef <- newIORef Nothing
+  lineRef <- newIORef Nothing
   return
     ShaderState
       { circleProgram = circleRef
       , arcProgram = arcRef
+      , lineProgram = lineRef
       }
 
 
@@ -128,6 +132,33 @@ arcFragmentShaderSrc =
     ]
 
 
+{-| Fragment shader for line segment (capsule) with SDF anti-aliasing.
+A thick line segment is rendered as a capsule - all points within
+a given distance from the line segment.
+-}
+lineFragmentShaderSrc :: String
+lineFragmentShaderSrc =
+  "#version 120 \n\
+  \varying vec2 vLocalCoord; \
+  \uniform vec4 uColor; \
+  \uniform vec2 uPointA; \
+  \uniform vec2 uPointB; \
+  \uniform float uThickness; \
+  \uniform float uPixelSize; \
+  \void main() { \
+  \  vec2 pa = vLocalCoord - uPointA; \
+  \  vec2 ba = uPointB - uPointA; \
+  \  float len2 = dot(ba, ba); \
+  \  float h = len2 > 0.0 ? clamp(dot(pa, ba) / len2, 0.0, 1.0) : 0.0; \
+  \  float dist = length(pa - ba * h); \
+  \  float aaWidth = min(uPixelSize, uThickness * 0.1); \
+  \  float d = dist - uThickness; \
+  \  float alpha = 1.0 - smoothstep(-aaWidth, aaWidth, d); \
+  \  if (alpha < 0.001) discard; \
+  \  gl_FragColor = vec4(uColor.rgb, uColor.a * alpha); \
+  \}"
+
+
 -- | Compile a shader from source
 compileShader :: GL.ShaderType -> String -> IO GL.Shader
 compileShader shaderType src = do
@@ -185,6 +216,18 @@ getArcProgram state = do
     Nothing -> do
       prog <- createProgram vertexShaderSrc arcFragmentShaderSrc
       writeIORef (arcProgram state) (Just prog)
+      return prog
+
+
+-- | Get or create the line shader program
+getLineProgram :: ShaderState -> IO GL.Program
+getLineProgram state = do
+  maybeProgram <- readIORef (lineProgram state)
+  case maybeProgram of
+    Just prog -> return prog
+    Nothing -> do
+      prog <- createProgram vertexShaderSrc lineFragmentShaderSrc
+      writeIORef (lineProgram state) (Just prog)
       return prog
 
 
@@ -326,3 +369,91 @@ renderArcSDF state posX posY scaleFactor outerR innerR startDeg endDeg color = d
       GL.Vertex2 (realToFrac x1 :: GL.GLfloat) (realToFrac y2 :: GL.GLfloat)
 
   GL.currentProgram $= oldProgram
+
+
+-- | Render a single line segment using SDF shader (capsule shape)
+renderLineSegmentSDF ::
+  ShaderState ->
+  Float -> -- ax
+  Float -> -- ay
+  Float -> -- bx
+  Float -> -- by
+  Float -> -- scaleFactor (pixels per unit)
+  Float -> -- thickness (diameter)
+  GL.Color4 GL.GLfloat -> -- color
+  IO ()
+renderLineSegmentSDF state ax ay bx by scaleFactor thickness color = do
+  program <- getLineProgram state
+
+  oldProgram <- GL.get GL.currentProgram
+  GL.currentProgram $= Just program
+
+  -- Set uniforms
+  uColorLoc <- GL.get (GL.uniformLocation program "uColor")
+  uPointALoc <- GL.get (GL.uniformLocation program "uPointA")
+  uPointBLoc <- GL.get (GL.uniformLocation program "uPointB")
+  uThicknessLoc <- GL.get (GL.uniformLocation program "uThickness")
+  uPixelLoc <- GL.get (GL.uniformLocation program "uPixelSize")
+
+  let halfThick = thickness / 2.0
+
+  GL.uniform uColorLoc $= color
+  GL.uniform uPointALoc
+    $= GL.Vector2 (realToFrac ax :: GL.GLfloat) (realToFrac ay)
+  GL.uniform uPointBLoc
+    $= GL.Vector2 (realToFrac bx :: GL.GLfloat) (realToFrac by)
+  GL.uniform uThicknessLoc $= (realToFrac halfThick :: GL.GLfloat)
+  GL.uniform uPixelLoc $= (realToFrac (1.0 / scaleFactor) :: GL.GLfloat)
+
+  -- Compute bounding box with padding for AA
+  let padding = 2.0 / scaleFactor
+      r = halfThick + padding
+      minX = min ax bx - r
+      maxX = max ax bx + r
+      minY = min ay by - r
+      maxY = max ay by + r
+
+  -- Draw quad covering the capsule
+  -- vLocalCoord receives the vertex position (world space)
+  GL.renderPrimitive GL.Quads $ do
+    GL.texCoord $
+      GL.TexCoord2 (realToFrac minX :: GL.GLfloat) (realToFrac minY :: GL.GLfloat)
+    GL.vertex $
+      GL.Vertex2 (realToFrac minX :: GL.GLfloat) (realToFrac minY :: GL.GLfloat)
+
+    GL.texCoord $
+      GL.TexCoord2 (realToFrac maxX :: GL.GLfloat) (realToFrac minY :: GL.GLfloat)
+    GL.vertex $
+      GL.Vertex2 (realToFrac maxX :: GL.GLfloat) (realToFrac minY :: GL.GLfloat)
+
+    GL.texCoord $
+      GL.TexCoord2 (realToFrac maxX :: GL.GLfloat) (realToFrac maxY :: GL.GLfloat)
+    GL.vertex $
+      GL.Vertex2 (realToFrac maxX :: GL.GLfloat) (realToFrac maxY :: GL.GLfloat)
+
+    GL.texCoord $
+      GL.TexCoord2 (realToFrac minX :: GL.GLfloat) (realToFrac maxY :: GL.GLfloat)
+    GL.vertex $
+      GL.Vertex2 (realToFrac minX :: GL.GLfloat) (realToFrac maxY :: GL.GLfloat)
+
+  GL.currentProgram $= oldProgram
+
+
+-- | Render an entire path as connected thick line segments using SDF
+renderThickLineSDF ::
+  ShaderState ->
+  [(Float, Float)] -> -- Path points
+  Float -> -- scaleFactor
+  Float -> -- thickness
+  GL.Color4 GL.GLfloat -> -- color
+  IO ()
+renderThickLineSDF _state [] _ _ _ = return ()
+renderThickLineSDF _state [_] _ _ _ = return () -- Single point, nothing to draw
+renderThickLineSDF state path scaleFactor thickness color = do
+  -- Render each segment as a capsule
+  -- Overlapping capsules at joins naturally create rounded joins
+  let segments = zip path (drop 1 path)
+  mapM_ renderSegment segments
+  where
+    renderSegment ((ax, ay), (bx, by)) =
+      renderLineSegmentSDF state ax ay bx by scaleFactor thickness color

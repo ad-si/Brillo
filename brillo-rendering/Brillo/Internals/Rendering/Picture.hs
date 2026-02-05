@@ -39,7 +39,11 @@ import Brillo.Internals.Rendering.Polygon (
   renderComplexPolygon,
   renderComplexPolygonSmooth,
  )
-import Brillo.Internals.Rendering.Shader (renderArcSDF, renderCircleSDF)
+import Brillo.Internals.Rendering.Shader (
+  renderArcSDF,
+  renderCircleSDF,
+  renderThickLineSDF,
+ )
 import Brillo.Internals.Rendering.State (
   State (
     stateBlendAlpha,
@@ -113,21 +117,8 @@ drawPicture state circScale picture =
       GL.renderPrimitive GL.LineStrip $ vertexPFs path
       GL.lineWidth $= oldLineWidth
     --
-    ThickLineSmooth path thickness -> do
-      widthRange <- GL.smoothLineWidthRange
-      when (thickness < fst widthRange || thickness > snd widthRange) $
-        hPutStrLn stderr $
-          "Error: The line width "
-            <> show thickness
-            <> " is outside the supported range of "
-            <> show widthRange
-
-      oldLineWidth <- get GL.lineWidth
-      GL.lineWidth $= gf thickness
-      GL.lineSmooth $= GL.Enabled
-      GL.renderPrimitive GL.LineStrip $ vertexPFs path
-      GL.lineSmooth $= GL.Disabled
-      GL.lineWidth $= oldLineWidth
+    ThickLineSmooth path thickness ->
+      renderThickLineSmoothSDF state 0 0 circScale path thickness
     --
     Polygon path
       | state.stateWireframe ->
@@ -583,3 +574,12 @@ renderArcSmoothSDF state posX posY scaleFactor radius a1 a2 thickness = do
   let outerR = abs radius + abs thickness / 2
       innerR = max 0 (abs radius - abs thickness / 2)
   renderArcSDF state.stateShaders posX posY scaleFactor outerR innerR a1 a2 color
+
+
+-- | Render a smooth thick line using SDF shader
+renderThickLineSmoothSDF ::
+  State -> Float -> Float -> Float -> [(Float, Float)] -> Float -> IO ()
+renderThickLineSmoothSDF state offsetX offsetY scaleFactor path thickness = do
+  color <- get GL.currentColor
+  let translatedPath = map (\(x, y) -> (x + offsetX, y + offsetY)) path
+  renderThickLineSDF state.stateShaders translatedPath scaleFactor thickness color
