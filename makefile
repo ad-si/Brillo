@@ -34,6 +34,18 @@ test:
 	stack run brillo-zen && \
 	stack run brillo-gui && \
 	stack run brillo-pickfiles && \
+	stack run brillo-antialiasing && \
+	stack run brillo-circle-comparison && \
+	stack run brillo-dropfiles && \
+	stack run brillo-interaction && \
+	stack run brillo-lines && \
+	stack run brillo-polygons && \
+	stack run brillo-2048 && \
+	stack run brillo-tetris && \
+	stack run brillo-chess && \
+	stack run brillo-tictactoe && \
+	stack run brillo-canvas-editor && \
+	stack run brillo-fule-layout && \
 	stack run brillo-render  # Must be last as it can't be closed
 
 
