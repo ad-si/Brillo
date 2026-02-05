@@ -98,6 +98,9 @@ interactWithBackend
                       let viewState' = viewState{viewStateViewPort = port'}
                       writeIORef viewSR viewState'
                       postRedisplay backendRef
+              , controllerSetCursor =
+                  \cursorShape ->
+                    setCursor backendRef cursorShape
               }
 
 

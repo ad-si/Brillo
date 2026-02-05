@@ -1,6 +1,7 @@
 module Brillo.Data.Controller (Controller (..))
 where
 
+import Brillo.Data.Cursor (CursorShape)
 import Brillo.Data.ViewPort
 
 
@@ -11,4 +12,6 @@ data Controller
   -- ^ Indicate that we want the picture to be redrawn.
   , controllerModifyViewPort :: (ViewPort -> IO ViewPort) -> IO ()
   -- ^ Modify the current viewport, also indicating that it should be redrawn.
+  , controllerSetCursor :: CursorShape -> IO ()
+  -- ^ Set the mouse cursor shape.
   }

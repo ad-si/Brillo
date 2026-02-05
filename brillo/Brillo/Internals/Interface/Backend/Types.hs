@@ -3,10 +3,12 @@
 
 module Brillo.Internals.Interface.Backend.Types (
   module Brillo.Internals.Interface.Backend.Types,
+  module Brillo.Data.Cursor,
   module Brillo.Data.Display,
 )
 where
 
+import Brillo.Data.Cursor
 import Brillo.Data.Display
 import Brillo.Data.FileDialog (FileDialog)
 import Data.IORef (IORef)
@@ -107,6 +109,10 @@ class Backend a where
 
   -- | Function that puts the current thread to sleep for 'n' seconds.
   sleep :: IORef a -> Double -> IO ()
+
+
+  -- | Set the cursor shape for the window.
+  setCursor :: IORef a -> CursorShape -> IO ()
 
 
 -- The callbacks should work for all backends. We pass a reference to the

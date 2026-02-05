@@ -5,6 +5,7 @@ module Brillo.Interface.IO.Interact (
   module Brillo.Data.Color,
   interactIO,
   Controller (..),
+  CursorShape (..),
   Event (..),
   Key (..),
   SpecialKey (..),
@@ -16,6 +17,7 @@ where
 
 import Brillo.Data.Color
 import Brillo.Data.Controller
+import Brillo.Data.Cursor
 import Brillo.Data.Display
 import Brillo.Data.Picture
 import Brillo.Internals.Interface.Backend

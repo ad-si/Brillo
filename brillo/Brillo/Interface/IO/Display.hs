@@ -5,11 +5,13 @@ module Brillo.Interface.IO.Display (
   module Brillo.Data.Color,
   displayIO,
   Controller (..),
+  CursorShape (..),
 )
 where
 
 import Brillo.Data.Color
 import Brillo.Data.Controller
+import Brillo.Data.Cursor
 import Brillo.Data.Display
 import Brillo.Data.Picture
 import Brillo.Internals.Interface.Backend

@@ -18,6 +18,7 @@ import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL qualified as GL
 import Graphics.UI.GLFW qualified as GLFW
 
+import Brillo.Data.Cursor (CursorShape (..))
 import Brillo.Data.FileDialog (FileDialog (..), SelectionMode (..))
 import Brillo.Internals.Interface.Backend.Types (
   Backend (..),
@@ -31,6 +32,8 @@ import Brillo.Internals.Interface.Backend.Types (
  )
 import Brillo.Internals.TinyFileDialogs as TinyFileDialogs
 import Data.List (singleton)
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
 
 
 -- | State of the GLFW backend library.
@@ -50,6 +53,8 @@ data GLFWState
   -- ^ Action perforrmed when idling
   , optWinHdl :: Maybe GLFW.Window
   -- ^ The Window Handle
+  , cursorCache :: Map CursorShape GLFW.Cursor
+  -- ^ Cache of created cursors
   }
 
 
@@ -64,6 +69,7 @@ glfwStateInit =
     , display = return ()
     , idle = return ()
     , optWinHdl = Nothing
+    , cursorCache = Map.empty
     }
 
 
@@ -96,6 +102,7 @@ instance Backend GLFWState where
   openFileDialog = openFileDialogGLFW
   elapsedTime _ = GLFW.getTime >>= \mt -> return $ fromJust mt
   sleep _ sec = threadDelay (floor (sec * 1000000.0)) -- GLFW.sleep sec)
+  setCursor = setCursorGLFW
 
 
 -- Initialise -----------------------------------------------------------------
@@ -123,6 +130,48 @@ exitGLFW :: IORef GLFWState -> IO ()
 exitGLFW ref = do
   win <- windowHandle ref
   GLFW.setWindowShouldClose win True
+
+
+-- Cursor ---------------------------------------------------------------------
+
+-- | Set the cursor shape for the GLFW window.
+setCursorGLFW :: IORef GLFWState -> CursorShape -> IO ()
+setCursorGLFW stateRef shape = do
+  state <- readIORef stateRef
+  win <- windowHandle stateRef
+
+  case shape of
+    CursorHidden -> do
+      -- Hide cursor using GLFW's cursor input mode
+      GLFW.setCursorInputMode win GLFW.CursorInputMode'Hidden
+    _ -> do
+      -- Ensure cursor is visible
+      GLFW.setCursorInputMode win GLFW.CursorInputMode'Normal
+
+      -- Check if cursor is already cached
+      case Map.lookup shape (cursorCache state) of
+        Just cursor -> do
+          GLFW.setCursor win cursor
+        Nothing -> do
+          -- Create and cache the cursor
+          let stdCursor = cursorShapeToGLFW shape
+          cursor <- GLFW.createStandardCursor stdCursor
+          -- Cache the cursor for future use
+          modifyIORef' stateRef $ \s ->
+            s{cursorCache = Map.insert shape cursor (cursorCache s)}
+          GLFW.setCursor win cursor
+
+
+-- | Convert Brillo CursorShape to GLFW StandardCursorShape.
+cursorShapeToGLFW :: CursorShape -> GLFW.StandardCursorShape
+cursorShapeToGLFW shape = case shape of
+  CursorArrow -> GLFW.StandardCursorShape'Arrow
+  CursorIBeam -> GLFW.StandardCursorShape'IBeam
+  CursorCrosshair -> GLFW.StandardCursorShape'Crosshair
+  CursorHand -> GLFW.StandardCursorShape'Hand
+  CursorResizeH -> GLFW.StandardCursorShape'HResize
+  CursorResizeV -> GLFW.StandardCursorShape'VResize
+  CursorHidden -> GLFW.StandardCursorShape'Arrow -- Not used, handled separately
 
 
 -- Open Window ----------------------------------------------------------------
@@ -412,7 +461,7 @@ callbackKeyboard _stateRef _callbacks _win _key _scancode GLFW.KeyState'Repeatin
 callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
   do
     let keystate = keystateglfw == GLFW.KeyState'Pressed
-    (modsSet, GLFWState mods pos _ _ _ _ _) <-
+    (modsSet, GLFWState mods pos _ _ _ _ _ _) <-
       setModifiers stateRef key keystate
     let key' = fromGLFW key
     let keystate' = if keystate then Down else Up
@@ -525,7 +574,7 @@ callbackChar ::
 callbackChar stateRef callbacks _win char -- keystate
   =
   do
-    (GLFWState mods pos _ _ _ _ _) <- readIORef stateRef
+    (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
     let key' = charToSpecial char
     -- TODO: is this correct? GLFW does not provide the keystate
     -- in a character callback, here we asume that its pressed
@@ -552,7 +601,7 @@ callbackMouseButton ::
   GLFW.MouseButtonCallback -- = Window -> MouseButton -> MouseButtonState -> ModifierKeys -> IO ()
 callbackMouseButton stateRef callbacks _win key keystate _modifier =
   do
-    (GLFWState mods pos _ _ _ _ _) <- readIORef stateRef
+    (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
     let key' = fromGLFW key
     let keystate' = if keystate == GLFW.MouseButtonState'Pressed then Down else Up
 
@@ -573,7 +622,7 @@ callbackMouseWheel ::
 callbackMouseWheel stateRef callbacks _win x _y =
   do
     (key, keystate) <- setMouseWheel stateRef (floor x)
-    (GLFWState mods pos _ _ _ _ _) <- readIORef stateRef
+    (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
 
     -- Call all the Brillo KeyMouse actions with the new state.
     mapM_

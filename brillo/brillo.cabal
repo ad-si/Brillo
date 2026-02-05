@@ -48,6 +48,7 @@ library
     Brillo.Data.Bitmap
     Brillo.Data.Color
     Brillo.Data.Controller
+    Brillo.Data.Cursor
     Brillo.Data.Display
     Brillo.Data.FileDialog
     Brillo.Data.Picture
