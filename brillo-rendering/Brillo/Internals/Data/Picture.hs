@@ -88,25 +88,31 @@ data Picture
     Circle Float
   | -- | A circle with the given radius, drawn with anti-aliasing.
     CircleSmooth Float
-  | -- | A circle with the given radius and thickness.
-    --   If the thickness is 0 then this is equivalent to `Circle`.
+  | {-| A circle with the given radius and thickness.
+    If the thickness is 0 then this is equivalent to `Circle`.
+    -}
     ThickCircle Float Float
-  | -- | A circle with the given radius and thickness, drawn with anti-aliasing.
-    --   If the thickness is 0 then this is equivalent to `CircleSmooth`.
+  | {-| A circle with the given radius and thickness, drawn with anti-aliasing.
+    If the thickness is 0 then this is equivalent to `CircleSmooth`.
+    -}
     ThickCircleSmooth Float Float
-  | -- | A circular arc drawn counter-clockwise between two angles
-    --  (in degrees) at the given radius.
+  | {-| A circular arc drawn counter-clockwise between two angles
+    (in degrees) at the given radius.
+    -}
     Arc Float Float Float
-  | -- | A circular arc drawn counter-clockwise between two angles
-    --  (in degrees) at the given radius, drawn with anti-aliasing.
+  | {-| A circular arc drawn counter-clockwise between two angles
+    (in degrees) at the given radius, drawn with anti-aliasing.
+    -}
     ArcSmooth Float Float Float
-  | -- | A circular arc drawn counter-clockwise between two angles
-    --  (in degrees), with the given radius and thickness.
-    --   If the thickness is 0 then this is equivalent to `Arc`.
+  | {-| A circular arc drawn counter-clockwise between two angles
+    (in degrees), with the given radius and thickness.
+    If the thickness is 0 then this is equivalent to `Arc`.
+    -}
     ThickArc Float Float Float Float
-  | -- | A circular arc drawn counter-clockwise between two angles
-    --  (in degrees), with the given radius and thickness, drawn with anti-aliasing.
-    --   If the thickness is 0 then this is equivalent to `ArcSmooth`.
+  | {-| A circular arc drawn counter-clockwise between two angles
+    (in degrees), with the given radius and thickness, drawn with anti-aliasing.
+    If the thickness is 0 then this is equivalent to `ArcSmooth`.
+    -}
     ThickArcSmooth Float Float Float Float
   | -- | Text to draw with a vector font
     Text Text
@@ -116,14 +122,16 @@ data Picture
     ThickText Text Float
   | -- | Text to draw with a vector font and a given thickness, drawn with anti-aliasing.
     ThickTextSmooth Text Float
-  | -- | Text to draw with a TrueType font located at the given path,
-    --   rendered at the specified pixel height.
+  | {-| Text to draw with a TrueType font located at the given path,
+    rendered at the specified pixel height.
+    -}
     TrueTypeText FilePath Int Text
   | -- | A bitmap image.
     Bitmap BitmapData
-  | -- | A subsection of a bitmap image where
-    --   the first argument selects a sub section in the bitmap,
-    --   and second argument determines the bitmap data.
+  | {-| A subsection of a bitmap image where
+    the first argument selects a sub section in the bitmap,
+    and second argument determines the bitmap data.
+    -}
     BitmapSection Rectangle BitmapData
   | -- Color ------------------------------------------
 

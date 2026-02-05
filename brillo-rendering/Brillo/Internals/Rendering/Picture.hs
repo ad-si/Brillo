@@ -62,8 +62,9 @@ import Brillo.Internals.Rendering.VectorFont as VF (canvastextFont, renderSafe)
 renderPicture ::
   -- | Current rendering state.
   State ->
-  -- | View port scale, which controls the level of detail.
-  --   Use 1.0 to start with.
+  {-| View port scale, which controls the level of detail.
+  Use 1.0 to start with.
+  -}
   Float ->
   -- | Picture to render.
   Picture ->
@@ -565,7 +566,8 @@ vertexPFs ((x, y) : rest) =
 -- SDF-based rendering helpers ------------------------------------------------
 
 -- | Render a smooth circle using SDF shader
-renderCircleSmoothSDF :: State -> Float -> Float -> Float -> Float -> Float -> IO ()
+renderCircleSmoothSDF ::
+  State -> Float -> Float -> Float -> Float -> Float -> IO ()
 renderCircleSmoothSDF state posX posY scaleFactor radius thickness = do
   color <- get GL.currentColor
   let outerR = abs radius + abs thickness / 2
@@ -574,7 +576,8 @@ renderCircleSmoothSDF state posX posY scaleFactor radius thickness = do
 
 
 -- | Render a smooth arc using SDF shader
-renderArcSmoothSDF :: State -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> IO ()
+renderArcSmoothSDF ::
+  State -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> IO ()
 renderArcSmoothSDF state posX posY scaleFactor radius a1 a2 thickness = do
   color <- get GL.currentColor
   let outerR = abs radius + abs thickness / 2

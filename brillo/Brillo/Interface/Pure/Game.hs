@@ -41,8 +41,9 @@ play ::
   (world -> Picture) ->
   -- | A function to handle input events.
   (Event -> world -> world) ->
-  -- | A function to step the world one iteration.
-  --   It is passed the period of time (in seconds) needing to be advanced.
+  {-| A function to step the world one iteration.
+  It is passed the period of time (in seconds) needing to be advanced.
+  -}
   (Float -> world -> world) ->
   IO ()
 play

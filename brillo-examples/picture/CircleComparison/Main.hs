@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{- | Comprehensive comparison of normal vs smooth circle rendering.
+{-| Comprehensive comparison of normal vs smooth circle rendering.
 
 This example tests various edge cases to identify rendering artifacts:
 - Very small circles (sub-pixel to a few pixels)
@@ -78,10 +78,14 @@ drawWorld :: World -> Picture
 drawWorld world =
   Pictures
     [ -- Instructions at top
-      Translate (-680) 420 $ Scale 0.1 0.1 $
-        Text "Up/Down or +/-: Zoom | Left/Right: Pan | R: Reset"
-    , Translate (-680) 390 $ Scale 0.1 0.1 $
-        Text $ T.pack $ "Zoom: " ++ show (worldZoom world)
+      Translate (-680) 420 $
+        Scale 0.1 0.1 $
+          Text "Up/Down or +/-: Zoom | Left/Right: Pan | R: Reset"
+    , Translate (-680) 390 $
+        Scale 0.1 0.1 $
+          Text $
+            T.pack $
+              "Zoom: " ++ show (worldZoom world)
     , -- Apply zoom and pan to test content
       Translate (worldPanX world) (worldPanY world) $
         Scale (worldZoom world) (worldZoom world) $
@@ -262,7 +266,7 @@ alphaSection =
             ]
       , -- Labels
         Translate (-60) (-55) $ Scale 0.06 0.06 $ Text "Normal"
-        , Translate 60 (-55) $ Scale 0.06 0.06 $ Text "Smooth"
+      , Translate 60 (-55) $ Scale 0.06 0.06 $ Text "Smooth"
       ]
 
 
@@ -294,8 +298,8 @@ circleGrid :: (Float -> Picture) -> Picture
 circleGrid circleFn =
   Pictures
     [ Translate (fromIntegral x * spacing) (fromIntegral y * spacing) $
-      Color (makeColor r g b 1) $
-        circleFn radius
+        Color (makeColor r g b 1) $
+          circleFn radius
     | x <- [-gridSize .. gridSize]
     , y <- [-gridSize .. gridSize]
     , let radius = 3 + fromIntegral (abs x + abs y) * 0.3
@@ -306,5 +310,3 @@ circleGrid circleFn =
   where
     gridSize = 5 :: Int
     spacing = 18 :: Float
-
-

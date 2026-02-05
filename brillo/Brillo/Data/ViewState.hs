@@ -170,10 +170,11 @@ isCommand2 _ key keyMods cMatch
 data ViewState
   = ViewState
   { viewStateCommands :: !(Map Command [(Key, Maybe Modifiers)])
-  -- ^ The command list for the viewport controller.
-  --      These can be safely overwridden at any time by deleting
-  --      or adding entries to the list.
-  --      Entries at the front of the list take precedence.
+  {- ^ The command list for the viewport controller.
+     These can be safely overwridden at any time by deleting
+     or adding entries to the list.
+     Entries at the front of the list take precedence.
+  -}
   , viewStateScaleStep :: !Float
   -- ^ How much to scale the world by for each step of the mouse wheel.
   , viewStateRotateFactor :: !Float
@@ -181,14 +182,17 @@ data ViewState
   , viewStateScaleFactor :: !Float
   -- ^ Ratio to scale the world by for each pixel of y motion.
   , viewStateTranslateMark :: !(Maybe (Float, Float))
-  -- ^ During viewport translation,
-  --      where the mouse was clicked on the window to start the translate.
+  {- ^ During viewport translation,
+     where the mouse was clicked on the window to start the translate.
+  -}
   , viewStateRotateMark :: !(Maybe (Float, Float))
-  -- ^ During viewport rotation,
-  --      where the mouse was clicked on the window to starte the rotate.
+  {- ^ During viewport rotation,
+     where the mouse was clicked on the window to starte the rotate.
+  -}
   , viewStateScaleMark :: !(Maybe (Float, Float))
-  -- ^ During viewport scale,
-  --      where the mouse was clicked on the window to start the scale.
+  {- ^ During viewport scale,
+     where the mouse was clicked on the window to start the scale.
+  -}
   , viewStateViewPort :: ViewPort
   -- ^ The current viewport.
   }

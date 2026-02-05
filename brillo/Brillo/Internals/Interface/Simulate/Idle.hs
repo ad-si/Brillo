@@ -22,16 +22,18 @@ callback_simulate_idle ::
   IORef SM.State ->
   -- | the animation statea
   IORef AN.State ->
-  -- | action to get the 'ViewPort'.  We don't use an 'IORef'
-  -- directly because sometimes we hold a ref to a 'ViewPort' (in
-  -- Game) and sometimes a ref to a 'ViewState'.
+  {-| action to get the 'ViewPort'.  We don't use an 'IORef'
+  directly because sometimes we hold a ref to a 'ViewPort' (in
+  Game) and sometimes a ref to a 'ViewState'.
+  -}
   IO ViewPort ->
   -- | the current world
   IORef world ->
   -- | fn to advance the world
   (ViewPort -> Float -> world -> IO world) ->
-  -- | how much time to advance world by
-  --      in single step mode
+  {-| how much time to advance world by
+     in single step mode
+  -}
   Float ->
   IdleCallback
 callback_simulate_idle simSR animateSR viewSA worldSR worldAdvance _singleStepTime backendRef =

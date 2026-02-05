@@ -148,7 +148,7 @@ smallCircles :: (Float -> Picture) -> Picture
 smallCircles circFn =
   Pictures
     [ Translate (fromIntegral x * 15 - 30) 0 $
-      Color (makeColor 0.2 0.4 0.8 1) $
-        circFn (3 + fromIntegral x)
+        Color (makeColor 0.2 0.4 0.8 1) $
+          circFn (3 + fromIntegral x)
     | x <- [0 .. 4 :: Int]
     ]

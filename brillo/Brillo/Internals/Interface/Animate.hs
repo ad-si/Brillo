@@ -32,8 +32,9 @@ animateWithBackendIO ::
   Display ->
   -- | Background color.
   Color ->
-  -- | Function to produce the next frame of animation.
-  --     It is passed the time in seconds since the program started.
+  {-| Function to produce the next frame of animation.
+    It is passed the time in seconds since the program started.
+  -}
   (Float -> IO Picture) ->
   -- | Eat the controller.
   (Controller -> IO ()) ->
@@ -85,8 +86,8 @@ animateWithBackendIO
             , callback_viewState_reshape
             ]
               ++ ( if pannable
-                    then [callback_viewState_keyMouse viewSR]
-                    else []
+                     then [callback_viewState_keyMouse viewSR]
+                     else []
                  )
 
       createWindow backend display backColor callbacks $

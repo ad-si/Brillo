@@ -23,8 +23,9 @@ createWindow ::
   Color ->
   -- | Callbacks to use.
   [Callback] ->
-  -- | Give the backend back to the caller before
-  --   entering the main loop.
+  {-| Give the backend back to the caller before
+  entering the main loop.
+  -}
   (IORef a -> IO ()) ->
   IO ()
 createWindow

@@ -22,14 +22,16 @@ import Data.IORef (IORef)
   the backend needs to have OpenGL in a state where it's able to accept them.
 -}
 class Backend a where
-  -- | Initialize the state used by the backend.
-  -- If you don't use any state, make a Unit-like type.
+  {-| Initialize the state used by the backend.
+  If you don't use any state, make a Unit-like type.
+  -}
   initBackendState :: a
 
 
-  -- | Perform any initialization that needs to happen before opening a window
-  --   The Boolean flag indicates if any debug information should be printed to
-  --   the terminal
+  {-| Perform any initialization that needs to happen before opening a window
+  The Boolean flag indicates if any debug information should be printed to
+  the terminal
+  -}
   initializeBackend :: IORef a -> Bool -> IO ()
 
 
@@ -93,8 +95,9 @@ class Backend a where
   openFileDialog :: IORef a -> FileDialog -> IO (Maybe [FilePath])
 
 
-  -- | Function that reports the time elapsed since the application started.
-  --   (in seconds)
+  {-| Function that reports the time elapsed since the application started.
+  (in seconds)
+  -}
   elapsedTime :: IORef a -> IO Double
 
 

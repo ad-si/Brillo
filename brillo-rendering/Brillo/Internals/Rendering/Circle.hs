@@ -473,8 +473,6 @@ degToRad :: Float -> Float
 degToRad d = d * pi / 180
 {-# INLINE degToRad #-}
 
-
-
 {- Unused sector drawing code.
    Sectors are currently drawn as compound Pictures,
    but we might want this if we end up implementing the ThickSector

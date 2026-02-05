@@ -22,8 +22,9 @@ data State
   -- ^ The time when we entered the display callback for the current frame.
   , stateDisplayTimeLast :: !Double
   , stateDisplayTimeClamp :: !Double
-  -- ^ Clamp the minimum time between frames to this value (in seconds)
-  --      Setting this to < 10ms probably isn't worthwhile.
+  {- ^ Clamp the minimum time between frames to this value (in seconds)
+     Setting this to < 10ms probably isn't worthwhile.
+  -}
   , stateGateTimeStart :: !Double
   -- ^ The time when the last call to the users render function finished.
   , stateGateTimeEnd :: !Double

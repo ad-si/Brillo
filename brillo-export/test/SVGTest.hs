@@ -731,8 +731,8 @@ testColorVariations = do
     , runTest "Gradient-like colors" $ do
         let pics =
               [ Color (makeColor (i / 10) 0 (1 - i / 10) 1) $
-                Translate (i * 40 - 200) 0 $
-                  Circle 15
+                  Translate (i * 40 - 200) 0 $
+                    Circle 15
               | i <- [0, 1 .. 10]
               ]
         let svg = pictureToSVGDoc (500, 100) white $ Pictures pics
@@ -740,8 +740,8 @@ testColorVariations = do
     , runTest "Alpha gradient" $ do
         let pics =
               [ Color (makeColor 1 0 0 (i / 10)) $
-                Translate (i * 40 - 200) 0 $
-                  circleSolid 30
+                  Translate (i * 40 - 200) 0 $
+                    circleSolid 30
               | i <- [1 .. 10]
               ]
         let svg = pictureToSVGDoc (500, 100) white $ Pictures pics

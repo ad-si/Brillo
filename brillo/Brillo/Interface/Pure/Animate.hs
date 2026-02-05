@@ -23,8 +23,9 @@ animate ::
   Display ->
   -- | Background color.
   Color ->
-  -- | Function to produce the next frame of animation.
-  --      It is passed the time in seconds since the program started.
+  {-| Function to produce the next frame of animation.
+     It is passed the time in seconds since the program started.
+  -}
   (Float -> Picture) ->
   IO ()
 animate display backColor frameFun =

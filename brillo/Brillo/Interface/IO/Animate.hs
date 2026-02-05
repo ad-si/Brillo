@@ -26,8 +26,9 @@ animateIO ::
   Display ->
   -- | Background color.
   Color ->
-  -- | Function to produce the next frame of animation.
-  --      It is passed the time in seconds since the program started.
+  {-| Function to produce the next frame of animation.
+     It is passed the time in seconds since the program started.
+  -}
   (Float -> IO Picture) ->
   -- | Callback to take the display controller.
   (Controller -> IO ()) ->
@@ -52,8 +53,9 @@ animateFixedIO ::
   Display ->
   -- | Background color.
   Color ->
-  -- | Function to produce the next frame of animation.
-  --      It is passed the time in seconds since the program started.
+  {-| Function to produce the next frame of animation.
+     It is passed the time in seconds since the program started.
+  -}
   (Float -> IO Picture) ->
   -- | Callback to take the display controller.
   (Controller -> IO ()) ->

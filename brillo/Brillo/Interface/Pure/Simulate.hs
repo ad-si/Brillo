@@ -41,9 +41,10 @@ simulate ::
   model ->
   -- | A function to convert the model to a picture.
   (model -> Picture) ->
-  -- | A function to step the model one iteration. It is passed the
-  --     current viewport and the amount of time for this simulation
-  --     step (in seconds).
+  {-| A function to step the model one iteration. It is passed the
+    current viewport and the amount of time for this simulation
+    step (in seconds).
+  -}
   (ViewPort -> Float -> model -> model) ->
   IO ()
 simulate

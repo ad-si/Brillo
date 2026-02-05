@@ -63,8 +63,9 @@ displayPicture ::
   Color ->
   -- | Current rendering state.
   RS.State ->
-  -- | View port scale, which controls the level of detail.
-  --   Use 1.0 to start with.
+  {-| View port scale, which controls the level of detail.
+  Use 1.0 to start with.
+  -}
   Float ->
   -- | Picture to draw.
   Picture ->
