@@ -58,6 +58,7 @@ createWindow
       installDisplayCallback backendStateRef callbacks
       installWindowCloseCallback backendStateRef
       installReshapeCallback backendStateRef callbacks
+      installRefreshCallback backendStateRef callbacks
       installKeyMouseCallback backendStateRef callbacks
       installMotionCallback backendStateRef callbacks
       installDropCallback backendStateRef callbacks

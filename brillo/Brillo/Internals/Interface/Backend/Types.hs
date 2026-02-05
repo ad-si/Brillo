@@ -59,6 +59,10 @@ class Backend a where
   installReshapeCallback :: IORef a -> [Callback] -> IO ()
 
 
+  -- | Install the refresh callback (called during live resize on macOS).
+  installRefreshCallback :: IORef a -> [Callback] -> IO ()
+
+
   -- | Install the keymouse press callbacks.
   installKeyMouseCallback :: IORef a -> [Callback] -> IO ()
 

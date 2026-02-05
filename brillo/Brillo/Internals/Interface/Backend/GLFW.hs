@@ -84,6 +84,7 @@ instance Backend GLFWState where
   installDisplayCallback = installDisplayCallbackGLFW
   installWindowCloseCallback = installWindowCloseCallbackGLFW
   installReshapeCallback = installReshapeCallbackGLFW
+  installRefreshCallback = installRefreshCallbackGLFW
   installKeyMouseCallback = installKeyMouseCallbackGLFW
   installMotionCallback = installMotionCallbackGLFW
   installDropCallback = installDropCallbackGLFW
@@ -337,10 +338,43 @@ callbackReshape ::
   IORef GLFWState ->
   [Callback] ->
   GLFW.WindowSizeCallback -- = Window -> Int -> Int -> IO ()
-callbackReshape glfwState callbacks _win sizeX sizeY =
+callbackReshape stateRef callbacks _win sizeX sizeY =
+  -- Call all reshape callbacks (which will update world state, viewport, etc.)
+  -- Note: The actual redraw during live resize is handled by callbackRefresh,
+  -- since on macOS the window size callback doesn't fire during drag.
   mapM_
     (\f -> f (sizeX, sizeY))
-    ([f glfwState | Reshape f <- callbacks])
+    ([f stateRef | Reshape f <- callbacks])
+
+
+-- Refresh -----------------------------------------------------------------------
+
+-- | Callback for when the window needs to be refreshed (e.g., during live resize on macOS).
+installRefreshCallbackGLFW ::
+  IORef GLFWState -> [Callback] -> IO ()
+installRefreshCallbackGLFW stateRef callbacks = do
+  win <- windowHandle stateRef
+  GLFW.setWindowRefreshCallback win (Just $ callbackRefresh stateRef callbacks)
+
+
+callbackRefresh ::
+  IORef GLFWState ->
+  [Callback] ->
+  GLFW.WindowRefreshCallback -- = Window -> IO ()
+callbackRefresh stateRef callbacks win = do
+  -- Get the current window size and fire reshape callbacks
+  -- This ensures EventResize is sent during live resize on macOS
+  (sizeX, sizeY) <- GLFW.getWindowSize win
+  mapM_
+    (\f -> f (sizeX, sizeY))
+    ([f stateRef | Reshape f <- callbacks])
+
+  -- Run idle callbacks to advance simulations/animations
+  callbackIdle stateRef callbacks
+
+  -- Redraw and present the frame
+  callbackDisplay stateRef callbacks
+  GLFW.swapBuffers win
 
 
 -- KeyMouse -----------------------------------------------------------------------
