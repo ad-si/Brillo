@@ -176,13 +176,14 @@ main = do
     let shorthand = check exportPictureToPNG size white
 
     -- Test multiple Brillo features and multiple export formats.
+    -- Use aliased primitives for deterministic rendering output.
     bmp <- loadBMP (dataDir </> "loadme.bmp")
     let pic =
           Pictures
             [ bmp
-            , Color red $ Polygon [(-80, 0), (0, 80), (80, 0)]
-            , Circle 80
-            , Text (pack "text")
+            , Color red $ PolygonAliased [(-80, 0), (0, 80), (80, 0)]
+            , CircleAliased 80
+            , TextAliased (pack "text")
             ]
     check
       exportPictureToPNG
@@ -210,13 +211,13 @@ main = do
       pic
     -- display (InWindow "" (100,80) (0, 0)) white pic
     shorthand "bmp.png" (bmp)
-    shorthand "circle.png" (circle 25)
+    shorthand "circle.png" (circleAliased 25)
     check
       exportPictureToPNG
       (500, 500)
       white
       "circles.png"
-      (Pictures (map circle [0, 10 .. 250]))
+      (Pictures (map circleAliased [0, 10 .. 250]))
 
     -- Make sure we can export large images. In a previous version, attempting
     -- to export an image larger than the screen resolution WxH resulted in a
@@ -226,10 +227,10 @@ main = do
     let hby2 = 1025 / 2
     let p =
           Pictures
-            [ Translate wby2 hby2 $ ThickCircle 10 80
-            , Translate wby2 hby2 $ ThickCircle 10 80
-            , Color blue $ Line [(-wby2, hby2), (wby2, -hby2)]
-            , ThickCircle 10 80
+            [ Translate wby2 hby2 $ ThickCircleAliased 10 80
+            , Translate wby2 hby2 $ ThickCircleAliased 10 80
+            , Color blue $ LineAliased [(-wby2, hby2), (wby2, -hby2)]
+            , ThickCircleAliased 10 80
             ]
     check exportPictureToPNG (1900, 1050) white "large_image.png" p
 
@@ -295,5 +296,6 @@ textFloats :: [Float]
 textFloats = [0, 1 .. 10]
 
 
+-- Use aliased polygon for deterministic rendering
 poly :: Float -> Picture
-poly l = Polygon [(-l, l), (l, l), (l, -l), (-l, -l)]
+poly l = PolygonAliased [(-l, l), (l, l), (l, -l), (-l, -l)]

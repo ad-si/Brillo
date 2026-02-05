@@ -72,56 +72,56 @@ data Picture
 
     -- | A blank picture, with nothing in it.
     Blank
-  | -- | A polygon filled with a solid color.
-    Polygon Path
   | -- | A polygon filled with a solid color, drawn with anti-aliased edges.
-    PolygonSmooth Path
-  | -- | A line along an arbitrary path.
+    Polygon Path
+  | -- | A polygon filled with a solid color, drawn without anti-aliasing.
+    PolygonAliased Path
+  | -- | A line along an arbitrary path, drawn with anti-aliasing.
     Line Path
-  | -- | A smooth line along an arbitrary path.
-    LineSmooth Path
-  | -- | A line along an arbitrary path with a given thickness.
+  | -- | A line along an arbitrary path, drawn without anti-aliasing.
+    LineAliased Path
+  | -- | A line along an arbitrary path with a given thickness, drawn with anti-aliasing.
     ThickLine Path Float
-  | -- | A smooth line along an arbitrary path with a given thickness.
-    ThickLineSmooth Path Float
-  | -- | A circle with the given radius.
-    Circle Float
+  | -- | A line along an arbitrary path with a given thickness, drawn without anti-aliasing.
+    ThickLineAliased Path Float
   | -- | A circle with the given radius, drawn with anti-aliasing.
-    CircleSmooth Float
-  | {-| A circle with the given radius and thickness.
+    Circle Float
+  | -- | A circle with the given radius, drawn without anti-aliasing.
+    CircleAliased Float
+  | {-| A circle with the given radius and thickness, drawn with anti-aliasing.
     If the thickness is 0 then this is equivalent to `Circle`.
     -}
     ThickCircle Float Float
-  | {-| A circle with the given radius and thickness, drawn with anti-aliasing.
-    If the thickness is 0 then this is equivalent to `CircleSmooth`.
+  | {-| A circle with the given radius and thickness, drawn without anti-aliasing.
+    If the thickness is 0 then this is equivalent to `CircleAliased`.
     -}
-    ThickCircleSmooth Float Float
-  | {-| A circular arc drawn counter-clockwise between two angles
-    (in degrees) at the given radius.
-    -}
-    Arc Float Float Float
+    ThickCircleAliased Float Float
   | {-| A circular arc drawn counter-clockwise between two angles
     (in degrees) at the given radius, drawn with anti-aliasing.
     -}
-    ArcSmooth Float Float Float
+    Arc Float Float Float
   | {-| A circular arc drawn counter-clockwise between two angles
-    (in degrees), with the given radius and thickness.
+    (in degrees) at the given radius, drawn without anti-aliasing.
+    -}
+    ArcAliased Float Float Float
+  | {-| A circular arc drawn counter-clockwise between two angles
+    (in degrees), with the given radius and thickness, drawn with anti-aliasing.
     If the thickness is 0 then this is equivalent to `Arc`.
     -}
     ThickArc Float Float Float Float
   | {-| A circular arc drawn counter-clockwise between two angles
-    (in degrees), with the given radius and thickness, drawn with anti-aliasing.
-    If the thickness is 0 then this is equivalent to `ArcSmooth`.
+    (in degrees), with the given radius and thickness, drawn without anti-aliasing.
+    If the thickness is 0 then this is equivalent to `ArcAliased`.
     -}
-    ThickArcSmooth Float Float Float Float
-  | -- | Text to draw with a vector font
-    Text Text
+    ThickArcAliased Float Float Float Float
   | -- | Text to draw with a vector font, drawn with anti-aliasing.
-    TextSmooth Text
-  | -- | Text to draw with a vector font and a given thickness.
-    ThickText Text Float
+    Text Text
+  | -- | Text to draw with a vector font, drawn without anti-aliasing.
+    TextAliased Text
   | -- | Text to draw with a vector font and a given thickness, drawn with anti-aliasing.
-    ThickTextSmooth Text Float
+    ThickText Text Float
+  | -- | Text to draw with a vector font and a given thickness, drawn without anti-aliasing.
+    ThickTextAliased Text Float
   | {-| Text to draw with a TrueType font located at the given path,
     rendered at the specified pixel height.
     -}

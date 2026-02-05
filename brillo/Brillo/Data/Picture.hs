@@ -7,23 +7,23 @@ module Brillo.Data.Picture (
   -- * Aliases for Picture constructors
   blank,
   polygon,
-  polygonSmooth,
+  polygonAliased,
   line,
-  lineSmooth,
+  lineAliased,
   thickLine,
-  thickLineSmooth,
+  thickLineAliased,
   circle,
-  circleSmooth,
+  circleAliased,
   thickCircle,
-  thickCircleSmooth,
+  thickCircleAliased,
   arc,
-  arcSmooth,
+  arcAliased,
   thickArc,
-  thickArcSmooth,
+  thickArcAliased,
   text,
-  textSmooth,
+  textAliased,
   thickText,
-  thickTextSmooth,
+  thickTextAliased,
   truetypeText,
   bitmap,
   bitmapSection,
@@ -36,23 +36,23 @@ module Brillo.Data.Picture (
 
   -- * Compound shapes
   lineLoop,
-  lineLoopSmooth,
+  lineLoopAliased,
   circleSolid,
-  circleSolidSmooth,
+  circleSolidAliased,
   arcSolid,
-  arcSolidSmooth,
+  arcSolidAliased,
   sectorWire,
-  sectorWireSmooth,
+  sectorWireAliased,
   rectanglePath,
   rectangleWire,
-  rectangleWireSmooth,
+  rectangleWireAliased,
   rectangleSolid,
-  rectangleSolidSmooth,
+  rectangleSolidAliased,
   rectangleUpperPath,
   rectangleUpperWire,
-  rectangleUpperWireSmooth,
+  rectangleUpperWireAliased,
   rectangleUpperSolid,
-  rectangleUpperSolidSmooth,
+  rectangleUpperSolidAliased,
 )
 where
 
@@ -69,76 +69,76 @@ blank :: Picture
 blank = Blank
 
 
--- | A polygon filled with a solid color.
+-- | A polygon filled with a solid color, drawn with anti-aliased edges.
 polygon :: Path -> Picture
 polygon = Polygon
 
 
--- | A polygon filled with a solid color, drawn with anti-aliased edges.
-polygonSmooth :: Path -> Picture
-polygonSmooth = PolygonSmooth
+-- | A polygon filled with a solid color, drawn without anti-aliasing.
+polygonAliased :: Path -> Picture
+polygonAliased = PolygonAliased
 
 
--- | A line along an arbitrary path.
+-- | A line along an arbitrary path, drawn with anti-aliasing.
 line :: Path -> Picture
 line = Line
 
 
--- | A line along an arbitrary path, drawn with anti-aliasing.
-lineSmooth :: Path -> Picture
-lineSmooth = LineSmooth
+-- | A line along an arbitrary path, drawn without anti-aliasing.
+lineAliased :: Path -> Picture
+lineAliased = LineAliased
 
 
--- | A line along an arbitrary path with a given thickness.
+-- | A line along an arbitrary path with a given thickness, drawn with anti-aliasing.
 thickLine :: Path -> Float -> Picture
 thickLine = ThickLine
 
 
--- | A line along an arbitrary path with a given thickness, drawn with anti-aliasing.
-thickLineSmooth :: Path -> Float -> Picture
-thickLineSmooth = ThickLineSmooth
+-- | A line along an arbitrary path with a given thickness, drawn without anti-aliasing.
+thickLineAliased :: Path -> Float -> Picture
+thickLineAliased = ThickLineAliased
 
 
--- | A circle with the given radius.
+-- | A circle with the given radius, drawn with anti-aliasing.
 circle :: Float -> Picture
 circle = Circle
 
 
--- | A circle with the given radius, drawn with anti-aliasing.
-circleSmooth :: Float -> Picture
-circleSmooth = CircleSmooth
+-- | A circle with the given radius, drawn without anti-aliasing.
+circleAliased :: Float -> Picture
+circleAliased = CircleAliased
 
 
-{-| A circle with the given thickness and radius.
+{-| A circle with the given thickness and radius, drawn with anti-aliasing.
   If the thickness is 0 then this is equivalent to `Circle`.
 -}
 thickCircle :: Float -> Float -> Picture
 thickCircle = ThickCircle
 
 
-{-| A circle with the given thickness and radius, drawn with anti-aliasing.
-  If the thickness is 0 then this is equivalent to `CircleSmooth`.
+{-| A circle with the given thickness and radius, drawn without anti-aliasing.
+  If the thickness is 0 then this is equivalent to `CircleAliased`.
 -}
-thickCircleSmooth :: Float -> Float -> Picture
-thickCircleSmooth = ThickCircleSmooth
+thickCircleAliased :: Float -> Float -> Picture
+thickCircleAliased = ThickCircleAliased
 
 
 {-| A circular arc drawn counter-clockwise between two angles (in degrees)
-  at the given radius.
+  at the given radius, drawn with anti-aliasing.
 -}
 arc :: Float -> Float -> Float -> Picture
 arc = Arc
 
 
 {-| A circular arc drawn counter-clockwise between two angles (in degrees)
-  at the given radius, drawn with anti-aliasing.
+  at the given radius, drawn without anti-aliasing.
 -}
-arcSmooth :: Float -> Float -> Float -> Picture
-arcSmooth = ArcSmooth
+arcAliased :: Float -> Float -> Float -> Picture
+arcAliased = ArcAliased
 
 
 {-| A circular arc drawn counter-clockwise between two angles (in degrees),
-  with the given radius  and thickness.
+  with the given radius and thickness, drawn with anti-aliasing.
   If the thickness is 0 then this is equivalent to `Arc`.
 -}
 thickArc :: Float -> Float -> Float -> Float -> Picture
@@ -146,31 +146,31 @@ thickArc = ThickArc
 
 
 {-| A circular arc drawn counter-clockwise between two angles (in degrees),
-  with the given radius and thickness, drawn with anti-aliasing.
-  If the thickness is 0 then this is equivalent to `ArcSmooth`.
+  with the given radius and thickness, drawn without anti-aliasing.
+  If the thickness is 0 then this is equivalent to `ArcAliased`.
 -}
-thickArcSmooth :: Float -> Float -> Float -> Float -> Picture
-thickArcSmooth = ThickArcSmooth
+thickArcAliased :: Float -> Float -> Float -> Float -> Picture
+thickArcAliased = ThickArcAliased
 
 
--- | Some text to draw with a vector font.
+-- | Some text to draw with a vector font, drawn with anti-aliasing.
 text :: Text -> Picture
 text = Text
 
 
--- | Some text to draw with a vector font, drawn with anti-aliasing.
-textSmooth :: Text -> Picture
-textSmooth = TextSmooth
+-- | Some text to draw with a vector font, drawn without anti-aliasing.
+textAliased :: Text -> Picture
+textAliased = TextAliased
 
 
--- | Some text to draw with a vector font and a given thickness.
+-- | Some text to draw with a vector font and a given thickness, drawn with anti-aliasing.
 thickText :: Text -> Float -> Picture
 thickText = ThickText
 
 
--- | Some text to draw with a vector font and a given thickness, drawn with anti-aliasing.
-thickTextSmooth :: Text -> Float -> Picture
-thickTextSmooth = ThickTextSmooth
+-- | Some text to draw with a vector font and a given thickness, drawn without anti-aliasing.
+thickTextAliased :: Text -> Float -> Picture
+thickTextAliased = ThickTextAliased
 
 
 -- | Some text to draw with a TrueType font, using the given pixel height.
@@ -218,45 +218,45 @@ pictures = Pictures
 
 -- Other Shapes ---------------------------------------------------------------
 
--- | A closed loop along a path.
+-- | A closed loop along a path, drawn with anti-aliasing.
 lineLoop :: Path -> Picture
 lineLoop [] = Line []
 lineLoop (x : xs) = Line ((x : xs) ++ [x])
 
 
--- | A closed loop along a path, drawn with anti-aliasing.
-lineLoopSmooth :: Path -> Picture
-lineLoopSmooth [] = LineSmooth []
-lineLoopSmooth (x : xs) = LineSmooth ((x : xs) ++ [x])
+-- | A closed loop along a path, drawn without anti-aliasing.
+lineLoopAliased :: Path -> Picture
+lineLoopAliased [] = LineAliased []
+lineLoopAliased (x : xs) = LineAliased ((x : xs) ++ [x])
 
 
 -- Circles and Arcs -----------------------------------------------------------
 
--- | A solid circle with the given radius.
+-- | A solid circle with the given radius, drawn with anti-aliasing.
 circleSolid :: Float -> Picture
 circleSolid r =
   thickCircle (r / 2) r
 
 
--- | A solid circle with the given radius, drawn with anti-aliasing.
-circleSolidSmooth :: Float -> Picture
-circleSolidSmooth r =
-  thickCircleSmooth (r / 2) r
+-- | A solid circle with the given radius, drawn without anti-aliasing.
+circleSolidAliased :: Float -> Picture
+circleSolidAliased r =
+  thickCircleAliased (r / 2) r
 
 
--- | A solid arc, drawn counter-clockwise between two angles (in degrees) at the given radius.
+-- | A solid arc, drawn counter-clockwise between two angles (in degrees) at the given radius, with anti-aliasing.
 arcSolid :: Float -> Float -> Float -> Picture
 arcSolid a1 a2 r =
   thickArc a1 a2 (r / 2) r
 
 
--- | A solid arc, drawn counter-clockwise between two angles (in degrees) at the given radius, with anti-aliasing.
-arcSolidSmooth :: Float -> Float -> Float -> Picture
-arcSolidSmooth a1 a2 r =
-  thickArcSmooth a1 a2 (r / 2) r
+-- | A solid arc, drawn counter-clockwise between two angles (in degrees) at the given radius, without anti-aliasing.
+arcSolidAliased :: Float -> Float -> Float -> Picture
+arcSolidAliased a1 a2 r =
+  thickArcAliased a1 a2 (r / 2) r
 
 
-{-| A wireframe sector of a circle.
+{-| A wireframe sector of a circle, drawn with anti-aliasing.
   An arc is draw counter-clockwise from the first to the second angle (in degrees) at
   the given radius. Lines are drawn from the origin to the ends of the arc.
 -}
@@ -277,17 +277,17 @@ sectorWire a1 a2 r_ =
         ]
 
 
-{-| A wireframe sector of a circle, drawn with anti-aliasing.
+{-| A wireframe sector of a circle, drawn without anti-aliasing.
   An arc is draw counter-clockwise from the first to the second angle (in degrees) at
   the given radius. Lines are drawn from the origin to the ends of the arc.
 -}
-sectorWireSmooth :: Float -> Float -> Float -> Picture
-sectorWireSmooth a1 a2 r_ =
+sectorWireAliased :: Float -> Float -> Float -> Picture
+sectorWireAliased a1 a2 r_ =
   let r = abs r_
   in  Pictures
-        [ ArcSmooth a1 a2 r
-        , LineSmooth [(0, 0), (r * cos (degToRad a1), r * sin (degToRad a1))]
-        , LineSmooth [(0, 0), (r * cos (degToRad a2), r * sin (degToRad a2))]
+        [ ArcAliased a1 a2 r
+        , LineAliased [(0, 0), (r * cos (degToRad a1), r * sin (degToRad a1))]
+        , LineAliased [(0, 0), (r * cos (degToRad a2), r * sin (degToRad a2))]
         ]
 
 
@@ -308,28 +308,28 @@ rectanglePath sizeX sizeY =
   in  [(-sx, -sy), (-sx, sy), (sx, sy), (sx, -sy)]
 
 
--- | A wireframe rectangle centered about the origin.
+-- | A wireframe rectangle centered about the origin, drawn with anti-aliasing.
 rectangleWire :: Float -> Float -> Picture
 rectangleWire sizeX sizeY =
   lineLoop $ rectanglePath sizeX sizeY
 
 
--- | A wireframe rectangle centered about the origin, drawn with anti-aliasing.
-rectangleWireSmooth :: Float -> Float -> Picture
-rectangleWireSmooth sizeX sizeY =
-  lineLoopSmooth $ rectanglePath sizeX sizeY
+-- | A wireframe rectangle centered about the origin, drawn without anti-aliasing.
+rectangleWireAliased :: Float -> Float -> Picture
+rectangleWireAliased sizeX sizeY =
+  lineLoopAliased $ rectanglePath sizeX sizeY
 
 
--- | A wireframe rectangle in the y > 0 half of the x-y plane.
+-- | A wireframe rectangle in the y > 0 half of the x-y plane, drawn with anti-aliasing.
 rectangleUpperWire :: Float -> Float -> Picture
 rectangleUpperWire sizeX sizeY =
   lineLoop $ rectangleUpperPath sizeX sizeY
 
 
--- | A wireframe rectangle in the y > 0 half of the x-y plane, drawn with anti-aliasing.
-rectangleUpperWireSmooth :: Float -> Float -> Picture
-rectangleUpperWireSmooth sizeX sizeY =
-  lineLoopSmooth $ rectangleUpperPath sizeX sizeY
+-- | A wireframe rectangle in the y > 0 half of the x-y plane, drawn without anti-aliasing.
+rectangleUpperWireAliased :: Float -> Float -> Picture
+rectangleUpperWireAliased sizeX sizeY =
+  lineLoopAliased $ rectangleUpperPath sizeX sizeY
 
 
 -- | A path representing a rectangle in the y > 0 half of the x-y plane.
@@ -339,25 +339,25 @@ rectangleUpperPath sizeX sy =
   in  [(-sx, 0), (-sx, sy), (sx, sy), (sx, 0)]
 
 
--- | A solid rectangle centered about the origin.
+-- | A solid rectangle centered about the origin, drawn with anti-aliased edges.
 rectangleSolid :: Float -> Float -> Picture
 rectangleSolid sizeX sizeY =
   Polygon $ rectanglePath sizeX sizeY
 
 
--- | A solid rectangle centered about the origin, drawn with anti-aliased edges.
-rectangleSolidSmooth :: Float -> Float -> Picture
-rectangleSolidSmooth sizeX sizeY =
-  PolygonSmooth $ rectanglePath sizeX sizeY
+-- | A solid rectangle centered about the origin, drawn without anti-aliasing.
+rectangleSolidAliased :: Float -> Float -> Picture
+rectangleSolidAliased sizeX sizeY =
+  PolygonAliased $ rectanglePath sizeX sizeY
 
 
--- | A solid rectangle in the y > 0 half of the x-y plane.
+-- | A solid rectangle in the y > 0 half of the x-y plane, drawn with anti-aliased edges.
 rectangleUpperSolid :: Float -> Float -> Picture
 rectangleUpperSolid sizeX sizeY =
   Polygon $ rectangleUpperPath sizeX sizeY
 
 
--- | A solid rectangle in the y > 0 half of the x-y plane, drawn with anti-aliased edges.
-rectangleUpperSolidSmooth :: Float -> Float -> Picture
-rectangleUpperSolidSmooth sizeX sizeY =
-  PolygonSmooth $ rectangleUpperPath sizeX sizeY
+-- | A solid rectangle in the y > 0 half of the x-y plane, drawn without anti-aliasing.
+rectangleUpperSolidAliased :: Float -> Float -> Picture
+rectangleUpperSolidAliased sizeX sizeY =
+  PolygonAliased $ rectangleUpperPath sizeX sizeY

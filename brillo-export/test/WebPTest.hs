@@ -418,8 +418,8 @@ testPictureTypes outputDir = do
         cleanupFile filePath
         exportPictureToWebP testSize white filePath pic
         doesFileExist filePath
-    , runTest "LineSmooth" $ do
-        let pic = LineSmooth [(-80, 0), (-40, 60), (40, -60), (80, 0)]
+    , runTest "LineAliased" $ do
+        let pic = LineAliased [(-80, 0), (-40, 60), (40, -60), (80, 0)]
         let filePath = outputDir </> "pic_linesmooth.webp"
         cleanupFile filePath
         exportPictureToWebP testSize white filePath pic

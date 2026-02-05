@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-{-| Comprehensive comparison of normal vs smooth circle rendering.
+{-| Comprehensive comparison of anti-aliased vs aliased circle rendering.
 
 This example tests various edge cases to identify rendering artifacts:
 - Very small circles (sub-pixel to a few pixels)
@@ -23,7 +23,7 @@ main :: IO ()
 main =
   play
     ( InWindow
-        "Circle Comparison - Normal vs Smooth"
+        "Circle Comparison - Anti-aliased vs Aliased"
         (1400, 900)
         (50, 50)
     )
@@ -118,16 +118,16 @@ sizeComparisonSection =
     Pictures
       [ -- Header
         Translate 0 70 $ Scale 0.12 0.12 $ Text "Size Comparison"
-      , Translate 0 50 $ Scale 0.08 0.08 $ Text "Normal (top) vs Smooth (bottom)"
+      , Translate 0 50 $ Scale 0.08 0.08 $ Text "Anti-aliased (top) vs Aliased (bottom)"
       , -- Row of circles with increasing sizes
         Pictures
           [ let xPos = fromIntegral i * 70
                 radius = sizes !! i
             in  Pictures
-                  [ -- Normal
+                  [ -- Anti-aliased
                     Translate xPos 20 $ Color blue $ circleSolid radius
-                  , -- Smooth
-                    Translate xPos (-30) $ Color blue $ circleSolidSmooth radius
+                  , -- Aliased
+                    Translate xPos (-30) $ Color blue $ circleSolidAliased radius
                   , -- Size label
                     Translate xPos (-60) $
                       Scale 0.06 0.06 $
@@ -152,10 +152,10 @@ thicknessSection =
           [ let xPos = fromIntegral i * 90
                 thickness = thicknesses !! i
             in  Pictures
-                  [ -- Normal
+                  [ -- Anti-aliased
                     Translate xPos 20 $ Color red $ thickCircle 25 thickness
-                  , -- Smooth
-                    Translate xPos (-40) $ Color red $ thickCircleSmooth 25 thickness
+                  , -- Aliased
+                    Translate xPos (-40) $ Color red $ thickCircleAliased 25 thickness
                   , -- Thickness label
                     Translate xPos (-80) $
                       Scale 0.06 0.06 $
@@ -180,10 +180,10 @@ arcSection =
           [ let xPos = fromIntegral i * 100
                 (a1, a2) = angles !! i
             in  Pictures
-                  [ -- Normal
+                  [ -- Anti-aliased
                     Translate xPos 15 $ Color green $ arcSolid a1 a2 30
-                  , -- Smooth
-                    Translate xPos (-50) $ Color green $ arcSolidSmooth a1 a2 30
+                  , -- Aliased
+                    Translate xPos (-50) $ Color green $ arcSolidAliased a1 a2 30
                   , -- Angle label
                     Translate xPos (-90) $
                       Scale 0.05 0.05 $
@@ -220,12 +220,12 @@ adjacentSection =
       , -- Adjacent circles (smooth)
         Translate (80) 0 $
           Pictures
-            [ Translate (-20) 0 $ Color orange $ circleSolidSmooth 20
-            , Translate 20 0 $ Color orange $ circleSolidSmooth 20
+            [ Translate (-20) 0 $ Color orange $ circleSolidAliased 20
+            , Translate 20 0 $ Color orange $ circleSolidAliased 20
             ]
       , -- Labels
-        Translate (-80) (-40) $ Scale 0.06 0.06 $ Text "Normal"
-      , Translate 80 (-40) $ Scale 0.06 0.06 $ Text "Smooth"
+        Translate (-80) (-40) $ Scale 0.06 0.06 $ Text "Anti-aliased"
+      , Translate 80 (-40) $ Scale 0.06 0.06 $ Text "Aliased"
       , -- Overlapping circles (normal)
         Translate (-80) (-80) $
           Pictures
@@ -235,8 +235,8 @@ adjacentSection =
       , -- Overlapping circles (smooth)
         Translate (80) (-80) $
           Pictures
-            [ Translate (-10) 0 $ Color (withAlpha 0.7 cyan) $ circleSolidSmooth 20
-            , Translate 10 0 $ Color (withAlpha 0.7 magenta) $ circleSolidSmooth 20
+            [ Translate (-10) 0 $ Color (withAlpha 0.7 cyan) $ circleSolidAliased 20
+            , Translate 10 0 $ Color (withAlpha 0.7 magenta) $ circleSolidAliased 20
             ]
       ]
 
@@ -250,23 +250,23 @@ alphaSection =
         Translate 0 70 $ Scale 0.12 0.12 $ Text "Alpha Transparency"
       , -- Background rectangle
         Color (greyN 0.8) $ rectangleSolid 200 100
-      , -- Normal with various alphas
+      , -- Anti-aliased with various alphas
         Translate (-60) 0 $
           Pictures
             [ Translate 0 20 $ Color (withAlpha 1.0 red) $ circleSolid 15
             , Translate 0 0 $ Color (withAlpha 0.7 red) $ circleSolid 15
             , Translate 0 (-20) $ Color (withAlpha 0.3 red) $ circleSolid 15
             ]
-      , -- Smooth with various alphas
+      , -- Aliased with various alphas
         Translate 60 0 $
           Pictures
-            [ Translate 0 20 $ Color (withAlpha 1.0 red) $ circleSolidSmooth 15
-            , Translate 0 0 $ Color (withAlpha 0.7 red) $ circleSolidSmooth 15
-            , Translate 0 (-20) $ Color (withAlpha 0.3 red) $ circleSolidSmooth 15
+            [ Translate 0 20 $ Color (withAlpha 1.0 red) $ circleSolidAliased 15
+            , Translate 0 0 $ Color (withAlpha 0.7 red) $ circleSolidAliased 15
+            , Translate 0 (-20) $ Color (withAlpha 0.3 red) $ circleSolidAliased 15
             ]
       , -- Labels
-        Translate (-60) (-55) $ Scale 0.06 0.06 $ Text "Normal"
-      , Translate 60 (-55) $ Scale 0.06 0.06 $ Text "Smooth"
+        Translate (-60) (-55) $ Scale 0.06 0.06 $ Text "Anti-aliased"
+      , Translate 60 (-55) $ Scale 0.06 0.06 $ Text "Aliased"
       ]
 
 
@@ -278,17 +278,17 @@ gridSection =
       [ -- Header
         Translate 0 140 $ Scale 0.12 0.12 $ Text "Stress Test Grid"
       , Translate 0 120 $ Scale 0.07 0.07 $ Text "Zoom in/out to test edge cases"
-      , -- Normal grid
+      , -- Anti-aliased grid
         Translate (-100) 0 $
           Pictures
-            [ Translate 0 (-120) $ Scale 0.06 0.06 $ Text "Normal"
+            [ Translate 0 (-120) $ Scale 0.06 0.06 $ Text "Anti-aliased"
             , circleGrid circleSolid
             ]
-      , -- Smooth grid
+      , -- Aliased grid
         Translate 100 0 $
           Pictures
-            [ Translate 0 (-120) $ Scale 0.06 0.06 $ Text "Smooth"
-            , circleGrid circleSolidSmooth
+            [ Translate 0 (-120) $ Scale 0.06 0.06 $ Text "Aliased"
+            , circleGrid circleSolidAliased
             ]
       ]
 

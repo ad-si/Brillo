@@ -229,14 +229,14 @@ testLine = do
         let pic = Line [(50, 50)]
         let svg = pictureToSVGDoc testSize white pic
         pure $ not (T.isInfixOf "<polyline" svg)
-    , runTest "LineSmooth" $ do
-        let pic = LineSmooth [(0, 0), (50, 100), (100, 0), (150, 100)]
+    , runTest "LineAliased" $ do
+        let pic = LineAliased [(0, 0), (50, 100), (100, 0), (150, 100)]
         let svg = pictureToSVGDoc testSize white pic
         assertContainsAll
           svg
           ["<path", "stroke-linecap=\"round\"", "stroke-linejoin=\"round\""]
-    , runTest "ThickLineSmooth" $ do
-        let pic = ThickLineSmooth [(0, 0), (50, 100), (100, 0)] 8.0
+    , runTest "ThickLineAliased" $ do
+        let pic = ThickLineAliased [(0, 0), (50, 100), (100, 0)] 8.0
         let svg = pictureToSVGDoc testSize white pic
         assertContainsAll svg ["<path", "stroke-width=\"8"]
     ]

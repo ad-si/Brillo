@@ -93,17 +93,20 @@ drawPicture state circScale picture =
     Blank ->
       return ()
     --
-    Line path ->
-      GL.renderPrimitive GL.LineStrip $
-        vertexPFs path
-    --
-    LineSmooth path -> do
+    Line path -> do
       GL.lineSmooth $= GL.Enabled
       GL.renderPrimitive GL.LineStrip $
         vertexPFs path
       GL.lineSmooth $= GL.Disabled
     --
-    ThickLine path thickness -> do
+    LineAliased path ->
+      GL.renderPrimitive GL.LineStrip $
+        vertexPFs path
+    --
+    ThickLine path thickness ->
+      renderThickLineSmoothSDF state 0 0 circScale path thickness
+    --
+    ThickLineAliased path thickness -> do
       widthRange <- GL.aliasedLineWidthRange
       when (thickness < fst widthRange || thickness > snd widthRange) $
         hPutStrLn stderr $
@@ -117,17 +120,7 @@ drawPicture state circScale picture =
       GL.renderPrimitive GL.LineStrip $ vertexPFs path
       GL.lineWidth $= oldLineWidth
     --
-    ThickLineSmooth path thickness ->
-      renderThickLineSmoothSDF state 0 0 circScale path thickness
-    --
     Polygon path
-      | state.stateWireframe ->
-          GL.renderPrimitive GL.LineLoop $
-            vertexPFs path
-      | otherwise ->
-          renderComplexPolygon path
-    --
-    PolygonSmooth path
       | state.stateWireframe -> do
           GL.lineSmooth $= GL.Enabled
           GL.renderPrimitive GL.LineLoop $
@@ -135,41 +128,33 @@ drawPicture state circScale picture =
           GL.lineSmooth $= GL.Disabled
       | otherwise ->
           renderComplexPolygonSmooth path
+    --
+    PolygonAliased path
+      | state.stateWireframe ->
+          GL.renderPrimitive GL.LineLoop $
+            vertexPFs path
+      | otherwise ->
+          renderComplexPolygon path
     -- circle
     Circle radius ->
-      renderCircle 0 0 circScale radius 0
-    CircleSmooth radius ->
       renderCircleSmoothSDF state 0 0 circScale radius 0
+    CircleAliased radius ->
+      renderCircle 0 0 circScale radius 0
     ThickCircle radius thickness ->
-      renderCircle 0 0 circScale radius thickness
-    ThickCircleSmooth radius thickness ->
       renderCircleSmoothSDF state 0 0 circScale radius thickness
+    ThickCircleAliased radius thickness ->
+      renderCircle 0 0 circScale radius thickness
     -- arc
     Arc a1 a2 radius ->
-      renderArc 0 0 circScale radius a1 a2 0
-    ArcSmooth a1 a2 radius ->
       renderArcSmoothSDF state 0 0 circScale radius a1 a2 0
+    ArcAliased a1 a2 radius ->
+      renderArc 0 0 circScale radius a1 a2 0
     ThickArc a1 a2 radius thickness ->
-      renderArc 0 0 circScale radius a1 a2 thickness
-    ThickArcSmooth a1 a2 radius thickness ->
       renderArcSmoothSDF state 0 0 circScale radius a1 a2 thickness
+    ThickArcAliased a1 a2 radius thickness ->
+      renderArc 0 0 circScale radius a1 a2 thickness
     -- Vector font text
     Text str -> do
-      let
-        characters :: [[(Double, Double)]]
-        characters = renderSafe canvastextFont str
-
-      oldLineWidth <- get GL.lineWidth
-      GL.lineWidth $= gf 3.0
-      GL.preservingMatrix $ do
-        GL.scale (gf 5) (gf 5) 0
-        forM_ characters $ \stroke -> do
-          GL.renderPrimitive GL.LineStrip $ do
-            forM_ stroke $ \(x, y) -> do
-              GL.vertex $ GL.Vertex2 x y
-      GL.lineWidth $= oldLineWidth
-    --
-    TextSmooth str -> do
       let
         characters :: [[(Double, Double)]]
         characters = renderSafe canvastextFont str
@@ -184,6 +169,21 @@ drawPicture state circScale picture =
             forM_ stroke $ \(x, y) -> do
               GL.vertex $ GL.Vertex2 x y
       GL.lineSmooth $= GL.Disabled
+      GL.lineWidth $= oldLineWidth
+    --
+    TextAliased str -> do
+      let
+        characters :: [[(Double, Double)]]
+        characters = renderSafe canvastextFont str
+
+      oldLineWidth <- get GL.lineWidth
+      GL.lineWidth $= gf 3.0
+      GL.preservingMatrix $ do
+        GL.scale (gf 5) (gf 5) 0
+        forM_ characters $ \stroke -> do
+          GL.renderPrimitive GL.LineStrip $ do
+            forM_ stroke $ \(x, y) -> do
+              GL.vertex $ GL.Vertex2 x y
       GL.lineWidth $= oldLineWidth
     --
     ThickText str thickness -> do
@@ -193,21 +193,6 @@ drawPicture state circScale picture =
 
       oldLineWidth <- get GL.lineWidth
       GL.lineWidth $= gf thickness
-      GL.preservingMatrix $ do
-        GL.scale (gf 5) (gf 5) 0
-        forM_ characters $ \stroke -> do
-          GL.renderPrimitive GL.LineStrip $ do
-            forM_ stroke $ \(x, y) -> do
-              GL.vertex $ GL.Vertex2 x y
-      GL.lineWidth $= oldLineWidth
-    --
-    ThickTextSmooth str thickness -> do
-      let
-        characters :: [[(Double, Double)]]
-        characters = renderSafe canvastextFont str
-
-      oldLineWidth <- get GL.lineWidth
-      GL.lineWidth $= gf thickness
       GL.lineSmooth $= GL.Enabled
       GL.preservingMatrix $ do
         GL.scale (gf 5) (gf 5) 0
@@ -216,6 +201,21 @@ drawPicture state circScale picture =
             forM_ stroke $ \(x, y) -> do
               GL.vertex $ GL.Vertex2 x y
       GL.lineSmooth $= GL.Disabled
+      GL.lineWidth $= oldLineWidth
+    --
+    ThickTextAliased str thickness -> do
+      let
+        characters :: [[(Double, Double)]]
+        characters = renderSafe canvastextFont str
+
+      oldLineWidth <- get GL.lineWidth
+      GL.lineWidth $= gf thickness
+      GL.preservingMatrix $ do
+        GL.scale (gf 5) (gf 5) 0
+        forM_ characters $ \stroke -> do
+          GL.renderPrimitive GL.LineStrip $ do
+            forM_ stroke $ \(x, y) -> do
+              GL.vertex $ GL.Vertex2 x y
       GL.lineWidth $= oldLineWidth
     TrueTypeText fontPath pixelHeight str ->
       renderTrueTypeText fontPath pixelHeight str
@@ -234,21 +234,21 @@ drawPicture state circScale picture =
     -- Translation --------------------------
     -- Easy translations are done directly to avoid calling GL.perserveMatrix.
     Translate posX posY (Circle radius) ->
-      renderCircle posX posY circScale radius 0
-    Translate posX posY (CircleSmooth radius) ->
       renderCircleSmoothSDF state posX posY circScale radius 0
+    Translate posX posY (CircleAliased radius) ->
+      renderCircle posX posY circScale radius 0
     Translate posX posY (ThickCircle radius thickness) ->
-      renderCircle posX posY circScale radius thickness
-    Translate posX posY (ThickCircleSmooth radius thickness) ->
       renderCircleSmoothSDF state posX posY circScale radius thickness
+    Translate posX posY (ThickCircleAliased radius thickness) ->
+      renderCircle posX posY circScale radius thickness
     Translate posX posY (Arc a1 a2 radius) ->
-      renderArc posX posY circScale radius a1 a2 0
-    Translate posX posY (ArcSmooth a1 a2 radius) ->
       renderArcSmoothSDF state posX posY circScale radius a1 a2 0
+    Translate posX posY (ArcAliased a1 a2 radius) ->
+      renderArc posX posY circScale radius a1 a2 0
     Translate posX posY (ThickArc a1 a2 radius thickness) ->
-      renderArc posX posY circScale radius a1 a2 thickness
-    Translate posX posY (ThickArcSmooth a1 a2 radius thickness) ->
       renderArcSmoothSDF state posX posY circScale radius a1 a2 thickness
+    Translate posX posY (ThickArcAliased a1 a2 radius thickness) ->
+      renderArc posX posY circScale radius a1 a2 thickness
     Translate tx ty (Rotate deg p) ->
       GL.preservingMatrix $
         do
@@ -264,21 +264,21 @@ drawPicture state circScale picture =
     -- Rotation -----------------------------
     -- Easy rotations are done directly to avoid calling GL.perserveMatrix.
     Rotate _ (Circle radius) ->
-      renderCircle 0 0 circScale radius 0
-    Rotate _ (CircleSmooth radius) ->
       renderCircleSmoothSDF state 0 0 circScale radius 0
+    Rotate _ (CircleAliased radius) ->
+      renderCircle 0 0 circScale radius 0
     Rotate _ (ThickCircle radius thickness) ->
-      renderCircle 0 0 circScale radius thickness
-    Rotate _ (ThickCircleSmooth radius thickness) ->
       renderCircleSmoothSDF state 0 0 circScale radius thickness
+    Rotate _ (ThickCircleAliased radius thickness) ->
+      renderCircle 0 0 circScale radius thickness
     Rotate deg (Arc a1 a2 radius) ->
-      renderArc 0 0 circScale radius (a1 - deg) (a2 - deg) 0
-    Rotate deg (ArcSmooth a1 a2 radius) ->
       renderArcSmoothSDF state 0 0 circScale radius (a1 - deg) (a2 - deg) 0
+    Rotate deg (ArcAliased a1 a2 radius) ->
+      renderArc 0 0 circScale radius (a1 - deg) (a2 - deg) 0
     Rotate deg (ThickArc a1 a2 radius thickness) ->
-      renderArc 0 0 circScale radius (a1 - deg) (a2 - deg) thickness
-    Rotate deg (ThickArcSmooth a1 a2 radius thickness) ->
       renderArcSmoothSDF state 0 0 circScale radius (a1 - deg) (a2 - deg) thickness
+    Rotate deg (ThickArcAliased a1 a2 radius thickness) ->
+      renderArc 0 0 circScale radius (a1 - deg) (a2 - deg) thickness
     Rotate deg p ->
       GL.preservingMatrix $
         do
