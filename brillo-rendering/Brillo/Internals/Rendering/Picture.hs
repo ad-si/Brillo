@@ -32,20 +32,20 @@ import Brillo.Internals.Data.Picture (
 import Brillo.Internals.Rendering.Bitmap (BitmapData (..), bitmapPath)
 import Brillo.Internals.Rendering.Circle (
   renderArc,
-  renderArcSmooth,
   renderCircle,
-  renderCircleSmooth,
  )
 import Brillo.Internals.Rendering.Common (gf, gsizei)
 import Brillo.Internals.Rendering.Polygon (
   renderComplexPolygon,
   renderComplexPolygonSmooth,
  )
+import Brillo.Internals.Rendering.Shader (renderArcSDF, renderCircleSDF)
 import Brillo.Internals.Rendering.State (
   State (
     stateBlendAlpha,
     stateColor,
     stateLineSmooth,
+    stateShaders,
     stateTextures,
     stateWireframe
   ),
@@ -147,20 +147,20 @@ drawPicture state circScale picture =
     Circle radius ->
       renderCircle 0 0 circScale radius 0
     CircleSmooth radius ->
-      renderCircleSmooth 0 0 circScale radius 0
+      renderCircleSmoothSDF state 0 0 circScale radius 0
     ThickCircle radius thickness ->
       renderCircle 0 0 circScale radius thickness
     ThickCircleSmooth radius thickness ->
-      renderCircleSmooth 0 0 circScale radius thickness
+      renderCircleSmoothSDF state 0 0 circScale radius thickness
     -- arc
     Arc a1 a2 radius ->
       renderArc 0 0 circScale radius a1 a2 0
     ArcSmooth a1 a2 radius ->
-      renderArcSmooth 0 0 circScale radius a1 a2 0
+      renderArcSmoothSDF state 0 0 circScale radius a1 a2 0
     ThickArc a1 a2 radius thickness ->
       renderArc 0 0 circScale radius a1 a2 thickness
     ThickArcSmooth a1 a2 radius thickness ->
-      renderArcSmooth 0 0 circScale radius a1 a2 thickness
+      renderArcSmoothSDF state 0 0 circScale radius a1 a2 thickness
     -- Vector font text
     Text str -> do
       let
@@ -244,19 +244,19 @@ drawPicture state circScale picture =
     Translate posX posY (Circle radius) ->
       renderCircle posX posY circScale radius 0
     Translate posX posY (CircleSmooth radius) ->
-      renderCircleSmooth posX posY circScale radius 0
+      renderCircleSmoothSDF state posX posY circScale radius 0
     Translate posX posY (ThickCircle radius thickness) ->
       renderCircle posX posY circScale radius thickness
     Translate posX posY (ThickCircleSmooth radius thickness) ->
-      renderCircleSmooth posX posY circScale radius thickness
+      renderCircleSmoothSDF state posX posY circScale radius thickness
     Translate posX posY (Arc a1 a2 radius) ->
       renderArc posX posY circScale radius a1 a2 0
     Translate posX posY (ArcSmooth a1 a2 radius) ->
-      renderArcSmooth posX posY circScale radius a1 a2 0
+      renderArcSmoothSDF state posX posY circScale radius a1 a2 0
     Translate posX posY (ThickArc a1 a2 radius thickness) ->
       renderArc posX posY circScale radius a1 a2 thickness
     Translate posX posY (ThickArcSmooth a1 a2 radius thickness) ->
-      renderArcSmooth posX posY circScale radius a1 a2 thickness
+      renderArcSmoothSDF state posX posY circScale radius a1 a2 thickness
     Translate tx ty (Rotate deg p) ->
       GL.preservingMatrix $
         do
@@ -274,19 +274,19 @@ drawPicture state circScale picture =
     Rotate _ (Circle radius) ->
       renderCircle 0 0 circScale radius 0
     Rotate _ (CircleSmooth radius) ->
-      renderCircleSmooth 0 0 circScale radius 0
+      renderCircleSmoothSDF state 0 0 circScale radius 0
     Rotate _ (ThickCircle radius thickness) ->
       renderCircle 0 0 circScale radius thickness
     Rotate _ (ThickCircleSmooth radius thickness) ->
-      renderCircleSmooth 0 0 circScale radius thickness
+      renderCircleSmoothSDF state 0 0 circScale radius thickness
     Rotate deg (Arc a1 a2 radius) ->
       renderArc 0 0 circScale radius (a1 - deg) (a2 - deg) 0
     Rotate deg (ArcSmooth a1 a2 radius) ->
-      renderArcSmooth 0 0 circScale radius (a1 - deg) (a2 - deg) 0
+      renderArcSmoothSDF state 0 0 circScale radius (a1 - deg) (a2 - deg) 0
     Rotate deg (ThickArc a1 a2 radius thickness) ->
       renderArc 0 0 circScale radius (a1 - deg) (a2 - deg) thickness
     Rotate deg (ThickArcSmooth a1 a2 radius thickness) ->
-      renderArcSmooth 0 0 circScale radius (a1 - deg) (a2 - deg) thickness
+      renderArcSmoothSDF state 0 0 circScale radius (a1 - deg) (a2 - deg) thickness
     Rotate deg p ->
       GL.preservingMatrix $
         do
@@ -560,3 +560,23 @@ vertexPFs ((x, y) : rest) =
     GL.vertex $ GL.Vertex2 (gf x) (gf y)
     vertexPFs rest
 {-# INLINE vertexPFs #-}
+
+
+-- SDF-based rendering helpers ------------------------------------------------
+
+-- | Render a smooth circle using SDF shader
+renderCircleSmoothSDF :: State -> Float -> Float -> Float -> Float -> Float -> IO ()
+renderCircleSmoothSDF state posX posY scaleFactor radius thickness = do
+  color <- get GL.currentColor
+  let outerR = abs radius + abs thickness / 2
+      innerR = max 0 (abs radius - abs thickness / 2)
+  renderCircleSDF state.stateShaders posX posY scaleFactor outerR innerR color
+
+
+-- | Render a smooth arc using SDF shader
+renderArcSmoothSDF :: State -> Float -> Float -> Float -> Float -> Float -> Float -> Float -> IO ()
+renderArcSmoothSDF state posX posY scaleFactor radius a1 a2 thickness = do
+  color <- get GL.currentColor
+  let outerR = abs radius + abs thickness / 2
+      innerR = max 0 (abs radius - abs thickness / 2)
+  renderArcSDF state.stateShaders posX posY scaleFactor outerR innerR a1 a2 color

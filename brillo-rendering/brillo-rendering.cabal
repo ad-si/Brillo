@@ -32,6 +32,7 @@ library
     Brillo.Internals.Rendering.Common
     Brillo.Internals.Rendering.Picture
     Brillo.Internals.Rendering.Polygon
+    Brillo.Internals.Rendering.Shader
     Brillo.Internals.Rendering.State
     Brillo.Internals.Rendering.TrueTypeFont
     Brillo.Internals.Rendering.VectorFont

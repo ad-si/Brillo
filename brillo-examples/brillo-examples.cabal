@@ -37,6 +37,17 @@ executable brillo-antialiasing
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
+executable brillo-circle-comparison
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/CircleComparison
+  build-depends:
+    , base    >=4.8    && <5
+    , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-bitmap
   default-language: GHC2021
   main-is:          Main.hs

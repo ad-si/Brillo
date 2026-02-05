@@ -26,6 +26,12 @@ import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL.GL qualified as GL
 
 
+-- | Tau = 2 * pi, the ratio of circumference to radius
+tau :: Float
+tau = 2 * pi
+{-# INLINE tau #-}
+
+
 -------------------------------------------------------------------------------
 
 {-| Decide how many line segments to use to render the circle.
@@ -72,8 +78,8 @@ renderCircle posX posY scaleFactor radius_ thickness_ =
 renderCircleLine :: Float -> Float -> Int -> Float -> IO ()
 renderCircleLine (F# posX) (F# posY) steps (F# rad) =
   let n = fromIntegral steps
-      !(F# tStep) = (2 * pi) / n
-      !(F# tStop) = (2 * pi)
+      !(F# tStep) = tau / n
+      !(F# tStop) = tau
   in  GL.renderPrimitive GL.LineLoop $
         renderCircleLineStep posX posY tStep tStop rad 0.0#
 {-# INLINE renderCircleLine #-}
@@ -83,8 +89,8 @@ renderCircleLine (F# posX) (F# posY) steps (F# rad) =
 renderCircleStrip :: Float -> Float -> Int -> Float -> Float -> IO ()
 renderCircleStrip (F# posX) (F# posY) steps r width =
   let n = fromIntegral steps
-      !(F# tStep) = (2 * pi) / n
-      !(F# tStop) = (2 * pi) + F# tStep / 2
+      !(F# tStep) = tau / n
+      !(F# tStop) = tau + F# tStep / 2
       !(F# r1) = r - width / 2
       !(F# r2) = r + width / 2
   in  GL.renderPrimitive GL.TriangleStrip $
@@ -104,8 +110,8 @@ renderCircleStrip (F# posX) (F# posY) steps r width =
 renderCircleStripRadii :: Float -> Float -> Int -> Float -> Float -> IO ()
 renderCircleStripRadii (F# posX) (F# posY) steps innerR outerR =
   let n = fromIntegral steps
-      !(F# tStep) = (2 * pi) / n
-      !(F# tStop) = (2 * pi) + F# tStep / 2
+      !(F# tStep) = tau / n
+      !(F# tStop) = tau + F# tStep / 2
       !(F# r1) = innerR
       !(F# r2) = outerR
   in  GL.renderPrimitive GL.TriangleStrip $
@@ -177,8 +183,8 @@ renderCircleSmooth posX posY scaleFactor radius_ thickness_ =
 renderCircleFan :: Float -> Float -> Int -> Float -> IO ()
 renderCircleFan (F# posX) (F# posY) steps (F# rad) =
   let n = fromIntegral steps
-      !(F# tStep) = (2 * pi) / n
-      !(F# tStop) = (2 * pi)
+      !(F# tStep) = tau / n
+      !(F# tStop) = tau
   in  GL.renderPrimitive GL.TriangleFan $ do
         -- Center vertex
         GL.vertex $ GL.Vertex2 (gf (F# posX)) (gf (F# posY))
@@ -260,9 +266,9 @@ renderArcLine ::
   Float -> Float -> Int -> Float -> Float -> Float -> IO ()
 renderArcLine (F# posX) (F# posY) steps (F# rad) a1 a2 =
   let n = fromIntegral steps
-      !(F# tStep) = (2 * pi) / n
+      !(F# tStep) = tau / n
       !(F# tStart) = degToRad a1
-      !(F# tStop) = degToRad a2 + if a1 >= a2 then 2 * pi else 0
+      !(F# tStop) = degToRad a2 + if a1 >= a2 then tau else 0
 
       -- force the line to end at the desired angle
       endVertex = addPointOnCircle posX posY rad tStop
@@ -277,9 +283,9 @@ renderArcLine (F# posX) (F# posY) steps (F# rad) a1 a2 =
 renderArcFan :: Float -> Float -> Int -> Float -> Float -> Float -> IO ()
 renderArcFan (F# posX) (F# posY) steps (F# rad) a1 a2 =
   let n = fromIntegral steps
-      !(F# tStep) = (2 * pi) / n
+      !(F# tStep) = tau / n
       !(F# tStart) = degToRad a1
-      !(F# tStop) = degToRad a2 + if a1 >= a2 then 2 * pi else 0
+      !(F# tStop) = degToRad a2 + if a1 >= a2 then tau else 0
   in  GL.renderPrimitive GL.TriangleFan $ do
         -- Center vertex
         GL.vertex $ GL.Vertex2 (gf (F# posX)) (gf (F# posY))
@@ -295,14 +301,10 @@ renderArcStrip ::
   Float -> Float -> Int -> Float -> Float -> Float -> Float -> IO ()
 renderArcStrip (F# posX) (F# posY) steps r a1 a2 width =
   let n = fromIntegral steps
-      tStep = (2 * pi) / n
+      tStep = tau / n
 
-      t1 = normalizeAngle $ degToRad a1
-
-      a2' = normalizeAngle $ degToRad a2
-      t2 = if a2' == 0 then 2 * pi else a2'
-
-      (tStart, tStop) = if t1 <= t2 then (t1, t2) else (t2, t1)
+      tStart = degToRad a1
+      tStop = degToRad a2 + if a1 >= a2 then tau else 0
       tDiff = tStop - tStart
       tMid = tStart + tDiff / 2
 
@@ -351,14 +353,10 @@ renderArcStripRadii ::
   Float -> Float -> Int -> Float -> Float -> Float -> Float -> IO ()
 renderArcStripRadii (F# posX) (F# posY) steps innerR outerR a1 a2 =
   let n = fromIntegral steps
-      tStep = (2 * pi) / n
+      tStep = tau / n
 
-      t1 = normalizeAngle $ degToRad a1
-
-      a2' = normalizeAngle $ degToRad a2
-      t2 = if a2' == 0 then 2 * pi else a2'
-
-      (tStart, tStop) = if t1 <= t2 then (t1, t2) else (t2, t1)
+      tStart = degToRad a1
+      tStop = degToRad a2 + if a1 >= a2 then tau else 0
       tDiff = tStop - tStart
       tMid = tStart + tDiff / 2
 
@@ -476,13 +474,6 @@ degToRad d = d * pi / 180
 {-# INLINE degToRad #-}
 
 
--- | Normalise an angle to be between 0 and 2*pi radians
-normalizeAngle :: Float -> Float
-normalizeAngle f = f - 2 * pi * floor' (f / (2 * pi))
-  where
-    floor' :: Float -> Float
-    floor' x = fromIntegral (floor x :: Int)
-{-# INLINE normalizeAngle #-}
 
 {- Unused sector drawing code.
    Sectors are currently drawn as compound Pictures,
@@ -493,9 +484,9 @@ normalizeAngle f = f - 2 * pi * floor' (f / (2 * pi))
 renderSectorLine :: Float -> Float -> Int -> Float -> Float -> Float -> IO ()
 renderSectorLine pX@(F# posX) pY@(F# posY) steps (F# rad) a1 a2
  = let  n               = fromIntegral steps
-        !(F# tStep)     = (2 * pi) / n
+        !(F# tStep)     = tau / n
         !(F# tStart)    = degToRad a1
-        !(F# tStop)     = degToRad a2 + if a1 >= a2 then 2 * pi else 0
+        !(F# tStop)     = degToRad a2 + if a1 >= a2 then tau else 0
 
         -- need to set up the edges of the start/end triangles
         startVertex     = GL.vertex $ GL.Vertex2 (gf pX) (gf pY)

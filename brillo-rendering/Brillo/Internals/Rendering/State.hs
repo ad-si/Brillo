@@ -9,6 +9,7 @@ module Brillo.Internals.Rendering.State (
 where
 
 import Brillo.Internals.Rendering.Bitmap (BitmapData)
+import Brillo.Internals.Rendering.Shader (ShaderState, initShaderState)
 import Data.IORef (IORef, newIORef)
 import Data.Word (Word8)
 import Foreign.ForeignPtr (ForeignPtr)
@@ -31,6 +32,8 @@ data State
   -- ^ Whether to use line smoothing
   , stateTextures :: !(IORef [Texture])
   -- ^ Cache of Textures that we've sent to OpenGL.
+  , stateShaders :: !ShaderState
+  -- ^ Shader programs for SDF-based rendering.
   }
 
 
@@ -60,6 +63,7 @@ initState :: IO State
 initState =
   do
     textures <- newIORef []
+    shaders <- initShaderState
     return
       State
         { stateColor = True
@@ -67,4 +71,5 @@ initState =
         , stateBlendAlpha = True
         , stateLineSmooth = False
         , stateTextures = textures
+        , stateShaders = shaders
         }
