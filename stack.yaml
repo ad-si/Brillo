@@ -1,5 +1,8 @@
 resolver: lts-23.28
 
+allow-newer-deps:
+  - storable-offset
+
 packages:
   - brillo
   - brillo-algorithms

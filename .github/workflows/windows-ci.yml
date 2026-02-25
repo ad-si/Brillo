@@ -43,7 +43,7 @@ jobs:
       - name: Restore cache
         uses: actions/cache/restore@v4
         with:
-          path: ~/AppData/Roaming/stack
+          path: C:\sr
           key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
           restore-keys: ${{ runner.os }}-stack-
 
@@ -60,5 +60,5 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: ~/AppData/Roaming/stack
+          path: C:\sr
           key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
