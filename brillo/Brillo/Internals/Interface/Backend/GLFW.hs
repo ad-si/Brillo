@@ -11,7 +11,6 @@ import Control.Exception qualified as X
 import Control.Monad (unless, when)
 import Data.Functor ((<&>))
 import Data.IORef (IORef, modifyIORef', readIORef, writeIORef)
-import Data.Maybe (fromJust)
 import Data.Text qualified as T
 import GHC.Desugar ((>>>))
 import Graphics.Rendering.OpenGL (($=))
@@ -100,7 +99,10 @@ instance Backend GLFWState where
   getWindowDimensions ref = windowHandle ref >>= \win -> GLFW.getWindowSize win
   getScreenSize = getScreenSizeGLFW
   openFileDialog = openFileDialogGLFW
-  elapsedTime _ = GLFW.getTime >>= \mt -> return $ fromJust mt
+  elapsedTime _ =
+    GLFW.getTime >>= \mt -> case mt of
+      Nothing -> error "GLFW.getTime returned Nothing. Is GLFW initialized?"
+      Just t -> return t
   sleep _ sec = threadDelay (floor (sec * 1000000.0)) -- GLFW.sleep sec)
   setCursor = setCursorGLFW
 
@@ -191,37 +193,57 @@ openWindowGLFW ref (InWindow title (sizeX, sizeY) pos) =
         Nothing
         Nothing
 
-    modifyIORef' ref (\s -> s{optWinHdl = win})
-    uncurry (GLFW.setWindowPos (fromJust win)) pos
-    GLFW.makeContextCurrent win
+    case win of
+      Nothing ->
+        error $
+          "GLFW.createWindow failed to create a "
+            ++ show sizeX
+            ++ "x"
+            ++ show sizeY
+            ++ " window."
+            ++ " Check that your GPU drivers support OpenGL."
+      Just w -> do
+        modifyIORef' ref (\s -> s{optWinHdl = win})
+        uncurry (GLFW.setWindowPos w) pos
+        GLFW.makeContextCurrent win
 
-    -- Try to enable sync-to-vertical-refresh by setting the number
-    -- of buffer swaps per vertical refresh to 1.
-    GLFW.swapInterval 1
+        -- Try to enable sync-to-vertical-refresh by setting the number
+        -- of buffer swaps per vertical refresh to 1.
+        GLFW.swapInterval 1
 openWindowGLFW ref FullScreen =
   do
     mon <- GLFW.getPrimaryMonitor
-    vmode <- GLFW.getVideoMode (fromJust mon)
+    case mon of
+      Nothing ->
+        error "GLFW.getPrimaryMonitor returned Nothing. No monitor detected."
+      Just m -> do
+        vmode <- GLFW.getVideoMode m
+        case vmode of
+          Nothing ->
+            error "GLFW.getVideoMode returned Nothing for primary monitor."
+          Just vm -> do
+            let sizeX = GLFW.videoModeWidth vm
+            let sizeY = GLFW.videoModeHeight vm
 
-    let sizeX = GLFW.videoModeWidth (fromJust vmode)
-    let sizeY = GLFW.videoModeHeight (fromJust vmode)
+            win <-
+              GLFW.createWindow
+                sizeX
+                sizeY
+                ""
+                mon
+                Nothing
 
-    win <-
-      GLFW.createWindow
-        sizeX
-        sizeY
-        ""
-        mon
-        Nothing
+            case win of
+              Nothing ->
+                error "GLFW.createWindow failed to create a fullscreen window."
+              Just w -> do
+                modifyIORef' ref (\s -> s{optWinHdl = win})
+                GLFW.makeContextCurrent win
 
-    modifyIORef' ref (\s -> s{optWinHdl = win})
-    GLFW.makeContextCurrent win
-
-    -- Try to enable sync-to-vertical-refresh by setting the number
-    -- of buffer swaps per vertical refresh to 1.
-    GLFW.swapInterval 1
-    -- GLFW.enableMouseCursor
-    GLFW.setCursorInputMode (fromJust win) GLFW.CursorInputMode'Normal
+                -- Try to enable sync-to-vertical-refresh by setting the number
+                -- of buffer swaps per vertical refresh to 1.
+                GLFW.swapInterval 1
+                GLFW.setCursorInputMode w GLFW.CursorInputMode'Normal
 
 
 windowHandle :: IORef GLFWState -> IO GLFW.Window
@@ -234,12 +256,18 @@ windowHandle ref =
 getScreenSizeGLFW :: IORef GLFWState -> IO (Int, Int)
 getScreenSizeGLFW _state = do
   monitor <- GLFW.getPrimaryMonitor
-  vmode <- GLFW.getVideoMode (fromJust monitor)
-
-  let sizeX = GLFW.videoModeWidth (fromJust vmode)
-  let sizeY = GLFW.videoModeHeight (fromJust vmode)
-
-  pure (sizeX, sizeY)
+  case monitor of
+    Nothing ->
+      error "GLFW.getPrimaryMonitor returned Nothing. No monitor detected."
+    Just m -> do
+      vmode <- GLFW.getVideoMode m
+      case vmode of
+        Nothing ->
+          error "GLFW.getVideoMode returned Nothing for primary monitor."
+        Just vm -> do
+          let sizeX = GLFW.videoModeWidth vm
+          let sizeY = GLFW.videoModeHeight vm
+          pure (sizeX, sizeY)
 
 
 -- | Open a file dialog. Return `Nothing` if the user cancels the dialog.
