@@ -73,9 +73,10 @@ getTestOutputDir = do
   pure outputDir
 
 
--- | Check if GLFW can initialize and create a window (i.e., we have a display
--- available). On Windows, GLFW.init can succeed even without a display, so we
--- also try creating a hidden window to verify.
+{-| Check if GLFW can initialize and create a window (i.e., we have a display
+available). On Windows, GLFW.init can succeed even without a display, so we
+also try creating a hidden window to verify.
+-}
 canInitializeGLFW :: IO Bool
 canInitializeGLFW = do
   result <- GLFW.init
