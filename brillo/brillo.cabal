@@ -43,6 +43,9 @@ library
   c-sources:          cbits/tinyfiledialogs.c
   cc-options:         -DHSFORCECONSOLE=0
   ghc-options:        -O2 -Wall
+
+  if os(windows)
+    extra-libraries: comdlg32 ole32 shell32 user32
   exposed-modules:
     Brillo
     Brillo.Data.Bitmap
