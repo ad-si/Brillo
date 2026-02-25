@@ -77,21 +77,21 @@ extern int tinyfd_winUtf8; /* on windows char strings can be 1:UTF-8(default) or
 /* for MBCS change this to 0, in tinyfiledialogs.c or in your code */
 
 /* Here are some functions to help you convert between UTF-16 UTF-8 MBSC */
-char * tinyfd_utf8toMbcs(char const * aUtf8string);
-char * tinyfd_utf16toMbcs(wchar_t const * aUtf16string);
-wchar_t * tinyfd_mbcsTo16(char const * aMbcsString);
-char * tinyfd_mbcsTo8(char const * aMbcsString);
-wchar_t * tinyfd_utf8to16(char const * aUtf8string);
-char * tinyfd_utf16to8(wchar_t const * aUtf16string);
+char * tinyfd_utf8toMbcs(const char * aUtf8string);
+char * tinyfd_utf16toMbcs(const wchar_t * aUtf16string);
+wchar_t * tinyfd_mbcsTo16(const char * aMbcsString);
+char * tinyfd_mbcsTo8(const char * aMbcsString);
+wchar_t * tinyfd_utf8to16(const char * aUtf8string);
+char * tinyfd_utf16to8(const wchar_t * aUtf16string);
 #endif
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
 
 /************* 3 funtions for C# (you don't need this in C or C++) : */
-char const * tinyfd_getGlobalChar(char const * aCharVariableName); /* returns NULL on error */
-int tinyfd_getGlobalInt(char const * aIntVariableName); /* returns -1 on error */
-int tinyfd_setGlobalInt(char const * aIntVariableName, int aValue); /* returns -1 on error */
+const char * tinyfd_getGlobalChar(const char * aCharVariableName); /* returns NULL on error */
+int tinyfd_getGlobalInt(const char * aIntVariableName); /* returns -1 on error */
+int tinyfd_setGlobalInt(const char * aIntVariableName, int aValue); /* returns -1 on error */
 /* aCharVariableName: "tinyfd_version" "tinyfd_needs" "tinyfd_response"
    aIntVariableName : "tinyfd_verbose" "tinyfd_silent" "tinyfd_allowCursesDialogs"
 				      "tinyfd_forceConsole" "tinyfd_assumeGraphicDisplay" "tinyfd_winUtf8"
@@ -133,52 +133,52 @@ for console mode:
 void tinyfd_beep(void);
 
 int tinyfd_notifyPopup(
-	char const * aTitle, /* NULL or "" */
-	char const * aMessage, /* NULL or "" may contain \n \t */
-	char const * aIconType); /* "info" "warning" "error" */
+	const char * aTitle, /* NULL or "" */
+	const char * aMessage, /* NULL or "" may contain \n \t */
+	const char * aIconType); /* "info" "warning" "error" */
 		/* return has only meaning for tinyfd_query */
 
 int tinyfd_messageBox(
-	char const * aTitle , /* NULL or "" */
-	char const * aMessage , /* NULL or "" may contain \n \t */
-	char const * aDialogType , /* "ok" "okcancel" "yesno" "yesnocancel" */
-	char const * aIconType , /* "info" "warning" "error" "question" */
+	const char * aTitle , /* NULL or "" */
+	const char * aMessage , /* NULL or "" may contain \n \t */
+	const char * aDialogType , /* "ok" "okcancel" "yesno" "yesnocancel" */
+	const char * aIconType , /* "info" "warning" "error" "question" */
 	int aDefaultButton ) ;
 		/* 0 for cancel/no , 1 for ok/yes , 2 for no in yesnocancel */
 
 char * tinyfd_inputBox(
-	char const * aTitle , /* NULL or "" */
-	char const * aMessage , /* NULL or "" (\n and \t have no effect) */
-	char const * aDefaultInput ) ;  /* NULL = passwordBox, "" = inputbox */
+	const char * aTitle , /* NULL or "" */
+	const char * aMessage , /* NULL or "" (\n and \t have no effect) */
+	const char * aDefaultInput ) ;  /* NULL = passwordBox, "" = inputbox */
 		/* returns NULL on cancel */
 
 char * tinyfd_saveFileDialog(
-	char const * aTitle , /* NULL or "" */
-	char const * aDefaultPathAndOrFile , /* NULL or "" , ends with / to set only a directory */
+	const char * aTitle , /* NULL or "" */
+	const char * aDefaultPathAndOrFile , /* NULL or "" , ends with / to set only a directory */
 	int aNumOfFilterPatterns , /* 0  (1 in the following example) */
-	char const * const * aFilterPatterns , /* NULL or char const * lFilterPatterns[1]={"*.txt"} */
-	char const * aSingleFilterDescription ) ; /* NULL or "text files" */
+	const char * const * aFilterPatterns , /* NULL or const char * lFilterPatterns[1]={"*.txt"} */
+	const char * aSingleFilterDescription ) ; /* NULL or "text files" */
 		/* returns NULL on cancel */
 
 char * tinyfd_openFileDialog(
-	char const * aTitle, /* NULL or "" */
-	char const * aDefaultPathAndOrFile, /* NULL or "" , ends with / to set only a directory */
+	const char * aTitle, /* NULL or "" */
+	const char * aDefaultPathAndOrFile, /* NULL or "" , ends with / to set only a directory */
 	int aNumOfFilterPatterns , /* 0 (2 in the following example) */
-	char const * const * aFilterPatterns, /* NULL or char const * lFilterPatterns[2]={"*.png","*.jpg"}; */
-	char const * aSingleFilterDescription, /* NULL or "image files" */
+	const char * const * aFilterPatterns, /* NULL or const char * lFilterPatterns[2]={"*.png","*.jpg"}; */
+	const char * aSingleFilterDescription, /* NULL or "image files" */
 	int aAllowMultipleSelects ) ; /* 0 or 1 */
 		/* in case of multiple files, the separator is | */
 		/* returns NULL on cancel */
 
 char * tinyfd_selectFolderDialog(
-	char const * aTitle, /* NULL or "" */
-	char const * aDefaultPath); /* NULL or "" */
+	const char * aTitle, /* NULL or "" */
+	const char * aDefaultPath); /* NULL or "" */
 		/* returns NULL on cancel */
 
 char * tinyfd_colorChooser(
-	char const * aTitle, /* NULL or "" */
-	char const * aDefaultHexRGB, /* NULL or "" or "#FF0000" */
-	unsigned char const aDefaultRGB[3] , /* unsigned char lDefaultRGB[3] = { 0 , 128 , 255 }; */
+	const char * aTitle, /* NULL or "" */
+	const char * aDefaultHexRGB, /* NULL or "" or "#FF0000" */
+	const unsigned char aDefaultRGB[3] , /* unsigned char lDefaultRGB[3] = { 0 , 128 , 255 }; */
 	unsigned char aoResultRGB[3] ) ; /* unsigned char lResultRGB[3]; */
 		/* aDefaultRGB is used only if aDefaultHexRGB is absent */
 		/* aDefaultRGB and aoResultRGB can be the same array */
@@ -192,56 +192,56 @@ char * tinyfd_colorChooser(
 
 /* windows only - utf-16 version */
 int tinyfd_notifyPopupW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aMessage, /* NULL or L"" may contain \n \t */
-	wchar_t const * aIconType); /* L"info" L"warning" L"error" */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aMessage, /* NULL or L"" may contain \n \t */
+	const wchar_t * aIconType); /* L"info" L"warning" L"error" */
 
 /* windows only - utf-16 version */
 int tinyfd_messageBoxW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aMessage, /* NULL or L"" may contain \n \t */
-	wchar_t const * aDialogType, /* L"ok" L"okcancel" L"yesno" */
-	wchar_t const * aIconType, /* L"info" L"warning" L"error" L"question" */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aMessage, /* NULL or L"" may contain \n \t */
+	const wchar_t * aDialogType, /* L"ok" L"okcancel" L"yesno" */
+	const wchar_t * aIconType, /* L"info" L"warning" L"error" L"question" */
 	int aDefaultButton ); /* 0 for cancel/no , 1 for ok/yes */
 		/* returns 0 for cancel/no , 1 for ok/yes */
 
 /* windows only - utf-16 version */
 wchar_t * tinyfd_inputBoxW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aMessage, /* NULL or L"" (\n nor \t not respected) */
-	wchar_t const * aDefaultInput); /* NULL passwordBox, L"" inputbox */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aMessage, /* NULL or L"" (\n nor \t not respected) */
+	const wchar_t * aDefaultInput); /* NULL passwordBox, L"" inputbox */
 
 /* windows only - utf-16 version */
 wchar_t * tinyfd_saveFileDialogW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aDefaultPathAndOrFile, /* NULL or L"" , ends with / to set only a directory */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aDefaultPathAndOrFile, /* NULL or L"" , ends with / to set only a directory */
 	int aNumOfFilterPatterns, /* 0 (1 in the following example) */
-	wchar_t const * const * aFilterPatterns, /* NULL or wchar_t const * lFilterPatterns[1]={L"*.txt"} */
-	wchar_t const * aSingleFilterDescription); /* NULL or L"text files" */
+	const wchar_t * const * aFilterPatterns, /* NULL or const wchar_t * lFilterPatterns[1]={L"*.txt"} */
+	const wchar_t * aSingleFilterDescription); /* NULL or L"text files" */
 		/* returns NULL on cancel */
 
 /* windows only - utf-16 version */
 wchar_t * tinyfd_openFileDialogW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aDefaultPathAndOrFile, /* NULL or L"" , ends with / to set only a directory */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aDefaultPathAndOrFile, /* NULL or L"" , ends with / to set only a directory */
 	int aNumOfFilterPatterns , /* 0 (2 in the following example) */
-	wchar_t const * const * aFilterPatterns, /* NULL or wchar_t const * lFilterPatterns[2]={L"*.png","*.jpg"} */
-	wchar_t const * aSingleFilterDescription, /* NULL or L"image files" */
+	const wchar_t * const * aFilterPatterns, /* NULL or const wchar_t * lFilterPatterns[2]={L"*.png","*.jpg"} */
+	const wchar_t * aSingleFilterDescription, /* NULL or L"image files" */
 	int aAllowMultipleSelects ) ; /* 0 or 1 */
 		/* in case of multiple files, the separator is | */
 		/* returns NULL on cancel */
 
 /* windows only - utf-16 version */
 wchar_t * tinyfd_selectFolderDialogW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aDefaultPath); /* NULL or L"" */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aDefaultPath); /* NULL or L"" */
 		/* returns NULL on cancel */
 
 /* windows only - utf-16 version */
 wchar_t * tinyfd_colorChooserW(
-	wchar_t const * aTitle, /* NULL or L"" */
-	wchar_t const * aDefaultHexRGB, /* NULL or L"#FF0000" */
-	unsigned char const aDefaultRGB[3], /* unsigned char lDefaultRGB[3] = { 0 , 128 , 255 }; */
+	const wchar_t * aTitle, /* NULL or L"" */
+	const wchar_t * aDefaultHexRGB, /* NULL or L"#FF0000" */
+	const unsigned char aDefaultRGB[3], /* unsigned char lDefaultRGB[3] = { 0 , 128 , 255 }; */
 	unsigned char aoResultRGB[3]); /* unsigned char lResultRGB[3]; */
 		/* returns the hexcolor as a string L"#FF0000" */
 		/* aoResultRGB also contains the result */
