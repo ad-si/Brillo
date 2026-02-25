@@ -17,15 +17,27 @@ import Text.Printf
 import qualified Paths_brillo_export as Paths
 
 
-{-| Check if GLFW can initialize (i.e., we have a display available).
-Returns True if GLFW initialized successfully, False otherwise.
+{-| Check if GLFW can initialize and create a window (i.e., we have a display
+available). On Windows, GLFW.init can succeed even without a display, so we
+also try creating a hidden window to verify.
 This is used to skip tests in headless CI environments.
 -}
 canInitializeGLFW :: IO Bool
 canInitializeGLFW = do
   result <- GLFW.init
-  when result GLFW.terminate
-  pure result
+  if not result
+    then pure False
+    else do
+      GLFW.windowHint (GLFW.WindowHint'Visible False)
+      maybeWindow <- GLFW.createWindow 1 1 "" Nothing Nothing
+      case maybeWindow of
+        Nothing -> do
+          GLFW.terminate
+          pure False
+        Just window -> do
+          GLFW.destroyWindow window
+          GLFW.terminate
+          pure True
 
 
 -- A variant of 'readImage' which fails with an exception instead of a 'Left'
