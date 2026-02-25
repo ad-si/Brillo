@@ -1,0 +1,64 @@
+name: Windows CI
+on:
+  - push
+  - pull_request
+  - merge_group
+jobs:
+  windows:
+    name: Windows - Stack
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: haskell-actions/setup@v2
+        with:
+          enable-stack: true
+          stack-no-global: true
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: >-
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-glfw
+            mingw-w64-x86_64-freetype
+            mingw-w64-x86_64-libwebp
+
+      - name: Configure environment
+        shell: bash
+        run: |
+          echo 'C:\msys64\mingw64\bin' >> "$GITHUB_PATH"
+          cat >> stack.yaml <<'EOF'
+
+          skip-msys: true
+          extra-include-dirs:
+            - C:\msys64\mingw64\include
+            - C:\msys64\mingw64\include\freetype2
+          extra-lib-dirs:
+            - C:\msys64\mingw64\lib
+          EOF
+
+      - name: Restore cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/AppData/Roaming/stack
+          key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
+          restore-keys: ${{ runner.os }}-stack-
+
+      - name: Install dependencies
+        run: stack build --only-dependencies --test --no-run-tests
+
+      - name: Build
+        run: stack build --test --no-run-tests
+
+      - name: Test
+        run: stack test
+
+      - name: Save cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/AppData/Roaming/stack
+          key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
