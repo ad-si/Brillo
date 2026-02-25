@@ -20,7 +20,7 @@ jobs:
         with:
           msystem: MINGW64
           update: false
-          location: C:\
+          release: false
           install: >-
             mingw-w64-x86_64-pkg-config
             mingw-w64-x86_64-glfw
