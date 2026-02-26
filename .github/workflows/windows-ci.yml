@@ -42,6 +42,7 @@ jobs:
           EOF
 
       - name: Restore cache
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           path: C:\sr
@@ -58,7 +59,7 @@ jobs:
         run: stack test
 
       - name: Save cache
-        if: always()
+        if: always() && steps.cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: C:\sr

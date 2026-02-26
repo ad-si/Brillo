@@ -51,7 +51,10 @@ jobs:
       # --- macOS dependencies ---
       - name: Install macOS dependencies
         if: runner.os == 'macOS'
-        run: brew install glfw freetype webp pkg-config
+        run: |
+          for pkg in glfw freetype webp pkg-config; do
+            brew list "$pkg" &>/dev/null || brew install "$pkg"
+          done
 
       # --- Windows dependencies ---
       - name: Install Windows dependencies
@@ -84,6 +87,7 @@ jobs:
 
       # --- Cache ---
       - name: Restore cache
+        id: cache-restore
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -142,7 +146,7 @@ jobs:
 
       # --- Save cache ---
       - name: Save cache
-        if: always()
+        if: always() && steps.cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: |
