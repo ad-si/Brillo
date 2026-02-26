@@ -1,0 +1,130 @@
+name: Build Tetris
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x86_64
+            os: ubuntu-24.04
+            artifact: brillo-tetris-linux-x86_64
+          - name: Linux arm64
+            os: ubuntu-24.04-arm
+            artifact: brillo-tetris-linux-arm64
+          - name: macOS x86_64
+            os: macos-15-intel
+            artifact: brillo-tetris-macos-x86_64
+          - name: macOS arm64
+            os: macos-latest
+            artifact: brillo-tetris-macos-arm64
+          - name: Windows x86_64
+            os: windows-latest
+            artifact: brillo-tetris-windows-x86_64
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: haskell-actions/setup@v2
+        with:
+          enable-stack: true
+          stack-no-global: true
+
+      # --- Linux dependencies ---
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libglfw3-dev libglu1-mesa-dev \
+            libxcursor-dev libxi-dev libxinerama-dev libxxf86vm-dev
+
+      # --- macOS dependencies ---
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: brew install glfw freetype webp pkg-config
+
+      # --- Windows dependencies ---
+      - name: Install Windows dependencies
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          release: false
+          install: >-
+            mingw-w64-x86_64-pkg-config
+            mingw-w64-x86_64-glfw
+            mingw-w64-x86_64-freetype
+            mingw-w64-x86_64-libwebp
+
+      - name: Configure Windows environment
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          echo 'C:\msys64\mingw64\bin' >> "$GITHUB_PATH"
+          cat >> stack.yaml <<'EOF'
+
+          skip-msys: true
+          extra-include-dirs:
+            - C:\msys64\mingw64\include
+            - C:\msys64\mingw64\include\freetype2
+          extra-lib-dirs:
+            - C:\msys64\mingw64\lib
+          EOF
+
+      # --- Cache ---
+      - name: Restore cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.stack
+            C:\sr
+          key: tetris-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
+          restore-keys: tetris-${{ runner.os }}-${{ runner.arch }}-
+
+      # --- Build ---
+      - name: Install dependencies
+        run: stack build --only-dependencies brillo-examples
+
+      - name: Build Tetris
+        run: stack build brillo-examples:brillo-tetris
+
+      # --- Collect artifact ---
+      - name: Collect binary (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p artifact
+          cp "$(stack exec -- which brillo-tetris)" artifact/brillo-tetris
+
+      - name: Collect binary (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p artifact
+          cp "$(stack exec -- which brillo-tetris)" artifact/brillo-tetris.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: artifact/
+
+      # --- Save cache ---
+      - name: Save cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.stack
+            C:\sr
+          key: tetris-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
