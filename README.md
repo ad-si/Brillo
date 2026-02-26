@@ -82,15 +82,49 @@ Once the window is open you can use the following:
 
 ## Installation
 
-Install necessary native dependencies like this:
+### Running pre-built binaries
 
-### Fedora
+If you're running a pre-built binary on Linux,
+install the required runtime libraries:
+
+#### Debian / Ubuntu
+
+```sh
+sudo apt-get install libglu1-mesa libglfw3 libwebp7 \
+  libxcursor1 libxi6 libxinerama1 libxrandr2 libxxf86vm1
+```
+
+#### Fedora
+
+```sh
+sudo dnf install mesa-libGLU glfw libwebp \
+  libXcursor libXi libXinerama libXrandr libXxf86vm
+```
+
+#### Arch
+
+```sh
+sudo pacman -S glu glfw libwebp libxcursor libxi libxinerama libxrandr libxxf86vm
+```
+
+### Building from source
+
+Install the development dependencies:
+
+#### Debian / Ubuntu
+
+```sh
+sudo apt-get install libglfw3-dev libglu1-mesa-dev libwebp-dev \
+  libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev
+```
+
+#### Fedora
 
 ```sh
 sudo dnf install glfw-devel libXxf86vm-devel
 ```
 
-### Arch
+#### Arch
 
 ```sh
 sudo pacman -S glfw libxxf86vm
