@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Drawing (drawWindow) where
+module Drawing (drawWindow, restartButtonBounds) where
 
 import Config
 import Figures
@@ -47,6 +47,23 @@ gameOverColor :: Color
 gameOverColor = makeColorI 181 7 7 220
 
 
+restartButtonColor :: Color
+restartButtonColor = makeColorI 71 136 183 255
+
+
+-- | Bounds of the restart button: (x, y, width, height)
+restartButtonBounds :: AppConfig -> (Float, Float, Float, Float)
+restartButtonBounds conf =
+  let (px, py) = cupPosition conf
+      (w, h) = cupSize conf
+      (cx, cy) = (px + w / 2, py + h / 2)
+      bw = 120
+      bh = 36
+      bx = cx - bw / 2
+      by = cy - 85
+  in  (bx, by, bw, bh)
+
+
 -- DRAWING FUNCTIONS
 
 -- | Draws all help components
@@ -56,16 +73,17 @@ drawHelp = do
   conf <- ask
   let (x, y) = cupPosition conf
   let w = snd $ cupSize conf
+  let fp = fontPath conf
   return $
     Pictures $
-      writeInfo (x - 250, y + w) (-20) (hardness gameState) (score gameState)
+      writeInfo fp (x - 250, y + w) (-22) (hardness gameState) (score gameState)
   where
-    writeInfo (x, y) step hard score =
+    writeInfo fp (x, y) step hard scr =
       snd $
         foldl
           ( \(s, pics) str ->
               ( s + step
-              , pics ++ [Color textColor $ translate x (y + s) $ scale 0.12 0.12 $ text str]
+              , pics ++ [Color textColor $ translate x (y + s) $ truetypeText fp 14 str]
               )
           )
           (step, [])
@@ -75,7 +93,7 @@ drawHelp = do
           , "Press Space to drop."
           , ""
           , "Hardness : " <> pack (show hard)
-          , "Score " <> pack (show score)
+          , "Score " <> pack (show scr)
           ]
 
 
@@ -176,11 +194,13 @@ drawSidebar :: StateT TetrisGame (Reader AppConfig) Picture
 drawSidebar = do
   gameState <- get
   conf <- ask
+  let fp = fontPath conf
   let fColor = toGlossColor $ case nextColors gameState of
         (c : _) -> c
         [] -> Red -- Default color if list is empty
   pic <-
     drawNextFigure
+      fp
       (gridSize conf)
       (getNextFigure gameState)
       fColor
@@ -188,7 +208,7 @@ drawSidebar = do
       (cupPosition conf)
   return $ Pictures [pic]
   where
-    drawNextFigure pos fig fColor bs cp =
+    drawNextFigure fp pos fig fColor bs cp =
       let np = (fst pos + 3, snd pos - 4)
       in  drawFigure fColor ((\(x, y) -> (x + 1, y - 1)) np) fig
             >>= return
@@ -198,8 +218,7 @@ drawSidebar = do
                         $ translate
                           (fst cp + (fromIntegral $ fst np) * bs)
                           (snd cp + (fromIntegral $ (snd np + 3)) * bs)
-                        $ scale 0.15 0.15
-                        $ text "Prepare for this"
+                        $ truetypeText fp 16 "Next"
                     ]
                 )
 
@@ -221,6 +240,7 @@ drawGameOver = do
   let (_winw, _winh) = windowSize conf
   let (winw, winh) = (fromIntegral _winw, fromIntegral _winh)
   let (cx, cy) = (px + w / 2, py + h / 2)
+  let fp = fontPath conf
   let overlay =
         Color overlayColor $
           polygon
@@ -229,17 +249,29 @@ drawGameOver = do
             , (winw, winh)
             , (winw, -winh)
             ]
+  let (bx, by, bw, bh) = restartButtonBounds conf
   return $
     Pictures
       [ overlay
-      , Color gameOverColor $ translate (cx - 72) cy $ scale 0.2 0.2 $ text "Game Over"
-      , Color textColor $
-          translate (cx - 72) (cy - 35) $
-            scale 0.15 0.15 $
-              text $
-                pack $
-                  show $
-                    score gameState
+      , Color gameOverColor $
+          translate (cx - 90) (cy + 20) $
+            truetypeText fp 36 "Game Over"
+      , let scoreStr = show $ score gameState
+            scoreWidth = fromIntegral (length scoreStr) * 13
+        in  Color textColor $
+              translate (cx - scoreWidth / 2) (cy - 25) $
+                truetypeText fp 24 $
+                  pack scoreStr
+      , Color restartButtonColor $
+          polygon
+            [ (bx, by)
+            , (bx + bw, by)
+            , (bx + bw, by + bh)
+            , (bx, by + bh)
+            ]
+      , Color (makeColorI 255 255 255 255) $
+          translate (bx + 30) (by + 10) $
+            truetypeText fp 18 "Restart"
       ]
 
 
@@ -252,6 +284,7 @@ drawPauseOverlay = do
   let (_winw, _winh) = windowSize conf
   let (winw, winh) = (fromIntegral _winw, fromIntegral _winh)
   let (cx, cy) = (px + w / 2, py + h / 2)
+  let fp = fontPath conf
   let overlay =
         Color overlayColor $
           polygon
@@ -263,7 +296,7 @@ drawPauseOverlay = do
   return $
     Pictures
       [ overlay
-      , Color textColor $ translate (cx - 38) cy $ scale 0.2 0.2 $ text "Pause"
+      , Color textColor $ translate (cx - 45) cy $ truetypeText fp 32 "Pause"
       ]
 
 

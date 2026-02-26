@@ -43,11 +43,12 @@ data AppConfig = AppConfig
   , blockSize :: BlockSize -- Size of one square block of grid
   , gridSize :: GridSize -- Size of grid in blocks
   , startPosition :: GridPosition -- Starting position of the falling figures (computed)
+  , fontPath :: FilePath -- Path to TrueType font file
   }
 
 
 -- | Default app config constructor
-defaultAppConfig :: AppConfig
+defaultAppConfig :: FilePath -> AppConfig
 defaultAppConfig =
   createAppConfig
     defaultWindowSize
@@ -59,8 +60,14 @@ defaultAppConfig =
 
 -- | Creates AppConfig with computed properties
 createAppConfig ::
-  WindowSize -> GameSize -> BlockSize -> GridSize -> WindowPosition -> AppConfig
-createAppConfig ws gms bs grs wp =
+  WindowSize ->
+  GameSize ->
+  BlockSize ->
+  GridSize ->
+  WindowPosition ->
+  FilePath ->
+  AppConfig
+createAppConfig ws gms bs grs wp fp =
   AppConfig
     ws
     gms
@@ -71,6 +78,7 @@ createAppConfig ws gms bs grs wp =
     bs
     grs
     (startPosition grs)
+    fp
   where
     cupSize' :: BlockSize -> GridSize -> CupSize
     cupSize' bs' (grw, grh) = (bs' * fromIntegral grw, bs' * fromIntegral grh)
