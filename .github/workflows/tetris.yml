@@ -119,6 +119,27 @@ jobs:
           name: ${{ matrix.artifact }}
           path: artifact/
 
+      # --- Windows Mesa software renderer artifact ---
+      - name: Bundle Mesa software renderer
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p artifact-mesa
+          cp artifact/brillo-tetris.exe artifact-mesa/
+          MESA_URL=$(gh api repos/mmozeiko/build-mesa/releases/latest \
+            --jq '.assets[] | select(.name | test("llvmpipe-x64")) | .browser_download_url')
+          curl -sL "$MESA_URL" -o mesa.7z
+          7z e mesa.7z opengl32.dll -oartifact-mesa
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Upload Mesa artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}-mesa
+          path: artifact-mesa/
+
       # --- Save cache ---
       - name: Save cache
         if: always()
