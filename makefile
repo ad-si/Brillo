@@ -46,6 +46,7 @@ test:
 	stack run brillo-tictactoe && \
 	stack run brillo-canvas-editor && \
 	stack run brillo-fule-layout && \
+	stack run brillo-pacman && \
 	stack run brillo-render  # Must be last as it can't be closed
 
 

@@ -441,6 +441,22 @@ executable brillo-chess
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
+executable brillo-pacman
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/PacMan
+  other-modules:
+    GhostAI
+    Maze
+    Structs
+
+  build-depends:
+    , base    >=4.8    && <5
+    , brillo  >=1.13.3 && <1.15
+    , text    >=2.0    && <2.2
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-snake
   default-language: GHC2021
   main-is:          Main.hs
