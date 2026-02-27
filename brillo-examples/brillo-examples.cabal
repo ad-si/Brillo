@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-examples
-version:       1.13.3
+version:       2.0.0
 license:       MIT
 license-file:  LICENSE
 author:        Ben Lippmeier, Adrian Sieber
@@ -32,8 +32,8 @@ executable brillo-antialiasing
   main-is:          Main.hs
   hs-source-dirs:   picture/Antialiasing
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -42,9 +42,9 @@ executable brillo-circle-comparison
   main-is:          Main.hs
   hs-source-dirs:   picture/CircleComparison
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -53,9 +53,9 @@ executable brillo-bitmap
   main-is:          Main.hs
   hs-source-dirs:   picture/Bitmap
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -68,9 +68,9 @@ executable brillo-boids
     Vec2
 
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
 
   ghc-options:      -O2 -threaded -rtsopts
 
@@ -79,9 +79,9 @@ executable brillo-clock
   main-is:          Main.hs
   hs-source-dirs:   picture/Clock
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -90,8 +90,8 @@ executable brillo-color
   main-is:          Main.hs
   hs-source-dirs:   picture/Color
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -104,10 +104,10 @@ executable brillo-conway
     World
 
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
-    , vector  >=0.13   && <0.14
+    , base    >=4.8  && <5
+    , brillo  >=2.0  && <3.0
+    , random  >=1.2  && <1.3
+    , vector  >=0.13 && <0.14
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -116,8 +116,8 @@ executable brillo-draw
   main-is:          Main.hs
   hs-source-dirs:   picture/Draw
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -126,9 +126,9 @@ executable brillo-dropfiles
   main-is:          Main.hs
   hs-source-dirs:   picture/DropFiles
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -137,8 +137,8 @@ executable brillo-easy
   main-is:          Main.hs
   hs-source-dirs:   picture/Easy
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -152,9 +152,9 @@ executable brillo-eden
     World
 
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -163,8 +163,8 @@ executable brillo-flake
   main-is:          Main.hs
   hs-source-dirs:   picture/Flake
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -173,9 +173,9 @@ executable brillo-gameevent
   main-is:          Main.hs
   hs-source-dirs:   picture/GameEvent
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -184,9 +184,9 @@ executable brillo-interaction
   main-is:          Main.hs
   hs-source-dirs:   picture/Interaction
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -195,8 +195,8 @@ executable brillo-hello
   main-is:          Main.hs
   hs-source-dirs:   picture/Hello
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -210,9 +210,9 @@ executable brillo-lifespan
     World
 
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -221,8 +221,8 @@ executable brillo-lines
   main-is:          Main.hs
   hs-source-dirs:   picture/Lines
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -231,8 +231,8 @@ executable brillo-machina
   main-is:          Main.hs
   hs-source-dirs:   picture/Machina
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -247,9 +247,9 @@ executable brillo-occlusion
     World
 
   build-depends:
-    , base               >=4.8    && <5
-    , brillo             >=1.13.3 && <1.15
-    , brillo-algorithms  >=1.13.3 && <1.15
+    , base               >=4.8 && <5
+    , brillo             >=2.0 && <3.0
+    , brillo-algorithms  >=2.0 && <3.0
 
   ghc-options:      -O2 -threaded -rtsopts
 
@@ -258,9 +258,9 @@ executable brillo-pickfiles
   main-is:          Main.hs
   hs-source-dirs:   picture/PickFiles
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -269,8 +269,8 @@ executable brillo-polygons
   main-is:          Main.hs
   hs-source-dirs:   picture/Polygons
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -288,9 +288,9 @@ executable brillo-styrene
     World
 
   build-depends:
-    , base        >=4.8    && <5
-    , brillo      >=1.13.3 && <1.15
-    , containers  >=0.5    && <0.9
+    , base        >=4.8 && <5
+    , brillo      >=2.0 && <3.0
+    , containers  >=0.5 && <0.9
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -299,8 +299,8 @@ executable brillo-tree
   main-is:          Main.hs
   hs-source-dirs:   picture/Tree
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -317,9 +317,9 @@ executable brillo-visibility
     World
 
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , vector  >=0.13   && <0.14
+    , base    >=4.8  && <5
+    , brillo  >=2.0  && <3.0
+    , vector  >=0.13 && <0.14
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -328,8 +328,8 @@ executable brillo-zen
   main-is:          Main.hs
   hs-source-dirs:   picture/Zen
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -338,10 +338,10 @@ executable brillo-graph
   main-is:          Main.hs
   hs-source-dirs:   picture/Graph
   build-depends:
-    , base        >=4.8    && <5
-    , brillo      >=1.13.3 && <1.15
-    , containers  >=0.5    && <0.9
-    , random      >=1.2    && <1.3
+    , base        >=4.8 && <5
+    , brillo      >=2.0 && <3.0
+    , containers  >=0.5 && <0.9
+    , random      >=1.2 && <1.3
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -350,19 +350,19 @@ executable brillo-gravity
   main-is:          Main.hs
   hs-source-dirs:   picture/Gravity
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
 executable brillo-render
   default-language: GHC2021
   build-depends:
-    , base              >=4.8    && <5
-    , brillo            >=1.13.3 && <1.15
-    , brillo-rendering  >=1.13.3 && <1.15
-    , GLFW-b            >=3.3    && <4
+    , base              >=4.8 && <5
+    , brillo            >=2.0 && <3.0
+    , brillo-rendering  >=2.0 && <3.0
+    , GLFW-b            >=3.3 && <4
 
   main-is:          Main.hs
   hs-source-dirs:   picture/Render
@@ -373,11 +373,11 @@ executable brillo-truetype
   main-is:          Main.hs
   hs-source-dirs:   picture/TrueType
   build-depends:
-    , base       >=4.8    && <5
-    , brillo     >=1.13.3 && <1.15
-    , directory  >=1.3    && <1.4
-    , freetype2  >=0.2    && <0.4
-    , text       >=2.0    && <2.2
+    , base       >=4.8 && <5
+    , brillo     >=2.0 && <3.0
+    , directory  >=1.3 && <1.4
+    , freetype2  >=0.2 && <0.4
+    , text       >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -386,10 +386,10 @@ executable brillo-gui
   main-is:          Main.hs
   hs-source-dirs:   picture/GUI
   build-depends:
-    , base       >=4.8    && <5
-    , brillo     >=1.13.3 && <1.15
-    , directory  >=1.3    && <1.4
-    , text       >=2.0    && <2.2
+    , base       >=4.8 && <5
+    , brillo     >=2.0 && <3.0
+    , directory  >=1.3 && <1.4
+    , text       >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -398,11 +398,11 @@ executable brillo-2048
   main-is:          Main.hs
   hs-source-dirs:   picture/2048
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
-    , split   >=0.2    && <0.3
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
+    , split   >=0.2 && <0.3
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -419,13 +419,13 @@ executable brillo-tetris
     World
 
   build-depends:
-    , base        >=4.8    && <5
-    , brillo      >=1.13.3 && <1.15
-    , containers  >=0.5    && <0.9
-    , directory   >=1.3    && <1.4
-    , mtl         >=2.2    && <2.4
-    , random      >=1.2    && <1.3
-    , text        >=2.0    && <2.2
+    , base        >=4.8 && <5
+    , brillo      >=2.0 && <3.0
+    , containers  >=0.5 && <0.9
+    , directory   >=1.3 && <1.4
+    , mtl         >=2.2 && <2.4
+    , random      >=1.2 && <1.3
+    , text        >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -434,10 +434,10 @@ executable brillo-chess
   main-is:          Main.hs
   hs-source-dirs:   picture/Chess
   build-depends:
-    , base        >=4.8    && <5
-    , brillo      >=1.13.3 && <1.15
-    , containers  >=0.5    && <0.9
-    , text        >=2.0    && <2.2
+    , base        >=4.8 && <5
+    , brillo      >=2.0 && <3.0
+    , containers  >=0.5 && <0.9
+    , text        >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -451,9 +451,9 @@ executable brillo-pacman
     Structs
 
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -462,10 +462,10 @@ executable brillo-snake
   main-is:          Main.hs
   hs-source-dirs:   picture/Snake
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -474,11 +474,11 @@ executable brillo-tictactoe
   main-is:          Main.hs
   hs-source-dirs:   picture/TicTacToe
   build-depends:
-    , array   >=0.5    && <0.6
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , random  >=1.2    && <1.3
-    , text    >=2.0    && <2.2
+    , array   >=0.5 && <0.6
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , random  >=1.2 && <1.3
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -487,10 +487,10 @@ executable brillo-export
   main-is:          Main.hs
   hs-source-dirs:   picture/Export
   build-depends:
-    , base           >=4.8    && <5
-    , brillo         >=1.13.3 && <1.15
-    , brillo-export  >=0.1    && <0.2
-    , directory      >=1.3    && <1.4
+    , base           >=4.8 && <5
+    , brillo         >=2.0 && <3.0
+    , brillo-export  >=0.1 && <0.2
+    , directory      >=1.3 && <1.4
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -499,10 +499,10 @@ executable brillo-canvas-editor
   main-is:          Main.hs
   hs-source-dirs:   picture/CanvasEditor
   build-depends:
-    , base           >=4.8    && <5
-    , brillo         >=1.13.3 && <1.15
-    , brillo-export  >=0.1    && <0.2
-    , directory      >=1.3    && <1.4
+    , base           >=4.8 && <5
+    , brillo         >=2.0 && <3.0
+    , brillo-export  >=0.1 && <0.2
+    , directory      >=1.3 && <1.4
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -511,10 +511,10 @@ executable brillo-fule-layout
   main-is:          Main.hs
   hs-source-dirs:   picture/FuleLayout
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.15
-    , FULE    >=0.3    && <0.4
-    , text    >=2.0    && <2.2
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , FULE    >=0.3 && <0.4
+    , text    >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
@@ -523,9 +523,9 @@ executable brillo-cursors
   main-is:          Main.hs
   hs-source-dirs:   picture/Cursors
   build-depends:
-    , base       >=4.8    && <5
-    , brillo     >=1.13.3 && <1.15
-    , directory  >=1.3    && <1.4
-    , text       >=2.0    && <2.2
+    , base       >=4.8 && <5
+    , brillo     >=2.0 && <3.0
+    , directory  >=1.3 && <1.4
+    , text       >=2.0 && <2.2
 
   ghc-options:      -O2 -Wall -threaded -rtsopts

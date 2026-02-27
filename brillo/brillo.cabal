@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               brillo
-version:            1.13.3
+version:            2.0.0
 license:            MIT
 license-file:       LICENSE
 author:             Ben Lippmeier, Adrian Sieber
@@ -31,12 +31,12 @@ source-repository head
 library
   default-language:   GHC2021
   build-depends:
-    , base              >=4.8    && <5
-    , brillo-rendering  >=1.13.3 && <1.15
-    , containers        >=0.5    && <0.9
-    , GLFW-b            >=3.3    && <4
-    , OpenGL            >=2.12   && <3.1
-    , text              >=2.0    && <2.2
+    , base              >=4.8  && <5
+    , brillo-rendering  >=2.0  && <3.0
+    , containers        >=0.5  && <0.9
+    , GLFW-b            >=3.3  && <4
+    , OpenGL            >=2.12 && <3.1
+    , text              >=2.0  && <2.2
 
   build-tool-depends: c2hs:c2hs
   include-dirs:       cbits/

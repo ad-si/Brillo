@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-rendering
-version:       1.13.3
+version:       2.0.0
 license:       MIT
 license-file:  LICENSE
 author:        Elise Huard, Ben Lippmeier, Adrian Sieber

@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-algorithms
-version:       1.13.3
+version:       2.0.0
 license:       MIT
 license-file:  LICENSE
 author:        Ben Lippmeier, Adrian Sieber
@@ -24,8 +24,8 @@ source-repository head
 library
   default-language: GHC2021
   build-depends:
-    , base    >=4.8    && <5
-    , brillo  >=1.13.3 && <1.14
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
 
   ghc-options:      -O2 -Wall
   exposed-modules:
