@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-juicy
-version:       0.2.4
+version:       0.3.0
 synopsis:
   Load any image supported by Juicy.Pixels in your brillo application
 
