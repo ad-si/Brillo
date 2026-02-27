@@ -22,11 +22,7 @@ main :: IO ()
 main = do
   g <- getStdGen
   play
-    ( InWindow
-        "2048 in Haskell by Maia"
-        (410, 500)
-        (20, 20)
-    )
+    (InWindow "2048" (410, 500) (20, 20))
     (makeColorI 193 177 156 255) -- background color
     fps -- simulation steps per second
     (initPositions g) -- initial world
@@ -296,15 +292,17 @@ drawTile x tile =
         [ Color (getColor $ val tile) $
             roundedRect tilePrecision tileS tileS tileRoundness
         ]
+      numStr = show (val tile)
+      numDigits = fromIntegral (length numStr)
+      charW = 104.76 * textScale
+      charH = 119.05 * textScale
       number =
         if val tile > 0
           then
-            [ Translate (-20) (-10) $
+            [ Translate (-(numDigits * charW) / 2) (-charH / 2) $
                 Scale textScale textScale $
                   Text $
-                    T.pack $
-                      show $
-                        val tile
+                    T.pack numStr
             ]
           else []
       curScale =

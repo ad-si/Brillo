@@ -40,4 +40,7 @@ Command | Result
 --------|--------
 `stack run brillo-2048`       | <img src="picture/2048/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-chess`      | <img src="picture/Chess/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-pacman`     | <img src="picture/PacMan/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-snake`      | <img src="picture/Snake/screenshot.png" style="max-height: 250px"/>
 `stack run brillo-tetris`     | <img src="picture/Tetris/screenshot.png" style="max-height: 250px"/>
+`stack run brillo-tictactoe`  | <img src="picture/TicTacToe/screenshot.png" style="max-height: 250px"/>
