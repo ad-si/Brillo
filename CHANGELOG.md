@@ -1,5 +1,32 @@
 # Changelog
 
+# 2026-02-27 - 2.0.0
+
+- Make anti-aliasing the default for all primitives
+- Add support for true type fonts and a simple GUI example using it
+- Add window refresh callback for live resizing support on macOS
+- Add cursor shape support to Controller
+- Add support for rendering non-convex polygons
+- File system support:
+  - Add dialog to pick files or directories
+  - Support opening a save file dialog
+  - Add support for dropping of files/directories
+- Add SVG export support with comprehensive test suite
+  - Add simple canvas editor to demonstrate SVG export
+- Export all fields of `BitmapData` type
+    (allows executing image manipulation operations on the pixel data)
+- Add `brillo-export` to export several image formats
+  - Add support for WebP file format
+- Add several example games
+  - 2048
+  - Chess
+  - Pac-Man
+  - Snake
+  - Tetris
+  - Tic Tac Toe
+- Remove all smart constructors that only wrap a data constructor
+
+
 ## 2024-11-26 - 1.13.3
 
 - Remove support for deprecated backends GLUT and SDL and use GLFW instead
