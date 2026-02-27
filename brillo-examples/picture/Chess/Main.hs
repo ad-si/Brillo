@@ -24,7 +24,7 @@ main = do
     5
     (initialState maxTime)
     (drawWorld boardWidth)
-    handleEvent
+    (handleEvent boardWidth)
     stepWorld
 
 
@@ -43,6 +43,7 @@ data Piece = Piece
 data Marker = Marker
   { position :: Pos
   , selected :: Maybe Pos
+  , invalid :: Maybe Pos
   }
 data Player = Player
   { name :: T.Text -- Not yet used
@@ -61,11 +62,15 @@ data State = State
 
 
 tBlue :: Color
-tBlue = makeColorI 0 102 255 128
+tBlue = makeColorI 70 110 180 255
 
 
 tGreen :: Color
-tGreen = makeColorI 51 255 0 128
+tGreen = makeColorI 80 160 80 255
+
+
+tRed :: Color
+tRed = makeColorI 180 60 60 255
 
 
 -- Helpers to handle pieces on the board
@@ -92,7 +97,7 @@ movePiece from to b = setPiece to p $ dropPiece from b
 
 
 setMarker :: Pos -> State -> State
-setMarker p s = s{marker = (marker s){position = p}}
+setMarker p s = s{marker = (marker s){position = p, invalid = Nothing}}
 
 
 setMessage :: T.Text -> State -> State
@@ -101,12 +106,14 @@ setMessage m s = s{message = m}
 
 -- Set selected if marker is on a valid piece
 setSelected :: Maybe Pos -> State -> State
-setSelected Nothing s = s{marker = (marker s){selected = Nothing}}
-setSelected (Just p) s = if valid then s' else s
+setSelected Nothing s = s{marker = (marker s){selected = Nothing, invalid = Nothing}}
+setSelected (Just p) s = if valid then sValid else sInvalid
   where
     piece = getPiece p (board s)
     valid = isJust piece && (pcolor (fromJust piece) == current s)
-    s' = s{marker = (marker s){selected = Just p}}
+    hasPiece = isJust piece
+    sValid = s{marker = (marker s){selected = Just p, invalid = Nothing}}
+    sInvalid = s{marker = (marker s){invalid = if hasPiece then Just p else Nothing}}
 
 
 -- Move pos marker, but make sure move is not outside board
@@ -122,7 +129,10 @@ movePos p _ = p
 -- This happen when the user has selected a piece and drop it on a new location
 drawPiece :: State -> State
 drawPiece s
-  | (isNothing b') = setMessage (T.pack "Invalid") s
+  | (isNothing b') =
+      setMessage
+        (T.pack "Invalid")
+        s{marker = (marker s){invalid = Just (position $ marker s)}}
   | (isCheck s') = setMessage (T.pack "Check") s
   | otherwise = setMessage (T.pack "") $ stepCurrent s'
   where
@@ -181,6 +191,46 @@ drawPiece s
             && (isJust $ rook) -- check that king has not moved
             && ((pstate $ fromJust rook) == Init) -- check that rook has not moved
             && (fst p1 == 2 || fst p1 == 6) -- check that target square is correct
+
+
+-- Check if a move from p0 to p1 is valid on the given board for the given color
+canMove :: Board -> PColor -> Pos -> Pos -> Bool
+canMove b cur p0 p1 =
+  case getPiece p0 b of
+    Nothing -> False
+    Just piece ->
+      let capture = getPiece p1 b
+          isValid =
+            (pcolor piece == cur)
+              && (distance p0 p1 > 0)
+          isPathClear = pathClear b p0 p1 piece
+          isAMove =
+            isValid
+              && isPathClear
+              && isNothing capture
+              && validMove piece p0 p1
+          isCapture =
+            isValid
+              && isPathClear
+              && isJust capture
+              && pcolor (fromJust capture) /= cur
+              && validCapture piece p0 p1
+          isEnPassant =
+            let cpawn = getPiece (fst p1, snd p0) b
+            in  isJust cpawn
+                  && (pstate (fromJust cpawn) == TwoStep)
+                  && validCapture piece p0 p1
+          isCastling =
+            let (r0, _r1) = castlingRookMove (p0, p1)
+                rook = getPiece r0 b
+            in  isValid
+                  && pathClear b p0 r0 piece
+                  && ptype piece == King
+                  && pstate piece == Init
+                  && isJust rook
+                  && (pstate (fromJust rook) == Init)
+                  && (fst p1 == 2 || fst p1 == 6)
+      in  isAMove || isCapture || isEnPassant || isCastling
 
 
 -- Get rook move from king move in castling
@@ -270,7 +320,7 @@ isCheck s = not $ Map.null checkers
 stepCurrent :: State -> State
 stepCurrent s =
   s
-    { marker = (marker s){selected = Nothing}
+    { marker = (marker s){selected = Nothing, invalid = Nothing}
     , current = opposite (current s)
     }
   where
@@ -288,8 +338,9 @@ drawWorld bw s =
     Pictures $
       [ drawBoard bw
       , drawPieces bw (board s)
-      , drawMarker bw (marker s)
+      , drawMarker bw s
       , drawSelected bw (marker s)
+      , drawInvalid bw (marker s)
       , drawState bw s
       ]
 
@@ -331,11 +382,26 @@ drawPieces bw b =
 
 
 -- Draw marker
-drawMarker :: BoardWidth -> Marker -> Picture
-drawMarker bw m =
-  let (tx, ty) = translatePos bw $ position m
-      marker = Color tGreen $ Translate tx ty $ ThickCircle 27 6
-  in  Translate (bw / 16) (bw / 16) $ marker
+drawMarker :: BoardWidth -> State -> Picture
+drawMarker bw s =
+  let pos = position $ marker s
+      (tx, ty) = translatePos bw pos
+      piece = getPiece pos (board s)
+      isEnemy = case piece of
+        Just p -> pcolor p /= current s
+        Nothing -> False
+      sel = selected $ marker s
+      noSelection = isNothing sel
+      invalidMove = case sel of
+        Just from -> pos /= from && not (canMove (board s) (current s) from pos)
+        Nothing -> False
+      col
+        | isEnemy && noSelection = tRed
+        | noSelection && isNothing piece = makeColorI 140 90 50 255
+        | invalidMove = tRed
+        | otherwise = tGreen
+      ring = Color col $ Translate tx ty $ ThickCircle 27 6
+  in  Translate (bw / 16) (bw / 16) $ ring
 
 
 -- Draw selected
@@ -346,6 +412,17 @@ drawSelected bw m =
       selector = Color tBlue $ Translate tx ty $ ThickCircle 27 6
   in  if (isJust sel)
         then Translate (bw / 16) (bw / 16) $ selector
+        else Blank
+
+
+-- Draw invalid selection
+drawInvalid :: BoardWidth -> Marker -> Picture
+drawInvalid bw m =
+  let inv = invalid m
+      (tx, ty) = translatePos bw $ maybe (0, 0) id inv
+      ring = Color tRed $ Translate tx ty $ ThickCircle 27 6
+  in  if (isJust inv)
+        then Translate (bw / 16) (bw / 16) $ ring
         else Blank
 
 
@@ -405,7 +482,7 @@ initialState timeLeft =
     whitePlayer
     blackPlayer
     White
-    (T.pack "Arrows: Move cursor | Space: Select/Move piece")
+    (T.pack "Arrows/Click: Move | Space/Click: Select")
   where
     asBlack t = Piece t Black Init
     asWhite t = Piece t White Init
@@ -417,24 +494,44 @@ initialState timeLeft =
         ++ zip (map (atRow 1) [0 .. 7]) (map asBlack r1)
         ++ zip (map (atRow 6) [0 .. 7]) (map asWhite r1)
         ++ zip (map (atRow 7) [0 .. 7]) (map asWhite r0)
-    marker = Marker (0, 0) Nothing
+    marker = Marker (0, 0) Nothing Nothing
     blackPlayer = Player (T.pack "Black Player") timeLeft Black []
     whitePlayer = Player (T.pack "White Player") timeLeft White []
 
 
-handleEvent :: Event -> State -> State
-handleEvent (EventKey (SpecialKey KeyUp) Down _ _) s = setMarker (movePos (position . marker $ s) KeyUp) s
-handleEvent (EventKey (SpecialKey KeyDown) Down _ _) s = setMarker (movePos (position . marker $ s) KeyDown) s
-handleEvent (EventKey (SpecialKey KeyLeft) Down _ _) s = setMarker (movePos (position . marker $ s) KeyLeft) s
-handleEvent (EventKey (SpecialKey KeyRight) Down _ _) s = setMarker (movePos (position . marker $ s) KeyRight) s
-handleEvent (EventKey (SpecialKey KeySpace) Down _ _) s -- Space toggle selection, or draw piece
+-- Convert world-space click coordinates to board position
+pixelToBoard :: BoardWidth -> (Float, Float) -> Maybe Pos
+pixelToBoard bw (mx, my) =
+  let col = floor ((mx + bw * 0.5) / (bw / 8))
+      row = 7 - floor ((my + bw * 0.55) / (bw / 8))
+  in  if col >= 0 && col <= 7 && row >= 0 && row <= 7
+        then Just (col, row)
+        else Nothing
+
+
+handleEvent :: BoardWidth -> Event -> State -> State
+handleEvent _ (EventKey (SpecialKey KeyUp) Down _ _) s = setMarker (movePos (position . marker $ s) KeyUp) s
+handleEvent _ (EventKey (SpecialKey KeyDown) Down _ _) s = setMarker (movePos (position . marker $ s) KeyDown) s
+handleEvent _ (EventKey (SpecialKey KeyLeft) Down _ _) s = setMarker (movePos (position . marker $ s) KeyLeft) s
+handleEvent _ (EventKey (SpecialKey KeyRight) Down _ _) s = setMarker (movePos (position . marker $ s) KeyRight) s
+handleEvent _ (EventKey (SpecialKey KeySpace) Down _ _) s -- Space toggle selection, or draw piece
   | isNothing sel = setSelected (Just pos) s
   | pos == fromJust sel = setSelected Nothing s
   | otherwise = drawPiece s
   where
     sel = selected . marker $ s
     pos = position . marker $ s
-handleEvent _ s = s
+handleEvent bw (EventKey (MouseButton LeftButton) Down _ clickPos) s
+  | Just p <- pixelToBoard bw clickPos =
+      let s' = setMarker p s
+          sel = selected . marker $ s'
+      in  if isNothing sel
+            then setSelected (Just p) s'
+            else
+              if p == fromJust sel
+                then setSelected Nothing s'
+                else drawPiece s'
+handleEvent _ _ s = s
 
 
 stepWorld :: Float -> State -> State
@@ -442,25 +539,176 @@ stepWorld dt s@(State _ _ w _ White _) = s{whitePlayer = w{timeLeft = (timeLeft 
 stepWorld dt s@(State _ _ _ b Black _) = s{blackPlayer = b{timeLeft = (timeLeft b - dt)}}
 
 
--- Simple text-based piece graphics
+-- Drawn chess piece graphics
 pieceGfx :: Piece -> Picture
 pieceGfx (Piece t c _) =
   let
-    pieceChar = case t of
-      King -> "K"
-      Queen -> "Q"
-      Rook -> "R"
-      Bishop -> "B"
-      Knight -> "N"
-      Pawn -> "P"
-    pieceColor = case c of
+    fill = case c of
       White -> greyN 0.9
-      Black -> black
+      Black -> greyN 0.15
+    outline = case c of
+      White -> greyN 0.2
+      Black -> greyN 0.7
   in
-    Pictures
-      [ Color pieceColor $ circleSolid 20
-      , Color (if c == White then black else white) $
-          Translate (-5) (-6) $
-            Scale 0.15 0.15 $
-              Text (T.pack pieceChar)
-      ]
+    case t of
+      Pawn -> pawnPic fill outline
+      Rook -> rookPic fill outline
+      Knight -> knightPic fill outline
+      Bishop -> bishopPic fill outline
+      Queen -> queenPic fill outline
+      King -> kingPic fill outline
+
+
+-- Draw a filled polygon with a border via offset copies
+borderedPoly :: Color -> Color -> [Point] -> Picture
+borderedPoly fill bord pts =
+  Pictures
+    [ Color bord $
+        Pictures
+          [Translate dx dy $ Polygon pts | dx <- [-1, 0, 1], dy <- [-1, 0, 1]]
+    , Color fill $ Polygon pts
+    ]
+
+
+-- Draw a filled circle with a border
+borderedCircle :: Color -> Color -> Float -> Picture
+borderedCircle fill bord r =
+  Pictures
+    [ Color bord $ circleSolid (r + 1.5)
+    , Color fill $ circleSolid r
+    ]
+
+
+pawnPic :: Color -> Color -> Picture
+pawnPic f o =
+  Pictures
+    [ borderedPoly
+        f
+        o
+        [ (-4, 3)
+        , (-8, -8)
+        , (-10, -13)
+        , (-10, -15)
+        , (10, -15)
+        , (10, -13)
+        , (8, -8)
+        , (4, 3)
+        ]
+    , Translate 0 8 $ borderedCircle f o 6
+    ]
+
+
+rookPic :: Color -> Color -> Picture
+rookPic f o =
+  borderedPoly
+    f
+    o
+    [ (-11, -15)
+    , (-11, -10)
+    , (-8, -10)
+    , (-8, 8)
+    , (-11, 8)
+    , (-11, 15)
+    , (-7, 15)
+    , (-7, 11)
+    , (-2, 11)
+    , (-2, 15)
+    , (2, 15)
+    , (2, 11)
+    , (7, 11)
+    , (7, 15)
+    , (11, 15)
+    , (11, 8)
+    , (8, 8)
+    , (8, -10)
+    , (11, -10)
+    , (11, -15)
+    ]
+
+
+knightPic :: Color -> Color -> Picture
+knightPic f o =
+  borderedPoly
+    f
+    o
+    [ (-6, -15)
+    , (-6, 0)
+    , (-8, 6)
+    , (-6, 10)
+    , (-2, 14)
+    , (2, 15)
+    , (6, 12)
+    , (8, 6)
+    , (10, 2)
+    , (8, -2)
+    , (4, 0)
+    , (6, -8)
+    , (8, -15)
+    ]
+
+
+bishopPic :: Color -> Color -> Picture
+bishopPic f o =
+  Pictures
+    [ borderedPoly
+        f
+        o
+        [ (0, 14)
+        , (-6, 4)
+        , (-9, -6)
+        , (-10, -13)
+        , (-10, -15)
+        , (10, -15)
+        , (10, -13)
+        , (9, -6)
+        , (6, 4)
+        ]
+    , Translate 0 17 $ borderedCircle f o 3
+    ]
+
+
+queenPic :: Color -> Color -> Picture
+queenPic f o =
+  borderedPoly
+    f
+    o
+    [ (-11, -15)
+    , (-9, -6)
+    , (-7, 0)
+    , (-11, 10)
+    , (-6, 6)
+    , (-3, 13)
+    , (0, 8)
+    , (3, 13)
+    , (6, 6)
+    , (11, 10)
+    , (7, 0)
+    , (9, -6)
+    , (11, -15)
+    ]
+
+
+kingPic :: Color -> Color -> Picture
+kingPic f o =
+  Pictures
+    [ borderedPoly
+        f
+        o
+        [ (-10, -15)
+        , (-9, -8)
+        , (-7, 0)
+        , (-6, 8)
+        , (6, 8)
+        , (7, 0)
+        , (9, -8)
+        , (10, -15)
+        ]
+    , borderedPoly
+        f
+        o
+        [(-1.5, 8), (-1.5, 20), (1.5, 20), (1.5, 8)]
+    , borderedPoly
+        f
+        o
+        [(-5, 14), (-5, 17), (5, 17), (5, 14)]
+    ]
