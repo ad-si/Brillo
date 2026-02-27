@@ -74,10 +74,13 @@ release: docs
 	# stack upload --documentation brillo-examples
 
 	stack upload brillo-juicy
-	stack upload --documentation brillo-juicy
+	# stack upload --documentation brillo-juicy
 
 	stack upload brillo-rendering
 	stack upload --documentation brillo-rendering
+
+	stack upload brillo-export
+	# stack upload --documentation brillo-export
 
 
 .PHONY: clean
