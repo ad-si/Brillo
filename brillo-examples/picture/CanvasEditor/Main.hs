@@ -202,7 +202,7 @@ renderHeader font =
       , -- Instructions text
         Translate (-380) (-8) $
           Color (greyN 0.3) $
-            truetypeText
+            TrueTypeText
               font
               20
               "Drag shapes to move them. Click the button below to export as SVG."
@@ -223,7 +223,7 @@ renderButton font isHovered =
       , -- Button text
         Translate (-70) (-8) $
           Color white $
-            truetypeText font 22 "Export as SVG"
+            TrueTypeText font 22 "Export as SVG"
       ]
 
 

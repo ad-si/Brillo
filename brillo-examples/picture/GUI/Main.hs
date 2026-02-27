@@ -94,56 +94,56 @@ findButtonAt pt btns =
 -- | Render the entire scene
 renderScene :: AppState -> Picture
 renderScene state =
-  pictures
+  Pictures
     [ -- Header section
-      translate 0 220 $ renderHeader (fontPath state)
+      Translate 0 220 $ renderHeader (fontPath state)
     , -- Main content area
-      translate 0 50 $ renderContent (fontPath state) (lastClicked state)
+      Translate 0 50 $ renderContent (fontPath state) (lastClicked state)
     , -- Button bar at bottom
-      pictures $ map (renderButton state) buttons
+      Pictures $ map (renderButton state) buttons
     , -- Status bar
-      translate 0 (-280) $ renderStatusBar (fontPath state) (mousePos state)
+      Translate 0 (-280) $ renderStatusBar (fontPath state) (mousePos state)
     ]
 
 
 -- | Render the header with title
 renderHeader :: FilePath -> Picture
 renderHeader font =
-  pictures
+  Pictures
     [ -- Header background
-      color (makeColor 0.2 0.4 0.7 1.0) $ rectangleSolid 800 80
+      Color (makeColor 0.2 0.4 0.7 1.0) $ rectangleSolid 800 80
     , -- Title text
-      translate (-350) (-10) $
-        color white $
-          truetypeText font 42 "Brillo GUI Demo"
+      Translate (-350) (-10) $
+        Color white $
+          TrueTypeText font 42 "Brillo GUI Demo"
     ]
 
 
 -- | Render the main content area
 renderContent :: FilePath -> Maybe String -> Picture
 renderContent font mLastClicked =
-  pictures
+  Pictures
     [ -- Content background
-      color (makeColor 0.98 0.98 1.0 1.0) $ rectangleSolid 760 300
+      Color (makeColor 0.98 0.98 1.0 1.0) $ rectangleSolid 760 300
     , -- Border
-      color (greyN 0.7) $ rectangleWire 760 300
+      Color (greyN 0.7) $ rectangleWire 760 300
     , -- Display last clicked button
       case mLastClicked of
         Nothing ->
-          translate (-250) 40 $
-            color (greyN 0.5) $
-              truetypeText font 32 "Click a button below!"
+          Translate (-250) 40 $
+            Color (greyN 0.5) $
+              TrueTypeText font 32 "Click a button below!"
         Just btnId ->
-          pictures
-            [ translate (-300) 60 $
-                color (makeColor 0.2 0.6 0.3 1.0) $
-                  truetypeText font 32 "Button clicked:"
-            , translate (-300) 0 $
-                color (makeColor 0.3 0.3 0.8 1.0) $
-                  truetypeText font 48 (T.pack btnId)
-            , translate (-300) (-70) $
-                color (greyN 0.4) $
-                  truetypeText font 24 "Try clicking other buttons!"
+          Pictures
+            [ Translate (-300) 60 $
+                Color (makeColor 0.2 0.6 0.3 1.0) $
+                  TrueTypeText font 32 "Button clicked:"
+            , Translate (-300) 0 $
+                Color (makeColor 0.3 0.3 0.8 1.0) $
+                  TrueTypeText font 48 (T.pack btnId)
+            , Translate (-300) (-70) $
+                Color (greyN 0.4) $
+                  TrueTypeText font 24 "Try clicking other buttons!"
             ]
     ]
 
@@ -170,29 +170,29 @@ renderButton state btn =
 
       -- Text positioning (centered in button)
       textOffset = -12 -- Approximate vertical centering for text
-  in  translate cx cy $
-        pictures
+  in  Translate cx cy $
+        Pictures
           [ -- Button background
-            color bgColor $
+            Color bgColor $
               rectangleSolid (buttonWidth btn) (buttonHeight btn)
           , -- Button border
-            color (greyN 0.2) $
+            Color (greyN 0.2) $
               rectangleWire (buttonWidth btn) (buttonHeight btn)
           , -- Button label
-            translate (-50) textOffset $
-              color textColor $
-                truetypeText (fontPath state) 28 (buttonLabel btn)
+            Translate (-50) textOffset $
+              Color textColor $
+                TrueTypeText (fontPath state) 28 (buttonLabel btn)
           ]
 
 
 -- | Render the status bar showing mouse position
 renderStatusBar :: FilePath -> Point -> Picture
 renderStatusBar font (mx, my) =
-  pictures
-    [ color (greyN 0.85) $ rectangleSolid 800 40
-    , translate (-380) (-8) $
-        color (greyN 0.3) $
-          truetypeText
+  Pictures
+    [ Color (greyN 0.85) $ rectangleSolid 800 40
+    , Translate (-380) (-8) $
+        Color (greyN 0.3) $
+          TrueTypeText
             font
             18
             ( T.pack $

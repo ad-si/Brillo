@@ -4,36 +4,6 @@ module Brillo.Data.Picture (
   Vector,
   Path,
 
-  -- * Aliases for Picture constructors
-  blank,
-  polygon,
-  polygonAliased,
-  line,
-  lineAliased,
-  thickLine,
-  thickLineAliased,
-  circle,
-  circleAliased,
-  thickCircle,
-  thickCircleAliased,
-  arc,
-  arcAliased,
-  thickArc,
-  thickArcAliased,
-  text,
-  textAliased,
-  thickText,
-  thickTextAliased,
-  truetypeText,
-  bitmap,
-  bitmapSection,
-  -- , bitmap
-  color,
-  translate,
-  rotate,
-  scale,
-  pictures,
-
   -- * Compound shapes
   lineLoop,
   lineLoopAliased,
@@ -58,165 +28,9 @@ where
 
 import Brillo.Geometry.Angle
 import Brillo.Rendering
-import Data.Text (Text)
 
 
--- Constructors ----------------------------------------------------------------
--- NOTE: The docs here should be identical to the ones on the constructors.
-
--- | A blank picture, with nothing in it.
-blank :: Picture
-blank = Blank
-
-
--- | A polygon filled with a solid color, drawn with anti-aliased edges.
-polygon :: Path -> Picture
-polygon = Polygon
-
-
--- | A polygon filled with a solid color, drawn without anti-aliasing.
-polygonAliased :: Path -> Picture
-polygonAliased = PolygonAliased
-
-
--- | A line along an arbitrary path, drawn with anti-aliasing.
-line :: Path -> Picture
-line = Line
-
-
--- | A line along an arbitrary path, drawn without anti-aliasing.
-lineAliased :: Path -> Picture
-lineAliased = LineAliased
-
-
--- | A line along an arbitrary path with a given thickness, drawn with anti-aliasing.
-thickLine :: Path -> Float -> Picture
-thickLine = ThickLine
-
-
--- | A line along an arbitrary path with a given thickness, drawn without anti-aliasing.
-thickLineAliased :: Path -> Float -> Picture
-thickLineAliased = ThickLineAliased
-
-
--- | A circle with the given radius, drawn with anti-aliasing.
-circle :: Float -> Picture
-circle = Circle
-
-
--- | A circle with the given radius, drawn without anti-aliasing.
-circleAliased :: Float -> Picture
-circleAliased = CircleAliased
-
-
-{-| A circle with the given thickness and radius, drawn with anti-aliasing.
-  If the thickness is 0 then this is equivalent to `Circle`.
--}
-thickCircle :: Float -> Float -> Picture
-thickCircle = ThickCircle
-
-
-{-| A circle with the given thickness and radius, drawn without anti-aliasing.
-  If the thickness is 0 then this is equivalent to `CircleAliased`.
--}
-thickCircleAliased :: Float -> Float -> Picture
-thickCircleAliased = ThickCircleAliased
-
-
-{-| A circular arc drawn counter-clockwise between two angles (in degrees)
-  at the given radius, drawn with anti-aliasing.
--}
-arc :: Float -> Float -> Float -> Picture
-arc = Arc
-
-
-{-| A circular arc drawn counter-clockwise between two angles (in degrees)
-  at the given radius, drawn without anti-aliasing.
--}
-arcAliased :: Float -> Float -> Float -> Picture
-arcAliased = ArcAliased
-
-
-{-| A circular arc drawn counter-clockwise between two angles (in degrees),
-  with the given radius and thickness, drawn with anti-aliasing.
-  If the thickness is 0 then this is equivalent to `Arc`.
--}
-thickArc :: Float -> Float -> Float -> Float -> Picture
-thickArc = ThickArc
-
-
-{-| A circular arc drawn counter-clockwise between two angles (in degrees),
-  with the given radius and thickness, drawn without anti-aliasing.
-  If the thickness is 0 then this is equivalent to `ArcAliased`.
--}
-thickArcAliased :: Float -> Float -> Float -> Float -> Picture
-thickArcAliased = ThickArcAliased
-
-
--- | Some text to draw with a vector font, drawn with anti-aliasing.
-text :: Text -> Picture
-text = Text
-
-
--- | Some text to draw with a vector font, drawn without anti-aliasing.
-textAliased :: Text -> Picture
-textAliased = TextAliased
-
-
--- | Some text to draw with a vector font and a given thickness, drawn with anti-aliasing.
-thickText :: Text -> Float -> Picture
-thickText = ThickText
-
-
--- | Some text to draw with a vector font and a given thickness, drawn without anti-aliasing.
-thickTextAliased :: Text -> Float -> Picture
-thickTextAliased = ThickTextAliased
-
-
--- | Some text to draw with a TrueType font, using the given pixel height.
-truetypeText :: FilePath -> Int -> Text -> Picture
-truetypeText = TrueTypeText
-
-
--- | A bitmap image
-bitmap :: BitmapData -> Picture
-bitmap bitmapData = Bitmap bitmapData
-
-
-{-| a subsection of a bitmap image
-  first argument selects a sub section in the bitmap
-  second argument determines the bitmap data
--}
-bitmapSection :: Rectangle -> BitmapData -> Picture
-bitmapSection = BitmapSection
-
-
--- | A picture drawn with this color.
-color :: Color -> Picture -> Picture
-color = Color
-
-
--- | A picture translated by the given x and y coordinates.
-translate :: Float -> Float -> Picture -> Picture
-translate = Translate
-
-
--- | A picture rotated clockwise by the given angle (in degrees).
-rotate :: Float -> Picture -> Picture
-rotate = Rotate
-
-
--- | A picture scaled by the given x and y factors.
-scale :: Float -> Float -> Picture -> Picture
-scale = Scale
-
-
--- | A picture consisting of several others.
-pictures :: [Picture] -> Picture
-pictures = Pictures
-
-
--- Other Shapes ---------------------------------------------------------------
+-- Shapes ---------------------------------------------------------------------
 
 -- | A closed loop along a path, drawn with anti-aliasing.
 lineLoop :: Path -> Picture
@@ -235,25 +49,25 @@ lineLoopAliased (x : xs) = LineAliased ((x : xs) ++ [x])
 -- | A solid circle with the given radius, drawn with anti-aliasing.
 circleSolid :: Float -> Picture
 circleSolid r =
-  thickCircle (r / 2) r
+  ThickCircle (r / 2) r
 
 
 -- | A solid circle with the given radius, drawn without anti-aliasing.
 circleSolidAliased :: Float -> Picture
 circleSolidAliased r =
-  thickCircleAliased (r / 2) r
+  ThickCircleAliased (r / 2) r
 
 
 -- | A solid arc, drawn counter-clockwise between two angles (in degrees) at the given radius, with anti-aliasing.
 arcSolid :: Float -> Float -> Float -> Picture
 arcSolid a1 a2 r =
-  thickArc a1 a2 (r / 2) r
+  ThickArc a1 a2 (r / 2) r
 
 
 -- | A solid arc, drawn counter-clockwise between two angles (in degrees) at the given radius, without anti-aliasing.
 arcSolidAliased :: Float -> Float -> Float -> Picture
 arcSolidAliased a1 a2 r =
-  thickArcAliased a1 a2 (r / 2) r
+  ThickArcAliased a1 a2 (r / 2) r
 
 
 {-| A wireframe sector of a circle, drawn with anti-aliasing.

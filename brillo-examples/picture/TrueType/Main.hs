@@ -64,9 +64,9 @@ buildScene fontPath = do
       bounds <- measureTrueTypeBounds fontPath (tiPixelHeight item) (tiContent item)
       let translatedBounds = translateBounds (tiOffset item) bounds
           picture =
-            translate dx dy $
-              color (tiColor item) $
-                truetypeText fontPath (tiPixelHeight item) (tiContent item)
+            Translate dx dy $
+              Color (tiColor item) $
+                TrueTypeText fontPath (tiPixelHeight item) (tiContent item)
             where
               (dx, dy) = tiOffset item
       pure (picture, translatedBounds)
@@ -86,12 +86,12 @@ buildScene fontPath = do
       offsetX = -centerX
       offsetY = -centerY
       background =
-        translate centerX centerY $
-          color (makeColor 0.08 0.09 0.12 1.0) $
+        Translate centerX centerY $
+          Color (makeColor 0.08 0.09 0.12 1.0) $
             rectangleSolid width height
       picture =
-        translate offsetX offsetY $
-          pictures (background : map fst measured)
+        Translate offsetX offsetY $
+          Pictures (background : map fst measured)
       widthPixels = max 200 (ceiling width)
       heightPixels = max 200 (ceiling height)
   pure

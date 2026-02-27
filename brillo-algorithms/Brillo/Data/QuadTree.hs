@@ -6,7 +6,6 @@
 -}
 module Brillo.Data.QuadTree (
   QuadTree (..),
-  emptyTree,
   emptyNode,
   takeQuadOfTree,
   liftToQuad,
@@ -37,11 +36,6 @@ data QuadTree a
       (QuadTree a)
       (QuadTree a) -- SW SE
   deriving (Show)
-
-
--- | A `TNil` tree.
-emptyTree :: QuadTree a
-emptyTree = TNil
 
 
 -- | A node with `TNil`. for all its branches.

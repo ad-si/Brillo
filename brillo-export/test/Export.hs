@@ -223,13 +223,13 @@ main = do
       pic
     -- display (InWindow "" (100,80) (0, 0)) white pic
     shorthand "bmp.png" (bmp)
-    shorthand "circle.png" (circleAliased 25)
+    shorthand "circle.png" (CircleAliased 25)
     check
       exportPictureToPNG
       (500, 500)
       white
       "circles.png"
-      (Pictures (map circleAliased [0, 10 .. 250]))
+      (Pictures (map CircleAliased [0, 10 .. 250]))
 
     -- Make sure we can export large images. In a previous version, attempting
     -- to export an image larger than the screen resolution WxH resulted in a

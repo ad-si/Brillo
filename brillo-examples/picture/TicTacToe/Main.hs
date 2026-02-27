@@ -44,61 +44,61 @@ drawBoard :: (Board, Play, MVar Board, GameState) -> IO Picture
 drawBoard (board, _, _, gameState) = return (grid <> plays <> status)
   where
     grid =
-      pictures
-        [ color (greyN 0.3) $ line [(-150, -50), (150, -50)]
-        , color (greyN 0.3) $ line [(-150, 50), (150, 50)]
-        , color (greyN 0.3) $ line [(-50, -150), (-50, 150)]
-        , color (greyN 0.3) $ line [(50, -150), (50, 150)]
+      Pictures
+        [ Color (greyN 0.3) $ Line [(-150, -50), (150, -50)]
+        , Color (greyN 0.3) $ Line [(-150, 50), (150, 50)]
+        , Color (greyN 0.3) $ Line [(-50, -150), (-50, 150)]
+        , Color (greyN 0.3) $ Line [(50, -150), (50, 150)]
         ]
 
-    plays = pictures [drawPlay x y p | ((x, y), p) <- assocs board]
+    plays = Pictures [drawPlay x y p | ((x, y), p) <- assocs board]
 
     drawPlay _ _ Nothing = Blank
     drawPlay x y (Just p) =
-      translate (fromIntegral (x - 1) * 100) (fromIntegral (1 - y) * 100) $
+      Translate (fromIntegral (x - 1) * 100) (fromIntegral (1 - y) * 100) $
         drawPiece p
 
     drawPiece X =
-      color red $
-        pictures
-          [ rotate 45 $ rectangleSolid 80 10
-          , rotate (-45) $ rectangleSolid 80 10
+      Color red $
+        Pictures
+          [ Rotate 45 $ rectangleSolid 80 10
+          , Rotate (-45) $ rectangleSolid 80 10
           ]
-    drawPiece O = color blue $ thickCircle 30 10
+    drawPiece O = Color blue $ ThickCircle 30 10
 
     status = case gameState of
       Won X ->
-        pictures
-          [ translate (-90) 220 $
-              scale 0.3 0.3 $
-                color red $
-                  text (T.pack "X Wins!")
-          , translate (-140) 180 $
-              scale 0.15 0.15 $
-                color (greyN 0.5) $
-                  text (T.pack "Press R to restart")
+        Pictures
+          [ Translate (-90) 220 $
+              Scale 0.3 0.3 $
+                Color red $
+                  Text (T.pack "X Wins!")
+          , Translate (-140) 180 $
+              Scale 0.15 0.15 $
+                Color (greyN 0.5) $
+                  Text (T.pack "Press R to restart")
           ]
       Won O ->
-        pictures
-          [ translate (-90) 220 $
-              scale 0.3 0.3 $
-                color blue $
-                  text (T.pack "O Wins!")
-          , translate (-140) 180 $
-              scale 0.15 0.15 $
-                color (greyN 0.5) $
-                  text (T.pack "Press R to restart")
+        Pictures
+          [ Translate (-90) 220 $
+              Scale 0.3 0.3 $
+                Color blue $
+                  Text (T.pack "O Wins!")
+          , Translate (-140) 180 $
+              Scale 0.15 0.15 $
+                Color (greyN 0.5) $
+                  Text (T.pack "Press R to restart")
           ]
       Draw ->
-        pictures
-          [ translate (-60) 220 $
-              scale 0.3 0.3 $
-                color black $
-                  text (T.pack "Draw!")
-          , translate (-140) 180 $
-              scale 0.15 0.15 $
-                color (greyN 0.5) $
-                  text (T.pack "Press R to restart")
+        Pictures
+          [ Translate (-60) 220 $
+              Scale 0.3 0.3 $
+                Color black $
+                  Text (T.pack "Draw!")
+          , Translate (-140) 180 $
+              Scale 0.15 0.15 $
+                Color (greyN 0.5) $
+                  Text (T.pack "Press R to restart")
           ]
       Playing -> Blank
 

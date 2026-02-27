@@ -61,7 +61,7 @@ clockFractal n s = Pictures [circ1, circ2, circ3, lines]
     --
     circNm1 =
       Pictures
-        [ circle 1
+        [ Circle 1
         , Scale (a / 2.5) (a / 2.5) $ clockFractal (n - 1) s
         , if n > 2
             then

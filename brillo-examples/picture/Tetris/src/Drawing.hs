@@ -83,7 +83,7 @@ drawHelp = do
         foldl
           ( \(s, pics) str ->
               ( s + step
-              , pics ++ [Color textColor $ translate x (y + s) $ truetypeText fp 14 str]
+              , pics ++ [Color textColor $ Translate x (y + s) $ TrueTypeText fp 14 str]
               )
           )
           (step, [])
@@ -108,7 +108,7 @@ drawBlock block blockColor = do
   return $
     Color
       blockColor
-      ( polygon
+      ( Polygon
           [ (bxp + 1, byp + 1)
           , (bxp + sz - 1, byp + 1)
           , (bxp + sz - 1, byp + sz - 1)
@@ -215,10 +215,10 @@ drawSidebar = do
               . Pictures
               . ( :
                     [ Color textColor
-                        $ translate
+                        $ Translate
                           (fst cp + (fromIntegral $ fst np) * bs)
                           (snd cp + (fromIntegral $ (snd np + 3)) * bs)
-                        $ truetypeText fp 16 "Next"
+                        $ TrueTypeText fp 16 "Next"
                     ]
                 )
 
@@ -243,7 +243,7 @@ drawGameOver = do
   let fp = fontPath conf
   let overlay =
         Color overlayColor $
-          polygon
+          Polygon
             [ (-winw, -winh)
             , (-winw, winh)
             , (winw, winh)
@@ -254,24 +254,24 @@ drawGameOver = do
     Pictures
       [ overlay
       , Color gameOverColor $
-          translate (cx - 90) (cy + 20) $
-            truetypeText fp 36 "Game Over"
+          Translate (cx - 90) (cy + 20) $
+            TrueTypeText fp 36 "Game Over"
       , let scoreStr = show $ score gameState
             scoreWidth = fromIntegral (length scoreStr) * 13
         in  Color textColor $
-              translate (cx - scoreWidth / 2) (cy - 25) $
-                truetypeText fp 24 $
+              Translate (cx - scoreWidth / 2) (cy - 25) $
+                TrueTypeText fp 24 $
                   pack scoreStr
       , Color restartButtonColor $
-          polygon
+          Polygon
             [ (bx, by)
             , (bx + bw, by)
             , (bx + bw, by + bh)
             , (bx, by + bh)
             ]
       , Color (makeColorI 255 255 255 255) $
-          translate (bx + 30) (by + 10) $
-            truetypeText fp 18 "Restart"
+          Translate (bx + 30) (by + 10) $
+            TrueTypeText fp 18 "Restart"
       ]
 
 
@@ -287,7 +287,7 @@ drawPauseOverlay = do
   let fp = fontPath conf
   let overlay =
         Color overlayColor $
-          polygon
+          Polygon
             [ (-winw, -winh)
             , (-winw, winh)
             , (winw, winh)
@@ -296,7 +296,7 @@ drawPauseOverlay = do
   return $
     Pictures
       [ overlay
-      , Color textColor $ translate (cx - 45) cy $ truetypeText fp 32 "Pause"
+      , Color textColor $ Translate (cx - 45) cy $ TrueTypeText fp 32 "Pause"
       ]
 
 
@@ -307,7 +307,7 @@ drawBackground = do
   let (x, y) = ((fromIntegral winw) / 2, (fromIntegral winh) / 2)
   let overlay =
         Color backgroundColor $
-          polygon
+          Polygon
             [ (-x, -y)
             , (-x, y)
             , (x, y)

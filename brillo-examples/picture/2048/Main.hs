@@ -165,12 +165,12 @@ rowHgt = 100
 
 gameOverMessage :: Picture
 gameOverMessage =
-  pictures
-    [ translate (-500) (-500) $ color translucentWhite $ rectangleSolid 2000 2000
-    , translate (-335) (-150) $
-        scale 0.5 0.5 $
-          color black $
-            text (T.pack "Game Over")
+  Pictures
+    [ Translate (-500) (-500) $ Color translucentWhite $ rectangleSolid 2000 2000
+    , Translate (-335) (-150) $
+        Scale 0.5 0.5 $
+          Color black $
+            Text (T.pack "Game Over")
     ]
   where
     translucentWhite = makeColorI 255 255 255 150
@@ -179,16 +179,16 @@ gameOverMessage =
 drawWorld :: World -> Picture
 drawWorld w = case board w of
   [r1, r2, r3, r4] ->
-    translate (150) (150) $
-      pictures $
+    Translate (150) (150) $
+      Pictures $
         [ drawRow r1
-        , translate 0 (-rowHgt) (drawRow r2)
-        , translate 0 (-rowHgt * 2) (drawRow r3)
-        , translate 0 (-rowHgt * 3) (drawRow r4)
-        , translate (-300) 60 $
-            scale 0.2 0.2 $
-              color white $
-                text $
+        , Translate 0 (-rowHgt) (drawRow r2)
+        , Translate 0 (-rowHgt * 2) (drawRow r3)
+        , Translate 0 (-rowHgt * 3) (drawRow r4)
+        , Translate (-300) 60 $
+            Scale 0.2 0.2 $
+              Color white $
+                Text $
                   T.pack $
                     "Score: " ++ (show $ score w)
         ]
@@ -200,7 +200,7 @@ drawWorld w = case board w of
           && go (Just L) w == w
           && go (Just U) w == w
           && go (Just D) w == w
-  _ -> blank
+  _ -> Blank
 
 
 -- debugPicture ])
@@ -243,18 +243,18 @@ quarterRoundedRect n w h r =
 
 
 drawQuarterRoundedRect :: Int -> Float -> Float -> Float -> Picture
-drawQuarterRoundedRect n w h r = polygon $ quarterRoundedRect n w h r
+drawQuarterRoundedRect n w h r = Polygon $ quarterRoundedRect n w h r
 
 
 -- takes width and height and radius and makes a filled rounded rectangle
 -- the int is the precision / number of points
 roundedRect :: Int -> Float -> Float -> Float -> Picture
 roundedRect n w h r =
-  pictures
+  Pictures
     [ drawQuarterRoundedRect n w h r
-    , rotate 90 $ drawQuarterRoundedRect n w h r
-    , rotate 180 $ drawQuarterRoundedRect n w h r
-    , rotate 270 $ drawQuarterRoundedRect n w h r
+    , Rotate 90 $ drawQuarterRoundedRect n w h r
+    , Rotate 180 $ drawQuarterRoundedRect n w h r
+    , Rotate 270 $ drawQuarterRoundedRect n w h r
     ]
 
 
@@ -284,24 +284,24 @@ tileBackColor :: Color
 tileBackColor = makeColorI 205 192 180 255
 drawTileBack :: Float -> Picture
 drawTileBack x =
-  color
+  Color
     tileBackColor
-    (translate x 0 (roundedRect tilePrecision tileS tileS tileRoundness))
+    (Translate x 0 (roundedRect tilePrecision tileS tileS tileRoundness))
 
 
 -- Takes x-offset and tile and draws the tile itself
 drawTile :: Float -> Tile -> Picture
 drawTile x tile =
   let background =
-        [ color (getColor $ val tile) $
+        [ Color (getColor $ val tile) $
             roundedRect tilePrecision tileS tileS tileRoundness
         ]
       number =
         if val tile > 0
           then
-            [ translate (-20) (-10) $
-                scale textScale textScale $
-                  text $
+            [ Translate (-20) (-10) $
+                Scale textScale textScale $
+                  Text $
                     T.pack $
                       show $
                         val tile
@@ -311,26 +311,26 @@ drawTile x tile =
         if (popInTime tile) > 0
           then (1 - (popInTime tile))
           else (1 + (popOutTime tile))
-  in  pictures
+  in  Pictures
         [ drawTileBack x
-        , translate x 0 $ scale curScale curScale $ pictures $ background ++ number
+        , Translate x 0 $ Scale curScale curScale $ Pictures $ background ++ number
         ]
 
 
 drawRow :: Row -> Picture
 drawRow row = case row of
   [i, j, k, l] ->
-    translate
+    Translate
       (-300)
       0
-      ( pictures
+      ( Pictures
           [ drawTile 0 i
           , drawTile rowHgt j
           , drawTile (rowHgt * 2) k
           , drawTile (rowHgt * 3) l
           ]
       )
-  _ -> blank
+  _ -> Blank
 
 
 --------------------------------------------

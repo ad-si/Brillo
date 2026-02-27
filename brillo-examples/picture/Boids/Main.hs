@@ -114,7 +114,7 @@ main =
             }
 
     let bs = initialize 500 10.0 0.5
-    let t = foldl (\tree b -> kdtAddPoint tree (position b) b) newKDTree bs
+    let t = foldl (\tree b -> kdtAddPoint tree (position b) b) Empty bs
 
     simulate
       (InWindow "Boids" (pixWidth w, pixHeight w) (10, 10))
@@ -399,10 +399,10 @@ iteration :: ViewPort -> Float -> KDTreeNode Boid -> KDTreeNode Boid
 iteration _ _ kdtree =
   let allBoids = kdtreeToList kdtree
       boids = mapKDTree kdtree (\i -> oneboid i allBoids)
-  in  foldl (\t b -> kdtAddPoint t (position b) b) newKDTree boids
+  in  foldl (\t b -> kdtAddPoint t (position b) b) Empty boids
 
 
 iterationkd :: ViewPort -> Float -> KDTreeNode Boid -> KDTreeNode Boid
 iterationkd _ _ kdtree =
   let boids = mapKDTree kdtree (\i -> oneboid i (findNeighbors kdtree i))
-  in  foldl (\t b -> kdtAddPoint t (position b) b) newKDTree boids
+  in  foldl (\t b -> kdtAddPoint t (position b) b) Empty boids

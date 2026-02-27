@@ -153,9 +153,9 @@ thicknessSection =
                 thickness = thicknesses !! i
             in  Pictures
                   [ -- Anti-aliased
-                    Translate xPos 20 $ Color red $ thickCircle 25 thickness
+                    Translate xPos 20 $ Color red $ ThickCircle 25 thickness
                   , -- Aliased
-                    Translate xPos (-40) $ Color red $ thickCircleAliased 25 thickness
+                    Translate xPos (-40) $ Color red $ ThickCircleAliased 25 thickness
                   , -- Thickness label
                     Translate xPos (-80) $
                       Scale 0.06 0.06 $

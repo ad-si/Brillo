@@ -12,6 +12,6 @@ main =
     white
     10
     0
-    (\world -> return (translate (-250) 0 (text $ show world)))
+    (\world -> return (Translate (-250) 0 (Text $ show world)))
     (\event -> (\world -> return world))
     (\timePassed -> (\world -> return $ world + timePassed))

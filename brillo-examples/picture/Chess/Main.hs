@@ -284,8 +284,8 @@ promotePiece new p = p{ptype = new}
 -- Draw the scene
 drawWorld :: BoardWidth -> State -> Picture
 drawWorld bw s =
-  translate (-bw * 0.5) (-bw * 0.55) $
-    pictures $
+  Translate (-bw * 0.5) (-bw * 0.55) $
+    Pictures $
       [ drawBoard bw
       , drawPieces bw (board s)
       , drawMarker bw (marker s)
@@ -299,43 +299,43 @@ drawBoard :: BoardWidth -> Picture
 drawBoard w =
   let
     tup a b = (a, b)
-    sqAt (c, r) = translate c r $ rectangleSolid 1 1
+    sqAt (c, r) = Translate c r $ rectangleSolid 1 1
     blackSquares =
       (tup <$> [0, 2, 4, 6] <*> [0, 2, 4, 6])
         ++ (tup <$> [1, 3, 5, 7] <*> [1, 3, 5, 7])
     whiteSquares =
       (tup <$> [1, 3, 5, 7] <*> [0, 2, 4, 6])
         ++ (tup <$> [0, 2, 4, 6] <*> [1, 3, 5, 7])
-    border = translate 3.5 3.5 $ rectangleWire 8 8
+    border = Translate 3.5 3.5 $ rectangleWire 8 8
   in
-    scale (w / 8) (w / 8) $
-      translate 0.5 0.5 $
-        pictures $
-          [ color white $ pictures (map sqAt whiteSquares)
-          , color (greyN 0.5) $ pictures (map sqAt blackSquares)
+    Scale (w / 8) (w / 8) $
+      Translate 0.5 0.5 $
+        Pictures $
+          [ Color white $ Pictures (map sqAt whiteSquares)
+          , Color (greyN 0.5) $ Pictures (map sqAt blackSquares)
           , border
           ]
 
 
 drawPieces :: BoardWidth -> Board -> Picture
 drawPieces bw b =
-  translate (bw / 16) (bw / 16) $
-    pictures $
+  Translate (bw / 16) (bw / 16) $
+    Pictures $
       Map.elems $
         Map.mapWithKey (\pos p -> toPic pos p) b
   where
     toPic :: Pos -> Piece -> Picture
     toPic pos p =
       let (tx, ty) = translatePos bw $ pos
-      in  translate tx ty $ pieceGfx p
+      in  Translate tx ty $ pieceGfx p
 
 
 -- Draw marker
 drawMarker :: BoardWidth -> Marker -> Picture
 drawMarker bw m =
   let (tx, ty) = translatePos bw $ position m
-      marker = color tGreen $ translate tx ty $ thickCircle 27 6
-  in  translate (bw / 16) (bw / 16) $ marker
+      marker = Color tGreen $ Translate tx ty $ ThickCircle 27 6
+  in  Translate (bw / 16) (bw / 16) $ marker
 
 
 -- Draw selected
@@ -343,9 +343,9 @@ drawSelected :: BoardWidth -> Marker -> Picture
 drawSelected bw m =
   let sel = selected m
       (tx, ty) = translatePos bw $ maybe (0, 0) id sel
-      selector = color tBlue $ translate tx ty $ thickCircle 27 6
+      selector = Color tBlue $ Translate tx ty $ ThickCircle 27 6
   in  if (isJust sel)
-        then translate (bw / 16) (bw / 16) $ selector
+        then Translate (bw / 16) (bw / 16) $ selector
         else Blank
 
 
@@ -362,39 +362,39 @@ drawState bw s =
       Black -> black
       White -> white
     pCurrent =
-      translate (0.5 * bw) (1.1 * bw) $
-        pictures
-          [ color col $ rectangleSolid (bw / 16) (bw / 16)
-          , color black $ rectangleWire (bw / 16) (bw / 16)
+      Translate (0.5 * bw) (1.1 * bw) $
+        Pictures
+          [ Color col $ rectangleSolid (bw / 16) (bw / 16)
+          , Color black $ rectangleWire (bw / 16) (bw / 16)
           ]
     tWhite = round (timeLeft . whitePlayer $ s) :: Integer
     tBlack = round (timeLeft . blackPlayer $ s) :: Integer
     pWhite =
-      color (timeColor tWhite) $
-        translate (0.3 * bw) (1.075 * bw) $
-          scale 0.2 0.2 $
-            text $
+      Color (timeColor tWhite) $
+        Translate (0.3 * bw) (1.075 * bw) $
+          Scale 0.2 0.2 $
+            Text $
               T.pack $
                 secFormatted $
                   tWhite
     pBlack =
-      color (timeColor tBlack) $
-        translate (0.56 * bw) (1.075 * bw) $
-          scale 0.2 0.2 $
-            text $
+      Color (timeColor tBlack) $
+        Translate (0.56 * bw) (1.075 * bw) $
+          Scale 0.2 0.2 $
+            Text $
               T.pack $
                 secFormatted $
                   tBlack
     secFormatted sec = show (sec `div` 60) ++ ":" ++ show (sec `mod` 60)
     timeColor sec = if (sec < 0) then red else black
     pMessage =
-      color black $
-        translate (0.05 * bw) ((-0.06) * bw) $
-          scale 0.15 0.15 $
-            text $
+      Color black $
+        Translate (0.05 * bw) ((-0.06) * bw) $
+          Scale 0.15 0.15 $
+            Text $
               message s
   in
-    pictures $ [pCurrent, pWhite, pBlack, pMessage]
+    Pictures $ [pCurrent, pWhite, pBlack, pMessage]
 
 
 initialState :: Float -> State
@@ -457,10 +457,10 @@ pieceGfx (Piece t c _) =
       White -> greyN 0.9
       Black -> black
   in
-    pictures
-      [ color pieceColor $ circleSolid 20
-      , color (if c == White then black else white) $
-          translate (-5) (-6) $
-            scale 0.15 0.15 $
-              text (T.pack pieceChar)
+    Pictures
+      [ Color pieceColor $ circleSolid 20
+      , Color (if c == White then black else white) $
+          Translate (-5) (-6) $
+            Scale 0.15 0.15 $
+              Text (T.pack pieceChar)
       ]

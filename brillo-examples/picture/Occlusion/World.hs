@@ -80,7 +80,7 @@ windowSizeOfWorld world =
 -- | Create the tree representing the world from a list of all its cells.
 makeWorldTree :: Extent -> [Cell] -> QuadTree Cell
 makeWorldTree extent cells =
-  foldr insert' emptyTree nonEmptyPosCells
+  foldr insert' TNil nonEmptyPosCells
   where
     insert' (pos, cell) tree =
       case insertByCoord extent pos cell tree of

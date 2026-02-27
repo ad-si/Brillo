@@ -5,7 +5,6 @@
 --
 module KDTree2d (
   KDTreeNode (..),
-  newKDTree,
   kdtAddPoints,
   kdtAddPoint,
   kdtRangeSearch,
@@ -25,11 +24,6 @@ data KDTreeNode a
   = Empty
   | Node !(KDTreeNode a) !Vec2 !a !(KDTreeNode a)
   deriving (Show)
-
-
--- | An empty KDTree
-newKDTree :: KDTreeNode a
-newKDTree = Empty
 
 
 -- | Flatten out a KDTree to a list.

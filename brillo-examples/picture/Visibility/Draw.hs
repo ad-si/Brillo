@@ -7,9 +7,8 @@ module Draw (
 where
 
 import Brillo (
-  Picture (Color, Line, Pictures, ThickCircle, Translate),
+  Picture (Blank, Color, Line, Pictures, ThickCircle, Translate),
   Point,
-  blank,
   dim,
   green,
   greyN,
@@ -85,14 +84,14 @@ drawWorldWithViewPos
                     ]
             in  Color red $ Pictures [picTarget, picLine, picSegsHit]
         | otherwise =
-            blank
+            Blank
 
       -- overlay
       picOverlay
         | ModeOverlayVisApprox <- modeOverlay =
             drawVisGrid 10 pView world
         | otherwise =
-            blank
+            Blank
     in
       Pictures [picOverlay, picWorld, picView, picTargets]
 

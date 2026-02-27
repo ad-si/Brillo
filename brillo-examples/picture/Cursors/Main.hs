@@ -99,24 +99,24 @@ findButtonAt pt btns =
 -- | Render the entire scene
 renderScene :: AppState -> Picture
 renderScene state =
-  pictures
+  Pictures
     [ -- Header
-      translate 0 200 $ renderHeader (fontPath state)
+      Translate 0 200 $ renderHeader (fontPath state)
     , -- Buttons
-      pictures $ map (renderButton state) cursorButtons
+      Pictures $ map (renderButton state) cursorButtons
     , -- Status bar
-      translate 0 (-200) $ renderStatusBar state
+      Translate 0 (-200) $ renderStatusBar state
     ]
 
 
 -- | Render the header
 renderHeader :: FilePath -> Picture
 renderHeader font =
-  pictures
-    [ color (makeColor 0.2 0.5 0.7 1.0) $ rectangleSolid 600 60
-    , translate (-250) (-12) $
-        color white $
-          truetypeText font 32 "Cursor Shape Demo"
+  Pictures
+    [ Color (makeColor 0.2 0.5 0.7 1.0) $ rectangleSolid 600 60
+    , Translate (-250) (-12) $
+        Color white $
+          TrueTypeText font 32 "Cursor Shape Demo"
     ]
 
 
@@ -135,20 +135,20 @@ renderButton state btn =
 
       cx = cbX btn + cbWidth btn / 2
       cy = cbY btn + cbHeight btn / 2
-  in  translate cx cy $
-        pictures
+  in  Translate cx cy $
+        Pictures
           [ -- Background
-            color bgColor $ rectangleSolid (cbWidth btn) (cbHeight btn)
+            Color bgColor $ rectangleSolid (cbWidth btn) (cbHeight btn)
           , -- Border
-            color (greyN 0.3) $ rectangleWire (cbWidth btn) (cbHeight btn)
+            Color (greyN 0.3) $ rectangleWire (cbWidth btn) (cbHeight btn)
           , -- Label
-            translate (-80) 5 $
-              color textColor $
-                truetypeText (fontPath state) 22 (cbLabel btn)
+            Translate (-80) 5 $
+              Color textColor $
+                TrueTypeText (fontPath state) 22 (cbLabel btn)
           , -- Description
-            translate (-80) (-18) $
-              color (if isHovered then greyN 0.9 else greyN 0.75) $
-                truetypeText (fontPath state) 14 (cbDescription btn)
+            Translate (-80) (-18) $
+              Color (if isHovered then greyN 0.9 else greyN 0.75) $
+                TrueTypeText (fontPath state) 14 (cbDescription btn)
           ]
 
 
@@ -158,11 +158,11 @@ renderStatusBar state =
   let cursorText = case hoveredCursor state of
         Nothing -> "Hover over a button to change cursor"
         Just shape -> "Current cursor: " <> T.pack (show shape)
-  in  pictures
-        [ color (greyN 0.85) $ rectangleSolid 600 50
-        , translate (-270) (-8) $
-            color (greyN 0.3) $
-              truetypeText (fontPath state) 18 cursorText
+  in  Pictures
+        [ Color (greyN 0.85) $ rectangleSolid 600 50
+        , Translate (-270) (-8) $
+            Color (greyN 0.3) $
+              TrueTypeText (fontPath state) 18 cursorText
         ]
 
 

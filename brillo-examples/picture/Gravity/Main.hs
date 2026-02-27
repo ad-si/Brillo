@@ -21,7 +21,7 @@ main =
     window = FullScreen
     background = black
     fps = 60
-    render xs = pictures $ map particleImage xs
+    render xs = Pictures $ map particleImage xs
     update _ = updateParticles
 
 
@@ -48,7 +48,7 @@ generateParticles gen widthInt heightInt =
 -- | Particle to its picture
 particleImage :: Particle -> Picture
 particleImage (x, y, _, _) =
-  translate x y $ color white $ circleSolid 2
+  Translate x y $ Color white $ circleSolid 2
 
 
 -- | To update particles for next frame
