@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-examples
-version:       2.0.0
+version:       2.0.1
 license:       MIT
 license-file:  LICENSE
 author:        Ben Lippmeier, Adrian Sieber
@@ -489,7 +489,7 @@ executable brillo-export
   build-depends:
     , base           >=4.8 && <5
     , brillo         >=2.0 && <3.0
-    , brillo-export  >=0.1 && <0.2
+    , brillo-export  >=0.2 && <0.3
     , directory      >=1.3 && <1.4
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
@@ -501,7 +501,7 @@ executable brillo-canvas-editor
   build-depends:
     , base           >=4.8 && <5
     , brillo         >=2.0 && <3.0
-    , brillo-export  >=0.1 && <0.2
+    , brillo-export  >=0.2 && <0.3
     , directory      >=1.3 && <1.4
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
