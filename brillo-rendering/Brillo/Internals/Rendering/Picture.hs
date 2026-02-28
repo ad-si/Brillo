@@ -42,6 +42,7 @@ import Brillo.Internals.Rendering.Polygon (
 import Brillo.Internals.Rendering.Shader (
   renderArcSDF,
   renderCircleSDF,
+  renderCustomShader,
   renderThickLineSDF,
  )
 import Brillo.Internals.Rendering.State (
@@ -385,6 +386,9 @@ drawPicture state circScale picture =
 
           -- Free uncachable texture objects.
           freeTexture tex
+    -- Custom shader
+    Shader shaderData ->
+      renderCustomShader state.stateShaders shaderData
     Pictures ps ->
       mapM_ (drawPicture state circScale) ps
 
