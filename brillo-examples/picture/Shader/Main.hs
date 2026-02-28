@@ -25,13 +25,19 @@ frame t =
     [ -- Rounded rectangle on the left
       Translate (-160) 0 $
         Color (makeColorI 255 200 0 255) $
-          shader 200 200 roundedRectFrag
+          shader
+            200
+            200
+            roundedRectFrag
             [ ("uSize", UniformVec2 200 200)
             , ("uRadius", UniformFloat 30)
             ]
     , -- Animated flame on the right
       Translate 160 (-20) $
-        shader 200 300 flameFrag
+        shader
+          200
+          300
+          flameFrag
           [("uTime", UniformFloat t)]
     ]
 
