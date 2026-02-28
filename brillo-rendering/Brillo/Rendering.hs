@@ -5,6 +5,12 @@ module Brillo.Rendering (
   Vector,
   Path,
 
+  -- * Shaders
+  UniformValue (..),
+  ShaderData (..),
+  defaultShaderVertex,
+  shader,
+
   -- * Colors
   Color,
   makeColor,

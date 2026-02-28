@@ -518,6 +518,17 @@ executable brillo-fule-layout
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
+executable brillo-shader
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/Shader
+  build-depends:
+    , base    >=4.8 && <5
+    , brillo  >=2.0 && <3.0
+    , text    >=2.0 && <2.2
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-cursors
   default-language: GHC2021
   main-is:          Main.hs

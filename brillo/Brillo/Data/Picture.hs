@@ -4,6 +4,12 @@ module Brillo.Data.Picture (
   Vector,
   Path,
 
+  -- * Shaders
+  UniformValue (..),
+  ShaderData (..),
+  defaultShaderVertex,
+  shader,
+
   -- * Compound shapes
   lineLoop,
   lineLoopAliased,

@@ -7,12 +7,19 @@ module Brillo.Internals.Rendering.Shader (
   renderCircleSDF,
   renderArcSDF,
   renderThickLineSDF,
+  renderCustomShader,
 ) where
 
-import Control.Monad (unless)
-import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import Control.Monad (forM_, unless)
+import Data.IORef (IORef, modifyIORef', newIORef, readIORef, writeIORef)
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Data.Text qualified as Text
 import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL.GL qualified as GL
+
+import Brillo.Internals.Data.Picture (ShaderData (..), UniformValue (..))
 
 
 -- | State for shader-based rendering
@@ -20,6 +27,7 @@ data ShaderState = ShaderState
   { circleProgram :: !(IORef (Maybe GL.Program))
   , arcProgram :: !(IORef (Maybe GL.Program))
   , lineProgram :: !(IORef (Maybe GL.Program))
+  , customPrograms :: !(IORef (Map (Text, Text) GL.Program))
   }
 
 
@@ -29,11 +37,13 @@ initShaderState = do
   circleRef <- newIORef Nothing
   arcRef <- newIORef Nothing
   lineRef <- newIORef Nothing
+  customRef <- newIORef Map.empty
   return
     ShaderState
       { circleProgram = circleRef
       , arcProgram = arcRef
       , lineProgram = lineRef
+      , customPrograms = customRef
       }
 
 
@@ -461,3 +471,78 @@ renderThickLineSDF state path scaleFactor thickness color = do
   where
     renderSegment ((ax, ay), (bx, by)) =
       renderLineSegmentSDF state ax ay bx by scaleFactor thickness color
+
+
+-- Custom shaders ------------------------------------------------------------
+
+-- | Get or compile a custom shader program, caching by (vertex, fragment) source pair.
+getCustomProgram :: ShaderState -> Text -> Text -> IO GL.Program
+getCustomProgram state vertSrc fragSrc = do
+  cache <- readIORef (customPrograms state)
+  let key = (vertSrc, fragSrc)
+  case Map.lookup key cache of
+    Just prog -> return prog
+    Nothing -> do
+      prog <- createProgram (Text.unpack vertSrc) (Text.unpack fragSrc)
+      modifyIORef' (customPrograms state) (Map.insert key prog)
+      return prog
+
+
+-- | Set a single uniform value on a shader program.
+setUniform :: GL.Program -> Text -> UniformValue -> IO ()
+setUniform program name val = do
+  loc <- GL.get (GL.uniformLocation program (Text.unpack name))
+  case val of
+    UniformFloat f ->
+      GL.uniform loc $= (realToFrac f :: GL.GLfloat)
+    UniformVec2 x y ->
+      GL.uniform loc $= GL.Vector2 (realToFrac x :: GL.GLfloat) (realToFrac y)
+    UniformVec3 x y z ->
+      GL.uniform loc
+        $= GL.Vector3 (realToFrac x :: GL.GLfloat) (realToFrac y) (realToFrac z)
+    UniformVec4 x y z w ->
+      GL.uniform loc
+        $= GL.Vector4
+          (realToFrac x :: GL.GLfloat)
+          (realToFrac y)
+          (realToFrac z)
+          (realToFrac w)
+    UniformInt i ->
+      GL.uniform loc $= (fromIntegral i :: GL.GLint)
+
+
+{-| Render a custom shader on a quad centered at the origin.
+The quad spans from @(-w\/2, -h\/2)@ to @(w\/2, h\/2)@ where
+@w@ and @h@ come from 'ShaderData'. The fragment shader receives
+@vLocalCoord@ with these local coordinates, and @gl_Color@ carries
+the current Brillo color.
+-}
+renderCustomShader :: ShaderState -> ShaderData -> IO ()
+renderCustomShader state sd = do
+  program <- getCustomProgram state (shaderVertex sd) (shaderFragment sd)
+
+  oldProgram <- GL.get GL.currentProgram
+  GL.currentProgram $= Just program
+
+  -- Set user uniforms
+  forM_ (shaderUniforms sd) $ \(name, val) ->
+    setUniform program name val
+
+  -- Draw quad centered at origin
+  let hw = shaderWidth sd / 2
+      hh = shaderHeight sd / 2
+
+  GL.renderPrimitive GL.Quads $ do
+    GL.texCoord $ GL.TexCoord2 (realToFrac (-hw) :: GL.GLfloat) (realToFrac (-hh))
+    GL.vertex $ GL.Vertex2 (realToFrac (-hw) :: GL.GLfloat) (realToFrac (-hh))
+
+    GL.texCoord $ GL.TexCoord2 (realToFrac hw :: GL.GLfloat) (realToFrac (-hh))
+    GL.vertex $ GL.Vertex2 (realToFrac hw :: GL.GLfloat) (realToFrac (-hh))
+
+    GL.texCoord $ GL.TexCoord2 (realToFrac hw :: GL.GLfloat) (realToFrac hh)
+    GL.vertex $ GL.Vertex2 (realToFrac hw :: GL.GLfloat) (realToFrac hh)
+
+    GL.texCoord $ GL.TexCoord2 (realToFrac (-hw) :: GL.GLfloat) (realToFrac hh)
+    GL.vertex $ GL.Vertex2 (realToFrac (-hw) :: GL.GLfloat) (realToFrac hh)
+
+  GL.currentProgram $= oldProgram
