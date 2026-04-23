@@ -19,16 +19,12 @@ packages:
   original:
     hackage: webp-0.1.2.0
 - completed:
-    name: FULE
+    hackage: FULE-0.3.1.2@sha256:cc8fb1360afb3f8b3baae9bf7aa7fa1d024a6ea0e4042cacfe7b16debb5dde7c,2238
     pantry-tree:
-      sha256: 9f6e5b5fb12e050cc9b38c3bf9194b6ef738103cd0596346ecc5fa219dcb0725
-      size: 2557
-    sha256: c3efb2a0a1f826f19c56b537303221b8087049f0196f8ae9f4759b5006542341
-    size: 33036
-    url: https://github.com/ad-si/FULE/archive/c2546b4a6c82ce2bc35d8b1ef1e558b0dd560e01.tar.gz
-    version: 0.3.1.2
+      sha256: 7268edb90a9519e91001fde56863f1aa98712672b21a0d662ddc7f343c11d721
+      size: 2206
   original:
-    url: https://github.com/ad-si/FULE/archive/c2546b4a6c82ce2bc35d8b1ef1e558b0dd560e01.tar.gz
+    hackage: FULE-0.3.1.2
 - completed:
     name: freetype2
     pantry-tree:
