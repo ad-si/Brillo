@@ -16,6 +16,8 @@ import GHC.Desugar ((>>>))
 import Graphics.Rendering.OpenGL (($=))
 import Graphics.Rendering.OpenGL qualified as GL
 import Graphics.UI.GLFW qualified as GLFW
+import System.Exit (ExitCode)
+import System.IO (hPutStrLn, stderr)
 
 import Brillo.Data.Cursor (CursorShape (..))
 import Brillo.Data.FileDialog (FileDialog (..), SelectionMode (..))
@@ -769,13 +771,23 @@ callbackIdle stateRef callbacks =
 -- Main Loop ------------------------------------------------------------------
 
 runMainLoopGLFW :: IORef GLFWState -> IO ()
-runMainLoopGLFW stateRef = do
-  X.catch go handleException
-  GLFW.destroyWindow =<< windowHandle stateRef
-  GLFW.terminate
+runMainLoopGLFW stateRef =
+  (go `X.catch` handleException) `X.finally` cleanup
   where
+    cleanup :: IO ()
+    cleanup = do
+      GLFW.destroyWindow =<< windowHandle stateRef
+      GLFW.terminate
+
+    -- Report unexpected errors to stderr, but re-throw `ExitCode` so that
+    -- `exitSuccess` / `exitFailure` from user code reach GHC's top-level
+    -- handler and terminate the program with the intended status. Without
+    -- this, those exits were silently swallowed, and since GHC 9.10 the
+    -- printed `SomeException` also carried a noisy HasCallStack backtrace.
     handleException :: X.SomeException -> IO ()
-    handleException = print
+    handleException exc
+      | Just (ec :: ExitCode) <- X.fromException exc = X.throwIO ec
+      | otherwise = hPutStrLn stderr (X.displayException exc)
 
     clearDirtyFlag :: IO ()
     clearDirtyFlag =
