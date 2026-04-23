@@ -225,6 +225,7 @@ jobs:
           echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
           echo "package brillo-rendering" >> cabal.project
           echo "    ghc-options: -Werror=incomplete-patterns -Werror=incomplete-uni-patterns" >> cabal.project
+          echo "allow-newer: FULE:containers" >> cabal.project
           $HCPKG list --simple-output --names-only | perl -ne 'for (split /\s+/) { print "constraints: any.$_ installed\n" unless /^(brillo|brillo-algorithms|brillo-examples|brillo-export|brillo-juicy|brillo-rendering)$/; }' >> cabal.project.local
           cat cabal.project
           cat cabal.project.local

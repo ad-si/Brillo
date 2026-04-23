@@ -5,3 +5,5 @@ packages:
   brillo-export
   brillo-juicy
   brillo-rendering
+
+allow-newer: FULE:containers
