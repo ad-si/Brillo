@@ -9,6 +9,12 @@ module Brillo.Internals.Data.Picture (
   Path,
   Picture (..),
 
+  -- * Shaders
+  UniformValue (..),
+  ShaderData (..),
+  defaultShaderVertex,
+  shader,
+
   -- * Bitmaps
   Rectangle (..),
   BitmapData (..),
@@ -38,7 +44,7 @@ import Codec.BMP (BMP, bmpDimensions, readBMP, unpackBMPToRGBA32)
 import Data.ByteString (ByteString)
 import Data.ByteString.Unsafe qualified as BSU
 import Data.Data (Data, Typeable)
-import Data.Text (Text)
+import Data.Text (Text, pack)
 import Data.Word (Word8)
 import Foreign.ForeignPtr (ForeignPtr, newForeignPtr)
 import Foreign.Marshal.Alloc (finalizerFree, mallocBytes)
@@ -64,6 +70,27 @@ type Vector = Point
 
 -- | A path through the x-y plane.
 type Path = [Point]
+
+
+-- | A value that can be passed as a uniform to a custom shader.
+data UniformValue
+  = UniformFloat !Float
+  | UniformVec2 !Float !Float
+  | UniformVec3 !Float !Float !Float
+  | UniformVec4 !Float !Float !Float !Float
+  | UniformInt !Int
+  deriving (Show, Eq, Data, Typeable)
+
+
+-- | Data needed to render a custom shader on a quad.
+data ShaderData = ShaderData
+  { shaderVertex :: !Text
+  , shaderFragment :: !Text
+  , shaderUniforms :: ![(Text, UniformValue)]
+  , shaderWidth :: !Float
+  , shaderHeight :: !Float
+  }
+  deriving (Show, Eq, Data, Typeable)
 
 
 -- | A 2D picture
@@ -145,6 +172,13 @@ data Picture
     Rotate Float Picture
   | -- | A picture scaled by the given x and y factors.
     Scale Float Float Picture
+  | -- Shaders ----------------------------------------
+
+    {-| A picture rendered by a custom GLSL shader on a quad.
+    The quad is centered at the origin with the dimensions from 'ShaderData'.
+    Use the 'shader' convenience function to create one with the default vertex shader.
+    -}
+    Shader ShaderData
   | -- More Pictures ----------------------------------
 
     -- | A picture consisting of several others.
@@ -263,3 +297,46 @@ loadBMP filePath =
 -}
 rectAtOrigin :: Int -> Int -> Rectangle
 rectAtOrigin w h = Rectangle (0, 0) (w, h)
+
+
+-- Shaders -------------------------------------------------------------------
+
+{-| The default vertex shader used for custom shaders.
+Passes through vertex positions via the model-view-projection matrix
+and forwards texture coordinates as @vLocalCoord@.
+-}
+defaultShaderVertex :: Text
+defaultShaderVertex =
+  pack $
+    unlines
+      [ "#version 120"
+      , "varying vec2 vLocalCoord;"
+      , "void main() {"
+      , "  vLocalCoord = gl_MultiTexCoord0.xy;"
+      , "  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;"
+      , "  gl_FrontColor = gl_Color;"
+      , "}"
+      ]
+
+
+{-| Create a 'Picture' that renders a custom GLSL fragment shader on a quad
+of the given width and height, centered at the origin.
+
+The fragment shader receives:
+
+* @vLocalCoord@ (vec2): local coordinates from @(-w\/2, -h\/2)@ to @(w\/2, h\/2)@
+* @gl_Color@: the current Brillo color (set via the 'Color' picture combinator)
+* Any custom uniforms passed in the list
+
+Uses the built-in vertex shader ('defaultShaderVertex').
+-}
+shader :: Float -> Float -> Text -> [(Text, UniformValue)] -> Picture
+shader w h frag uniforms =
+  Shader
+    ShaderData
+      { shaderVertex = defaultShaderVertex
+      , shaderFragment = frag
+      , shaderUniforms = uniforms
+      , shaderWidth = w
+      , shaderHeight = h
+      }

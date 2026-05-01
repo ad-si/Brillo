@@ -253,6 +253,8 @@ renderPicture rs (Scale sx sy picture) =
     , renderPicture rs picture
     , "  </g>\n"
     ]
+renderPicture _ (Shader _) =
+  "  <!-- Custom shader: not supported in SVG export -->\n"
 renderPicture rs (Pictures pictures) =
   T.concat (map (renderPicture rs) pictures)
 
