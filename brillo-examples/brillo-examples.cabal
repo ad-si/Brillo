@@ -59,6 +59,18 @@ executable brillo-bitmap
 
   ghc-options:      -O2 -Wall -threaded -rtsopts
 
+executable brillo-compressed-bitmap
+  default-language: GHC2021
+  main-is:          Main.hs
+  hs-source-dirs:   picture/CompressedBitmap
+  build-depends:
+    , base        >=4.8  && <5
+    , brillo      >=2.0  && <3.0
+    , bytestring  >=0.11 && <0.13
+    , text        >=2.0  && <2.2
+
+  ghc-options:      -O2 -Wall -threaded -rtsopts
+
 executable brillo-boids
   default-language: GHC2021
   main-is:          Main.hs

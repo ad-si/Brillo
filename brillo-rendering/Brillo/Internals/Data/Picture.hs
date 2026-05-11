@@ -15,12 +15,17 @@ module Brillo.Internals.Data.Picture (
   PixelFormat (..),
   BitmapFormat (..),
   RowOrder (..),
+  CompressedFormat (..),
   bitmapOfForeignPtr,
   bitmapDataOfForeignPtr,
   bitmapOfByteString,
   bitmapDataOfByteString,
   bitmapOfBMP,
   bitmapDataOfBMP,
+  compressedBitmapOfForeignPtr,
+  compressedBitmapDataOfForeignPtr,
+  compressedBitmapOfByteString,
+  compressedBitmapDataOfByteString,
   loadBMP,
   rectAtOrigin,
 )
@@ -30,12 +35,14 @@ import Brillo.Internals.Data.Color (Color)
 import Brillo.Internals.Rendering.Bitmap (
   BitmapData (..),
   BitmapFormat (..),
+  CompressedFormat (..),
   PixelFormat (..),
   Rectangle (..),
   RowOrder (..),
  )
 import Codec.BMP (BMP, bmpDimensions, readBMP, unpackBMPToRGBA32)
 import Data.ByteString (ByteString)
+import Data.ByteString qualified as BS
 import Data.ByteString.Unsafe qualified as BSU
 import Data.Data (Data, Typeable)
 import Data.Text (Text)
@@ -209,16 +216,10 @@ bitmapOfByteString width height fmt bs cacheMe =
 bitmapDataOfByteString ::
   Int -> Int -> BitmapFormat -> ByteString -> Bool -> BitmapData
 bitmapDataOfByteString width height fmt bs cacheMe =
-  unsafePerformIO $
-    do
-      let len = width * height * 4
-      ptr <- mallocBytes len
-      fptr <- newForeignPtr finalizerFree ptr
-
-      BSU.unsafeUseAsCString bs $
-        \cstr -> copyBytes ptr (castPtr cstr) len
-
-      return $ BitmapData len fmt (width, height) cacheMe fptr
+  unsafePerformIO $ do
+    let len = width * height * 4
+    fptr <- copyByteStringToFPtr len bs
+    return $ BitmapData len fmt (width, height) cacheMe fptr
 {-# NOINLINE bitmapDataOfByteString #-}
 
 
@@ -231,21 +232,98 @@ bitmapOfBMP bmp =
 -- | O(size). Copy a `BMP` file into a bitmap.
 bitmapDataOfBMP :: BMP -> BitmapData
 bitmapDataOfBMP bmp =
-  unsafePerformIO $
-    do
-      let (width, height) = bmpDimensions bmp
-      let bs = unpackBMPToRGBA32 bmp
-      let len = width * height * 4
-
-      ptr <- mallocBytes len
-      fptr <- newForeignPtr finalizerFree ptr
-
-      BSU.unsafeUseAsCString bs $
-        \cstr -> copyBytes ptr (castPtr cstr) len
-
-      return $
-        BitmapData len (BitmapFormat BottomToTop PxRGBA) (width, height) True fptr
+  unsafePerformIO $ do
+    let (width, height) = bmpDimensions bmp
+        len = width * height * 4
+    fptr <- copyByteStringToFPtr len (unpackBMPToRGBA32 bmp)
+    return $
+      BitmapData len (BitmapFormat BottomToTop PxRGBA) (width, height) True fptr
 {-# NOINLINE bitmapDataOfBMP #-}
+
+
+-- | Copy @len@ bytes from a `ByteString` into a freshly allocated `ForeignPtr`.
+copyByteStringToFPtr :: Int -> ByteString -> IO (ForeignPtr Word8)
+copyByteStringToFPtr len bs = do
+  ptr <- mallocBytes len
+  fptr <- newForeignPtr finalizerFree ptr
+  BSU.unsafeUseAsCString bs $ \cstr -> copyBytes ptr (castPtr cstr) len
+  pure fptr
+
+
+{-| O(1). Use a `ForeignPtr` of GPU-compressed texel data as a bitmap.
+
+  The image is uploaded to the GPU as-is using
+  `glCompressedTexImage2D`. The byte length is the exact size of the
+  compressed payload, and @width@ / @height@ must match the dimensions
+  of the decoded image. The chosen `CompressedFormat` must be supported
+  by the running OpenGL implementation; query
+  @Graphics.Rendering.OpenGL.GL.Texturing.Specification.compressedTextureFormats@
+  at runtime if you are not sure.
+
+  The boolean flag controls whether Brillo should cache the data
+  between frames for speed. If you are programatically generating
+  the image for each frame then use `False`. If you have loaded it
+  from a file then use `True`.
+-}
+compressedBitmapOfForeignPtr ::
+  Int ->
+  Int ->
+  RowOrder ->
+  CompressedFormat ->
+  Int ->
+  ForeignPtr Word8 ->
+  Bool ->
+  Picture
+compressedBitmapOfForeignPtr w h ro cf byteLen fptr cacheMe =
+  Bitmap $
+    compressedBitmapDataOfForeignPtr w h ro cf byteLen fptr cacheMe
+
+
+compressedBitmapDataOfForeignPtr ::
+  Int ->
+  Int ->
+  RowOrder ->
+  CompressedFormat ->
+  Int ->
+  ForeignPtr Word8 ->
+  Bool ->
+  BitmapData
+compressedBitmapDataOfForeignPtr w h ro cf byteLen fptr cacheMe =
+  BitmapData byteLen (BitmapFormat ro (PxCompressed cf)) (w, h) cacheMe fptr
+
+
+{-| O(size). Copy a `ByteString` of GPU-compressed texel data into a bitmap.
+
+  See `compressedBitmapOfForeignPtr` for the constraints on the inputs.
+-}
+compressedBitmapOfByteString ::
+  Int ->
+  Int ->
+  RowOrder ->
+  CompressedFormat ->
+  ByteString ->
+  Bool ->
+  Picture
+compressedBitmapOfByteString w h ro cf bs cacheMe =
+  Bitmap $
+    compressedBitmapDataOfByteString w h ro cf bs cacheMe
+
+
+compressedBitmapDataOfByteString ::
+  Int ->
+  Int ->
+  RowOrder ->
+  CompressedFormat ->
+  ByteString ->
+  Bool ->
+  BitmapData
+compressedBitmapDataOfByteString w h ro cf bs cacheMe =
+  unsafePerformIO $ do
+    let byteLen = BS.length bs
+    fptr <- copyByteStringToFPtr byteLen bs
+    return $
+      BitmapData byteLen (BitmapFormat ro (PxCompressed cf)) (w, h) cacheMe fptr
+{-# NOINLINE compressedBitmapDataOfByteString #-}
 
 
 -- | Load an uncompressed 24 or 32bit RGBA BMP file as a bitmap.

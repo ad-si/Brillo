@@ -23,8 +23,9 @@ import System.Mem.StableName (makeStableName)
 import Brillo.Internals.Data.Color (Color (RGBA))
 import Brillo.Internals.Data.Picture (
   BitmapFormat (pixelFormat, rowOrder),
+  CompressedFormat (CompressedFormat),
   Picture (..),
-  PixelFormat (PxABGR, PxRGBA),
+  PixelFormat (PxABGR, PxCompressed, PxRGBA),
   Rectangle (Rectangle, rectPos, rectSize),
   RowOrder (BottomToTop, TopToBottom),
   rectAtOrigin,
@@ -470,13 +471,8 @@ loadTexture refTextures imgData@BitmapData{bitmapSize = (width, height)} cacheMe
   returning the new texture handle.
 -}
 installTexture :: BitmapData -> IO Texture
-installTexture bitmapData@(BitmapData _ fmt (width, height) cacheMe fptr) =
+installTexture bitmapData@(BitmapData byteLen fmt (width, height) cacheMe fptr) =
   do
-    let glFormat =
-          case pixelFormat fmt of
-            PxABGR -> GL.ABGR
-            PxRGBA -> GL.RGBA
-
     -- Allocate texture handle for texture
     [tex] <- GL.genObjectNames 1
     GL.textureBinding GL.Texture2D $= Just tex
@@ -484,19 +480,26 @@ installTexture bitmapData@(BitmapData _ fmt (width, height) cacheMe fptr) =
     -- Sets the texture in imgData as the current texture
     -- This copies the data from the pointer into OpenGL texture memory,
     -- so it's ok if the foreignptr gets garbage collected after this.
-    withForeignPtr fptr $
-      \ptr ->
-        GL.texImage2D
-          GL.Texture2D
-          GL.NoProxy
-          0
-          GL.RGBA8
-          ( GL.TextureSize2D
-              (gsizei width)
-              (gsizei height)
-          )
-          0
-          (GL.PixelData glFormat GL.UnsignedByte ptr)
+    let size = GL.TextureSize2D (gsizei width) (gsizei height)
+        uploadRGBA8 glFormat ptr =
+          GL.texImage2D GL.Texture2D GL.NoProxy 0 GL.RGBA8 size 0 $
+            GL.PixelData glFormat GL.UnsignedByte ptr
+    withForeignPtr fptr $ \ptr ->
+      case pixelFormat fmt of
+        PxCompressed (CompressedFormat compFmt) ->
+          GL.compressedTexImage2D
+            GL.Texture2D
+            GL.NoProxy
+            0
+            size
+            0
+            ( GL.CompressedPixelData
+                (GL.CompressedTextureFormat (fromIntegral compFmt))
+                (fromIntegral byteLen)
+                ptr
+            )
+        PxABGR -> uploadRGBA8 GL.ABGR ptr
+        PxRGBA -> uploadRGBA8 GL.RGBA ptr
 
     -- Make a stable name that we can use to identify this data again.
     -- If the user gives us the same texture data at the same size then we

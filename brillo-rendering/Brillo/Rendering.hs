@@ -20,12 +20,35 @@ module Brillo.Rendering (
   BitmapFormat (..),
   PixelFormat (..),
   RowOrder (..),
+  CompressedFormat (..),
   bitmapOfForeignPtr,
   bitmapDataOfForeignPtr,
   bitmapOfByteString,
   bitmapDataOfByteString,
   bitmapOfBMP,
   bitmapDataOfBMP,
+  compressedBitmapOfForeignPtr,
+  compressedBitmapDataOfForeignPtr,
+  compressedBitmapOfByteString,
+  compressedBitmapDataOfByteString,
+
+  -- ** Common compressed texture formats
+  Bitmap.compressedRGB_S3TC_DXT1,
+  Bitmap.compressedRGBA_S3TC_DXT1,
+  Bitmap.compressedRGBA_S3TC_DXT3,
+  Bitmap.compressedRGBA_S3TC_DXT5,
+  Bitmap.compressedSRGB_S3TC_DXT1,
+  Bitmap.compressedSRGB_ALPHA_S3TC_DXT1,
+  Bitmap.compressedSRGB_ALPHA_S3TC_DXT3,
+  Bitmap.compressedSRGB_ALPHA_S3TC_DXT5,
+  Bitmap.compressedRED_RGTC1,
+  Bitmap.compressedSIGNED_RED_RGTC1,
+  Bitmap.compressedRG_RGTC2,
+  Bitmap.compressedSIGNED_RG_RGTC2,
+  Bitmap.compressedRGBA_BPTC_UNORM,
+  Bitmap.compressedSRGB_ALPHA_BPTC_UNORM,
+  Bitmap.compressedRGB_BPTC_SIGNED_FLOAT,
+  Bitmap.compressedRGB_BPTC_UNSIGNED_FLOAT,
   loadBMP,
 
   -- * Rendering
@@ -40,6 +63,7 @@ where
 
 import Brillo.Internals.Data.Color
 import Brillo.Internals.Data.Picture
+import Brillo.Internals.Rendering.Bitmap qualified as Bitmap
 import Brillo.Internals.Rendering.Common
 import Brillo.Internals.Rendering.Picture
 import Brillo.Internals.Rendering.State qualified as RS

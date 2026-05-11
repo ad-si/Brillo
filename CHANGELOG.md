@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Support GPU-compressed textures (`glCompressedTexImage2D`):
+  - Add `PxCompressed` variant of `PixelFormat` carrying a
+    `CompressedFormat` (S3TC, RGTC, BPTC, …)
+  - Add `compressedBitmapOfForeignPtr`, `compressedBitmapOfByteString`
+    and their `BitmapData`-returning counterparts
+  - Export named constants for the common compressed format enums
+    (`compressedRGBA_S3TC_DXT1`, `compressedRGBA_BPTC_UNORM`, …)
+
+
 # 2026-02-27 - 2.0.0
 
 - Make anti-aliasing the default for all primitives

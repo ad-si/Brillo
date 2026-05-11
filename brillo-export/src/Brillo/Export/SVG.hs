@@ -20,8 +20,10 @@ module Brillo.Export.SVG (
 
 import Brillo.Rendering (
   BitmapData (..),
+  BitmapFormat (..),
   Color,
   Picture (..),
+  PixelFormat (..),
   Point,
   Rectangle (..),
   makeColor,
@@ -617,63 +619,67 @@ renderTextSmooth rs txt thickness =
 
 -- | Render a bitmap image as a data URI embedded image
 renderBitmap :: RenderState -> BitmapData -> Maybe Rectangle -> Text
-renderBitmap _ bitmapData maybeRect =
-  let
-    BitmapData _len _fmt (bmpWidth, bmpHeight) _cache fptr = bitmapData
+renderBitmap _ bitmapData maybeRect
+  | PxCompressed _ <- pixelFormat (bitmapFormat bitmapData) =
+      -- SVG export cannot decode GPU-compressed payloads; emit a placeholder.
+      "  <!-- compressed bitmap omitted from SVG export -->\n"
+  | otherwise =
+      let
+        BitmapData _len _fmt (bmpWidth, bmpHeight) _cache fptr = bitmapData
 
-    -- Get the actual section to render
-    (srcX, srcY, width, height) = case maybeRect of
-      Nothing -> (0, 0, bmpWidth, bmpHeight)
-      Just (Rectangle (rx, ry) (rw, rh)) -> (rx, ry, rw, rh)
+        -- Get the actual section to render
+        (srcX, srcY, width, height) = case maybeRect of
+          Nothing -> (0, 0, bmpWidth, bmpHeight)
+          Just (Rectangle (rx, ry) (rw, rh)) -> (rx, ry, rw, rh)
 
-    -- Create a base64 PNG data URI
-    dataUri = unsafePerformIO $ do
-      withForeignPtr fptr $ \ptr -> do
-        -- Read pixel data
-        let pixelCount = bmpWidth * bmpHeight * 4
-        pixelData <- V.generateM pixelCount $ \i -> do
-          let bytePtr = castPtr ptr :: Ptr Word8
-          peekElemOff bytePtr i
+        -- Create a base64 PNG data URI
+        dataUri = unsafePerformIO $ do
+          withForeignPtr fptr $ \ptr -> do
+            -- Read pixel data
+            let pixelCount = bmpWidth * bmpHeight * 4
+            pixelData <- V.generateM pixelCount $ \i -> do
+              let bytePtr = castPtr ptr :: Ptr Word8
+              peekElemOff bytePtr i
 
-        -- Create JuicyPixels image
-        let img = JP.Image bmpWidth bmpHeight pixelData :: JP.Image JP.PixelRGBA8
+            -- Create JuicyPixels image
+            let img = JP.Image bmpWidth bmpHeight pixelData :: JP.Image JP.PixelRGBA8
 
-        -- Encode to PNG and then base64
-        let pngBytes = JP.encodePng img
-        pure $ "data:image/png;base64," ++ encodeBase64 (BL.unpack pngBytes)
+            -- Encode to PNG and then base64
+            let pngBytes = JP.encodePng img
+            pure $ "data:image/png;base64," ++ encodeBase64 (BL.unpack pngBytes)
 
-    -- Center the image at origin (Brillo convention)
-    halfW = fromIntegral width / 2 :: Float
-    halfH = fromIntegral height / 2 :: Float
-  in
-    T.concat
-      [ "  <image x=\""
-      , T.pack (showFloat (-halfW))
-      , "\" y=\""
-      , T.pack (showFloat (-halfH))
-      , "\" width=\""
-      , T.pack (show width)
-      , "\" height=\""
-      , T.pack (show height)
-      , "\" xlink:href=\""
-      , T.pack dataUri
-      , "\""
-      , if srcX /= 0 || srcY /= 0
-          then
-            T.concat
-              [ " preserveAspectRatio=\"xMinYMin slice\" viewBox=\""
-              , T.pack (show srcX)
-              , " "
-              , T.pack (show srcY)
-              , " "
-              , T.pack (show width)
-              , " "
-              , T.pack (show height)
-              , "\""
-              ]
-          else ""
-      , "/>\n"
-      ]
+        -- Center the image at origin (Brillo convention)
+        halfW = fromIntegral width / 2 :: Float
+        halfH = fromIntegral height / 2 :: Float
+      in
+        T.concat
+          [ "  <image x=\""
+          , T.pack (showFloat (-halfW))
+          , "\" y=\""
+          , T.pack (showFloat (-halfH))
+          , "\" width=\""
+          , T.pack (show width)
+          , "\" height=\""
+          , T.pack (show height)
+          , "\" xlink:href=\""
+          , T.pack dataUri
+          , "\""
+          , if srcX /= 0 || srcY /= 0
+              then
+                T.concat
+                  [ " preserveAspectRatio=\"xMinYMin slice\" viewBox=\""
+                  , T.pack (show srcX)
+                  , " "
+                  , T.pack (show srcY)
+                  , " "
+                  , T.pack (show width)
+                  , " "
+                  , T.pack (show height)
+                  , "\""
+                  ]
+              else ""
+          , "/>\n"
+          ]
 
 
 -- | Simple base64 encoding

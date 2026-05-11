@@ -11,6 +11,7 @@ test:
 .PHONY: test-examples
 test-examples:
 	stack run brillo-bitmap brillo-examples/picture/Bitmap/lena-101x101.bmp && \
+	stack run brillo-compressed-bitmap && \
 	stack run brillo-boids && \
 	stack run brillo-clock && \
 	stack run brillo-color && \
