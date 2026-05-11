@@ -13,7 +13,7 @@ import Data.ByteString (ByteString)
 import Data.ByteString qualified as BS
 import Data.ByteString.Builder qualified as BSB
 import Data.ByteString.Lazy qualified as BSL
-import Data.List (foldl')
+import Data.List qualified as List
 import Data.Text qualified as T
 import Data.Word (Word16, Word32, Word8)
 import Foreign.ForeignPtr (withForeignPtr)
@@ -149,7 +149,7 @@ blockBytes pixels =
     palette = [p0, p1, p2, p3]
     indices = zip [0 :: Int ..] (map (nearestIndex palette) pixels)
     packed =
-      foldl'
+      List.foldl'
         (\acc (i, idx) -> acc .|. (fromIntegral idx `shiftL` (2 * i)))
         (0 :: Word32)
         indices
