@@ -13,6 +13,7 @@ import Data.ByteString (ByteString)
 import Data.ByteString qualified as BS
 import Data.ByteString.Builder qualified as BSB
 import Data.ByteString.Lazy qualified as BSL
+import Data.List (foldl')
 import Data.Text qualified as T
 import Data.Word (Word16, Word32, Word8)
 import Foreign.ForeignPtr (withForeignPtr)
