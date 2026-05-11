@@ -9,6 +9,7 @@ import Brillo.Data.Point (pointInBox)
 import Brillo.Interface.Pure.Game
 import Data.Function ((&))
 import Data.List (partition)
+import Data.List qualified as List
 import Data.Text qualified as T
 
 
@@ -390,7 +391,7 @@ moveAliensSideways gs =
       extent (lo, hi) a
         | not a.alive = (lo, hi)
         | otherwise = let x = fst a.alienPos in (min lo x, max hi x)
-      (minX, maxX) = foldl' extent (1 / 0, -(1 / 0)) moved
+      (minX, maxX) = List.foldl' extent (1 / 0, -(1 / 0)) moved
       hitEdge = maxX > 280 || minX < -280
   in  gs{aliens = moved, moveDown = hitEdge}
 
