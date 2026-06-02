@@ -180,6 +180,31 @@ cursorShapeToGLFW shape = case shape of
 
 -- Open Window ----------------------------------------------------------------
 
+{-| Request an OpenGL 2.1 compatibility context.
+
+Brillo's anti-aliased shapes are rendered with @#version 120@ GLSL shaders
+that rely on compatibility built-ins (e.g. @gl_ModelViewProjectionMatrix@,
+@gl_MultiTexCoord0@, @gl_FragColor@) mixed with immediate-mode drawing.
+Without these hints the actual profile is driver-dependent, and some drivers
+(notably on Windows) hand out a context that rejects that mixed path with
+@GL_INVALID_OPERATION@. Pinning a 2.1 compatibility context avoids that.
+
+macOS is excluded: it only offers a legacy 2.1 context (the default when no
+profile hint is set, which is what Brillo wants) or a 3.2+ core context.
+Explicitly requesting a compatibility profile there makes 'GLFW.createWindow'
+fail, so we leave the default hints in place on Apple platforms.
+-}
+setWindowHints :: IO ()
+#ifdef darwin_HOST_OS
+setWindowHints = pure ()
+#else
+setWindowHints = do
+  GLFW.windowHint (GLFW.WindowHint'ContextVersionMajor 2)
+  GLFW.windowHint (GLFW.WindowHint'ContextVersionMinor 1)
+  GLFW.windowHint (GLFW.WindowHint'OpenGLProfile GLFW.OpenGLProfile'Compat)
+#endif
+
+
 -- | Open a new window.
 openWindowGLFW ::
   IORef GLFWState ->
@@ -187,6 +212,7 @@ openWindowGLFW ::
   IO ()
 openWindowGLFW ref (InWindow title (sizeX, sizeY) pos) =
   do
+    setWindowHints
     win <-
       GLFW.createWindow
         sizeX
@@ -227,6 +253,7 @@ openWindowGLFW ref FullScreen =
             let sizeX = GLFW.videoModeWidth vm
             let sizeY = GLFW.videoModeHeight vm
 
+            setWindowHints
             win <-
               GLFW.createWindow
                 sizeX

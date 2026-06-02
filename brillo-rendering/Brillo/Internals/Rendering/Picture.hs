@@ -403,11 +403,18 @@ checkErrors place =
       mapM_ (handleError place) errors
 
 
+{-| Report an OpenGL error.
+
+These are logged to @stderr@ rather than thrown so that a single error from a
+driver quirk (e.g. the shader-based rendering path on some Windows GL drivers)
+doesn't crash the whole program. The error flag has already been cleared by
+'checkErrors' reading it, so rendering can continue.
+-}
 handleError :: String -> GLU.Error -> IO ()
 handleError place err =
   case err of
     GLU.Error GLU.StackOverflow _ ->
-      error $
+      hPutStrLn stderr $
         unlines
           [ "Brillo / OpenGL Stack Overflow " ++ show place
           , "  This program uses the Brillo vector graphics library, which tried to"
@@ -424,7 +431,7 @@ handleError place err =
           , "  transforms used when defining the Picture given to Brillo. Sorry."
           ]
     _ ->
-      error $
+      hPutStrLn stderr $
         unlines
           [ "Brillo / OpenGL Internal Error " ++ show place
           , "  Please report this at https://github.com/ad-si/Brillo/issues."
