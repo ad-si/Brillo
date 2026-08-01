@@ -10,6 +10,7 @@
   - Export named constants for the common compressed format enums
     (`compressedRGBA_S3TC_DXT1`, `compressedRGBA_BPTC_UNORM`, …)
 
+- Support setting the window title dynamically
 
 # 2026-02-27 - 2.0.0
 
