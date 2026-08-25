@@ -239,6 +239,20 @@ createWindowWithHints sizeX sizeY title monitor = do
       GLFW.createWindow sizeX sizeY title monitor Nothing
 
 
+{-| Move the window, keeping its title bar reachable.
+
+The given position is the upper left corner of the content area,
+so a window at @(0, 0)@ would have its title bar above the top edge
+of the screen and couldn't be moved by the user anymore.
+Push the window down by the height of the title bar in that case.
+-}
+setWindowPosOnScreen :: GLFW.Window -> Int -> Int -> IO ()
+setWindowPosOnScreen win posX posY = do
+  -- Left, top, right, and bottom edge of the window's frame
+  (_, titleBarHeight, _, _) <- GLFW.getWindowFrameSize win
+  GLFW.setWindowPos win posX (max titleBarHeight posY)
+
+
 -- | Open a new window.
 openWindowGLFW ::
   IORef GLFWState ->
@@ -266,7 +280,7 @@ openWindowGLFW ref (InWindow title (sizeX, sizeY) pos) =
             ++ ". Check that your GPU drivers support OpenGL."
       Just w -> do
         modifyIORef' ref (\s -> s{optWinHdl = win})
-        uncurry (GLFW.setWindowPos w) pos
+        uncurry (setWindowPosOnScreen w) pos
         GLFW.makeContextCurrent win
 
         -- Try to enable sync-to-vertical-refresh by setting the number
