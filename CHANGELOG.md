@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Fix window creation always failing with
+  `Context profiles are only defined for OpenGL version 3.2 and above`,
+  as the OpenGL 2.1 context hint must not be combined with a profile hint
+- Retry with the driver's default context
+  if an OpenGL 2.1 context can't be created
+- Include GLFW's error message when window creation fails
+- Print GLFW errors to `stderr` instead of `stdout`
 - Support GPU-compressed textures (`glCompressedTexImage2D`):
   - Add `PxCompressed` variant of `PixelFormat` carrying a
     `CompressedFormat` (S3TC, RGTC, BPTC, …)

@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# OPTIONS_HADDOCK hide #-}
 
@@ -116,7 +115,7 @@ initializeGLFW :: IORef GLFWState -> Bool -> IO ()
 initializeGLFW _ debug =
   do
     let simpleErrorCallback e s =
-          putStrLn $ unwords ["GLFW backend: ", show e, show s]
+          hPutStrLn stderr $ unwords ["GLFW backend: ", show e, show s]
     GLFW.setErrorCallback (Just simpleErrorCallback)
 
     _ <- GLFW.init
@@ -180,29 +179,64 @@ cursorShapeToGLFW shape = case shape of
 
 -- Open Window ----------------------------------------------------------------
 
-{-| Request an OpenGL 2.1 compatibility context.
+{-| Request an OpenGL 2.1 context.
 
 Brillo's anti-aliased shapes are rendered with @#version 120@ GLSL shaders
 that rely on compatibility built-ins (e.g. @gl_ModelViewProjectionMatrix@,
 @gl_MultiTexCoord0@, @gl_FragColor@) mixed with immediate-mode drawing.
-Without these hints the actual profile is driver-dependent, and some drivers
+Without a version hint the context is driver-dependent, and some drivers
 (notably on Windows) hand out a context that rejects that mixed path with
-@GL_INVALID_OPERATION@. Pinning a 2.1 compatibility context avoids that.
+@GL_INVALID_OPERATION@. Asking for 2.1 yields a context that is required to
+be backwards compatible with it, which avoids that.
 
-macOS is excluded: it only offers a legacy 2.1 context (the default when no
-profile hint is set, which is what Brillo wants) or a 3.2+ core context.
-Explicitly requesting a compatibility profile there makes 'GLFW.createWindow'
-fail, so we leave the default hints in place on Apple platforms.
+No @WindowHint'OpenGLProfile@ is set on purpose:
+context profiles are only defined for OpenGL 3.2 and above and GLFW aborts
+window creation with @GLFW_INVALID_VALUE@ if one is combined with a lower
+version, no matter which platform or driver is used.
 -}
 setWindowHints :: IO ()
-#ifdef darwin_HOST_OS
-setWindowHints = pure ()
-#else
 setWindowHints = do
   GLFW.windowHint (GLFW.WindowHint'ContextVersionMajor 2)
   GLFW.windowHint (GLFW.WindowHint'ContextVersionMinor 1)
-  GLFW.windowHint (GLFW.WindowHint'OpenGLProfile GLFW.OpenGLProfile'Compat)
-#endif
+
+
+-- | Describe the last GLFW error, if there was one.
+lastGlfwError :: IO String
+lastGlfwError = do
+  optError <- GLFW.getError
+  pure $ case optError of
+    Nothing -> ""
+    Just (err, msg) -> " (" <> show err <> ": " <> msg <> ")"
+
+
+{-| Create a window with Brillo's preferred context hints.
+
+If the driver can't provide such a context, 'GLFW.createWindow' returns
+'Nothing' instead of falling back on its own.
+Retry with GLFW's default hints in that case,
+as a suboptimal context is still better than no window at all.
+-}
+createWindowWithHints ::
+  Int ->
+  Int ->
+  String ->
+  Maybe GLFW.Monitor ->
+  IO (Maybe GLFW.Window)
+createWindowWithHints sizeX sizeY title monitor = do
+  GLFW.defaultWindowHints
+  setWindowHints
+  winWithHints <- GLFW.createWindow sizeX sizeY title monitor Nothing
+
+  case winWithHints of
+    Just _ -> pure winWithHints
+    Nothing -> do
+      errorMsg <- lastGlfwError
+      hPutStrLn stderr $
+        "Warning: Could not create an OpenGL 2.1 context"
+          <> errorMsg
+          <> ". Retrying with the driver's default context …"
+      GLFW.defaultWindowHints
+      GLFW.createWindow sizeX sizeY title monitor Nothing
 
 
 -- | Open a new window.
@@ -212,24 +246,24 @@ openWindowGLFW ::
   IO ()
 openWindowGLFW ref (InWindow title (sizeX, sizeY) pos) =
   do
-    setWindowHints
     win <-
-      GLFW.createWindow
+      createWindowWithHints
         sizeX
         sizeY
         (T.unpack title)
         Nothing
-        Nothing
 
     case win of
-      Nothing ->
+      Nothing -> do
+        errorMsg <- lastGlfwError
         error $
           "GLFW.createWindow failed to create a "
             ++ show sizeX
             ++ "x"
             ++ show sizeY
-            ++ " window."
-            ++ " Check that your GPU drivers support OpenGL."
+            ++ " window"
+            ++ errorMsg
+            ++ ". Check that your GPU drivers support OpenGL."
       Just w -> do
         modifyIORef' ref (\s -> s{optWinHdl = win})
         uncurry (GLFW.setWindowPos w) pos
@@ -253,18 +287,20 @@ openWindowGLFW ref FullScreen =
             let sizeX = GLFW.videoModeWidth vm
             let sizeY = GLFW.videoModeHeight vm
 
-            setWindowHints
             win <-
-              GLFW.createWindow
+              createWindowWithHints
                 sizeX
                 sizeY
                 ""
                 mon
-                Nothing
 
             case win of
-              Nothing ->
-                error "GLFW.createWindow failed to create a fullscreen window."
+              Nothing -> do
+                errorMsg <- lastGlfwError
+                error $
+                  "GLFW.createWindow failed to create a fullscreen window"
+                    ++ errorMsg
+                    ++ ". Check that your GPU drivers support OpenGL."
               Just w -> do
                 modifyIORef' ref (\s -> s{optWinHdl = win})
                 GLFW.makeContextCurrent win
