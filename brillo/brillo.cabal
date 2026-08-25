@@ -73,6 +73,7 @@ library
     Brillo.Interface.IO.Display
     Brillo.Interface.IO.Game
     Brillo.Interface.IO.Interact
+    Brillo.Interface.IO.MessageBox
     Brillo.Interface.IO.Simulate
     Brillo.Interface.Pure.Animate
     Brillo.Interface.Pure.Display

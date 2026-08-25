@@ -9,6 +9,8 @@
   if an OpenGL 2.1 context can't be created
 - Include GLFW's error message when window creation fails
 - Print GLFW errors to `stderr` instead of `stdout`
+- Add `Brillo.Interface.IO.MessageBox` to expose the bundled
+  message box, notification popup, and beep functions
 - Support GPU-compressed textures (`glCompressedTexImage2D`):
   - Add `PxCompressed` variant of `PixelFormat` carrying a
     `CompressedFormat` (S3TC, RGTC, BPTC, …)
