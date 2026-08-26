@@ -14,6 +14,10 @@
   and a window at `(0, 0)` couldn't be moved by the user anymore
 - Add `Brillo.Interface.IO.MessageBox` to expose the bundled
   message box, notification popup, and beep functions
+- Add `getDpiScale` to `Brillo.Interface.Environment`,
+  which reports the scale factor between window coordinates
+  and logical UI units (e.g. `1.75` on a Windows display set to 175 %),
+  so that apps can size themselves independently of the display
 - Support GPU-compressed textures (`glCompressedTexImage2D`):
   - Add `PxCompressed` variant of `PixelFormat` carrying a
     `CompressedFormat` (S3TC, RGTC, BPTC, …)

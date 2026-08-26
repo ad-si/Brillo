@@ -21,6 +21,21 @@ getScreenSize = do
   Backend.Types.getScreenSize backendStateRef
 
 
+{-| Get the scale factor between window coordinates and logical UI units,
+  e.g. @1.5@ for a display configured to 150 % scaling.
+
+  Multiply window sizes and drawing coordinates with it
+  to keep an interface at a constant physical size across displays.
+  It is always 1 on platforms whose window coordinates
+  already are logical units (e.g. macOS).
+-}
+getDpiScale :: IO Float
+getDpiScale = do
+  backendStateRef <- newIORef defaultBackendState
+  Backend.Types.initializeBackend backendStateRef False
+  Backend.Types.getDpiScale backendStateRef
+
+
 {-| Open a file dialog to select files/directories.
 
   Returns a list of paths, or `Nothing` if the dialog was cancelled.

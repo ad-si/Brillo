@@ -17,6 +17,7 @@ import Graphics.Rendering.OpenGL qualified as GL
 import Graphics.UI.GLFW qualified as GLFW
 import System.Exit (ExitCode)
 import System.IO (hPutStrLn, stderr)
+import System.Info (os)
 
 import Brillo.Data.Cursor (CursorShape (..))
 import Brillo.Data.FileDialog (FileDialog (..), SelectionMode (..))
@@ -99,6 +100,7 @@ instance Backend GLFWState where
   postRedisplay = postRedisplayGLFW
   getWindowDimensions ref = windowHandle ref >>= \win -> GLFW.getWindowSize win
   getScreenSize = getScreenSizeGLFW
+  getDpiScale = getDpiScaleGLFW
   openFileDialog = openFileDialogGLFW
   elapsedTime _ =
     GLFW.getTime >>= \mt -> case mt of
@@ -347,6 +349,30 @@ getScreenSizeGLFW _state = do
           let sizeX = GLFW.videoModeWidth vm
           let sizeY = GLFW.videoModeHeight vm
           pure (sizeX, sizeY)
+
+
+{-| The scale factor between window coordinates and logical UI units,
+e.g. @1.5@ for a display configured to 150 % scaling.
+
+On macOS window coordinates already are logical points
+(only the framebuffer is the high resolution one),
+so the factor is always 1 there.
+On Windows and X11 window coordinates are physical pixels,
+which makes the factor the content scale of the primary monitor.
+-}
+getDpiScaleGLFW :: IORef GLFWState -> IO Float
+getDpiScaleGLFW _state =
+  if os == "darwin"
+    then pure 1
+    else do
+      monitorMb <- GLFW.getPrimaryMonitor
+      case monitorMb of
+        Nothing -> pure 1
+        Just monitor -> do
+          (scaleX, scaleY) <- GLFW.getMonitorContentScale monitor
+          let scale = max scaleX scaleY
+          -- Guard against drivers reporting a nonsensical scale
+          pure $ if scale > 0 then scale else 1
 
 
 -- | Open a file dialog. Return `Nothing` if the user cancels the dialog.

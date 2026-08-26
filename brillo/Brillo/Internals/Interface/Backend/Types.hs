@@ -97,6 +97,12 @@ class Backend a where
   getScreenSize :: IORef a -> IO (Int, Int)
 
 
+  {-| Function that returns the scale factor
+  between window coordinates and logical UI units.
+  -}
+  getDpiScale :: IORef a -> IO Float
+
+
   -- | Open a file dialog to pick files/directories.
   openFileDialog :: IORef a -> FileDialog -> IO (Maybe [FilePath])
 
