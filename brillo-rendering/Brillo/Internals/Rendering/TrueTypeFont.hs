@@ -90,13 +90,38 @@ getContentScale = do
       pure $ max scaleX scaleY
 
 
+{-| The scale the current modelview matrix applies to the drawing.
+
+Text nested in a scaled `Picture` covers correspondingly more pixels,
+so the glyphs have to be rasterized at that size to stay crisp.
+-}
+getModelviewScale :: IO Float
+getModelviewScale = do
+  modelview <-
+    get (GL.matrix (Just (GL.Modelview 0))) :: IO (GL.GLmatrix GL.GLfloat)
+  components <- GL.getMatrixComponents GL.ColumnMajor modelview
+  -- Column major, so the first two columns are the images of the x and y axis
+  pure $ case components of
+    xX : xY : xZ : _xW : yX : yY : yZ : _rest ->
+      let
+        scaleX = sqrt ((xX * xX) + (xY * xY) + (xZ * xZ))
+        scaleY = sqrt ((yX * yX) + (yY * yY) + (yZ * yZ))
+      in
+        realToFrac $ max scaleX scaleY
+    _ -> 1
+
+
 renderTrueTypeText :: FilePath -> Int -> Text -> IO ()
 renderTrueTypeText fontPath pixelHeight str
   | T.null str = pure ()
   | otherwise = do
       -- Detect DPI scale factor for HiDPI/Retina displays
-      scaleFactor <- getContentScale
-      let scaledHeight = round (fromIntegral pixelHeight * scaleFactor)
+      contentScale <- getContentScale
+      modelviewScale <- getModelviewScale
+      let
+        scaleFactorRaw = contentScale * modelviewScale
+        scaleFactor = if scaleFactorRaw > 0 then scaleFactorRaw else 1
+        scaledHeight = round (fromIntegral pixelHeight * scaleFactor)
 
       glyphs <- getOrLoadFont fontPath scaledHeight
       let fallbackGlyph = Map.lookup '?' glyphs

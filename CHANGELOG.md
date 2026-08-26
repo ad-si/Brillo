@@ -18,6 +18,9 @@
   which reports the scale factor between window coordinates
   and logical UI units (e.g. `1.75` on a Windows display set to 175 %),
   so that apps can size themselves independently of the display
+- Rasterize TrueType text at the size it's drawn at,
+  so that text nested in a scaled `Picture` stays crisp
+  instead of being magnified from a smaller glyph atlas
 - Support GPU-compressed textures (`glCompressedTexImage2D`):
   - Add `PxCompressed` variant of `PixelFormat` carrying a
     `CompressedFormat` (S3TC, RGTC, BPTC, …)
