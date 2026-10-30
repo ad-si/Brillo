@@ -43,8 +43,13 @@ data Command
   | CBumpCClockwise
   deriving (Show, Eq, Ord)
 
+data CommandKey
+  = CKey Key
+  | CMouseWheel WheelDirection
+  deriving (Show, Eq, Ord)
 
-type CommandConfig = [(Command, [(Key, Maybe Modifiers)])]
+
+type CommandConfig = [(Command, [(CommandKey, Maybe Modifiers)])]
 
 
 {-| The default commands.  Left click pans, wheel zooms, right click
@@ -54,13 +59,13 @@ defaultCommandConfig :: CommandConfig
 defaultCommandConfig =
   [
     ( CRestore
-    , [(Char 'r', Nothing)]
+    , [(CKey $ Char 'r', Nothing)]
     )
   ,
     ( CTranslate
     ,
       [
-        ( MouseButton LeftButton
+        ( CKey $ MouseButton LeftButton
         , Just (Modifiers{shift = Up, ctrl = Up, alt = Up})
         )
       ]
@@ -69,11 +74,11 @@ defaultCommandConfig =
     ( CScale
     ,
       [
-        ( MouseButton LeftButton
+        ( CKey $ MouseButton LeftButton
         , Just (Modifiers{shift = Up, ctrl = Down, alt = Up})
         )
       ,
-        ( MouseButton RightButton
+        ( CKey $ MouseButton RightButton
         , Just (Modifiers{shift = Up, ctrl = Up, alt = Up})
         )
       ]
@@ -82,11 +87,11 @@ defaultCommandConfig =
     ( CRotate
     ,
       [
-        ( MouseButton LeftButton
+        ( CKey $ MouseButton LeftButton
         , Just (Modifiers{shift = Up, ctrl = Up, alt = Down})
         )
       ,
-        ( MouseButton RightButton
+        ( CKey $ MouseButton RightButton
         , Just (Modifiers{shift = Up, ctrl = Down, alt = Up})
         )
       ]
@@ -95,51 +100,51 @@ defaultCommandConfig =
 
     ( CBumpZoomOut
     ,
-      [ (MouseButton WheelDown, Nothing)
-      , (SpecialKey KeyPageDown, Nothing)
+      [ (CMouseWheel WheelDown, Nothing)
+      , (CKey $ SpecialKey KeyPageDown, Nothing)
       ]
     )
   ,
     ( CBumpZoomIn
     ,
-      [ (MouseButton WheelUp, Nothing)
-      , (SpecialKey KeyPageUp, Nothing)
+      [ (CMouseWheel WheelUp, Nothing)
+      , (CKey $ SpecialKey KeyPageUp, Nothing)
       ]
     )
   , -- bump translate
 
     ( CBumpLeft
-    , [(SpecialKey KeyLeft, Nothing)]
+    , [(CKey $ SpecialKey KeyLeft, Nothing)]
     )
   ,
     ( CBumpRight
-    , [(SpecialKey KeyRight, Nothing)]
+    , [(CKey $ SpecialKey KeyRight, Nothing)]
     )
   ,
     ( CBumpUp
-    , [(SpecialKey KeyUp, Nothing)]
+    , [(CKey $ SpecialKey KeyUp, Nothing)]
     )
   ,
     ( CBumpDown
-    , [(SpecialKey KeyDown, Nothing)]
+    , [(CKey $ SpecialKey KeyDown, Nothing)]
     )
   , -- bump rotate
 
     ( CBumpClockwise
-    , [(SpecialKey KeyHome, Nothing)]
+    , [(CKey $ SpecialKey KeyHome, Nothing)]
     )
   ,
     ( CBumpCClockwise
-    , [(SpecialKey KeyEnd, Nothing)]
+    , [(CKey $ SpecialKey KeyEnd, Nothing)]
     )
   ]
 
 
 -- | Check if the provided key combination is some brillo viewport command.
 isCommand ::
-  Map Command [(Key, Maybe Modifiers)] ->
+  Map Command [(CommandKey, Maybe Modifiers)] ->
   Command ->
-  Key ->
+  CommandKey ->
   Modifiers ->
   Bool
 isCommand commands c key keyMods
@@ -150,16 +155,13 @@ isCommand commands c key keyMods
 
 
 -- | Check if the provided key combination is some brillo viewport command.
-isCommand2 :: Command -> Key -> Modifiers -> (Key, Maybe Modifiers) -> Bool
+isCommand2 :: Command -> CommandKey -> Modifiers -> (CommandKey, Maybe Modifiers) -> Bool
 isCommand2 _ key keyMods cMatch
-  | (keyC, mModsC) <- cMatch
-  , keyC == key
+  | (keyC, mModsC) <- cMatch, keyC == key
   , case mModsC of
       Nothing -> True
-      Just modsC -> modsC == keyMods =
-      True
-  | otherwise =
-      False
+      Just modsC -> modsC == keyMods = True
+  | otherwise = False
 
 
 -- ViewControl State -----------------------------------------------------------
@@ -169,7 +171,7 @@ isCommand2 _ key keyMods cMatch
 -}
 data ViewState
   = ViewState
-  { viewStateCommands :: !(Map Command [(Key, Maybe Modifiers)])
+  { viewStateCommands :: !(Map Command [(CommandKey, Maybe Modifiers)])
   {- ^ The command list for the viewport controller.
      These can be safely overwridden at any time by deleting
      or adding entries to the list.
@@ -229,60 +231,51 @@ updateViewStateWithEvent ev viewState =
   was needed.
 -}
 updateViewStateWithEventMaybe :: Event -> ViewState -> Maybe ViewState
-updateViewStateWithEventMaybe (EventKey key keyState keyMods pos) viewState
-  | isCommand commands CRestore key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = viewPortInit}
-  | isCommand commands CBumpZoomOut key keyMods
-  , keyState == Down =
-      Just $ controlZoomIn viewState
-  | isCommand commands CBumpZoomIn key keyMods
-  , keyState == Down =
-      Just $ controlZoomOut viewState
-  | isCommand commands CBumpLeft key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (20, 0)}
-  | isCommand commands CBumpRight key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (-20, 0)}
-  | isCommand commands CBumpUp key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (0, -20)}
-  | isCommand commands CBumpDown key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (0, 20)}
-  | isCommand commands CBumpClockwise key keyMods
-  , keyState == Down =
-      Just $
-        viewState
-          { viewStateViewPort =
-              port{viewPortRotate = viewPortRotate port + 5}
-          }
-  | isCommand commands CBumpCClockwise key keyMods
-  , keyState == Down =
-      Just $
-        viewState
-          { viewStateViewPort =
-              port{viewPortRotate = viewPortRotate port - 5}
-          }
-  -- Start Translation.
-  | isCommand commands CTranslate key keyMods
-  , keyState == Down
-  , not $ currentlyRotating || currentlyScaling =
-      Just $ viewState{viewStateTranslateMark = Just pos}
-  -- Start Rotation.
-  | isCommand commands CRotate key keyMods
-  , keyState == Down
-  , not $ currentlyTranslating || currentlyScaling =
-      Just $ viewState{viewStateRotateMark = Just pos}
-  -- Start Scale.
-  | isCommand commands CScale key keyMods
-  , keyState == Down
-  , not $ currentlyTranslating || currentlyRotating =
-      Just $ viewState{viewStateScaleMark = Just pos}
-  -- Kill current translate/rotate/scale command when the mouse button
-  -- is released.
-  | keyState == Up =
+updateViewStateWithEventMaybe evt viewState = case evt of
+  EventMouseWheel wheelDir keyMods _pos -> updateViewStateWithMouseWheelEventMaybe wheelDir keyMods viewState
+  EventKey key keyState keyMods pos     -> updateViewStateWithKeyEventMaybe key keyState keyMods pos viewState
+
+  -- Note that only a translation or rotation applies, not both at the same time.
+  EventMotion pos ->
+    motionScale (viewStateScaleMark viewState) pos viewState
+      `mplus` motionTranslate (viewStateTranslateMark viewState) pos viewState
+      `mplus` motionRotate (viewStateRotateMark viewState) pos viewState
+  _ -> Nothing
+
+updateViewStateWithMouseWheelEventMaybe :: WheelDirection -> Modifiers -> ViewState -> Maybe ViewState
+updateViewStateWithMouseWheelEventMaybe wheelDir keyMods viewState
+    | isCommand commands CBumpZoomOut (CMouseWheel wheelDir) keyMods = Just $ controlZoomIn viewState
+    | isCommand commands CBumpZoomIn (CMouseWheel wheelDir) keyMods = Just $ controlZoomOut viewState
+    | otherwise = Nothing
+  where
+    commands = viewStateCommands viewState
+
+updateViewStateWithKeyEventMaybe :: Key -> KeyState -> Modifiers -> (Float, Float) -> ViewState -> Maybe ViewState
+updateViewStateWithKeyEventMaybe key keyState keyMods pos viewState
+    | isCommand commands CRestore (CKey key) keyMods, keyState == Down = Just $ viewState{viewStateViewPort = viewPortInit}
+    | isCommand commands CBumpLeft (CKey key) keyMods, keyState == Down = Just $ viewState{viewStateViewPort = motionBump port (20, 0)}
+    | isCommand commands CBumpRight (CKey key) keyMods, keyState == Down = Just $ viewState{viewStateViewPort = motionBump port (-20, 0)}
+    | isCommand commands CBumpUp (CKey key) keyMods, keyState == Down = Just $ viewState{viewStateViewPort = motionBump port (0, -20)}
+    | isCommand commands CBumpDown (CKey key) keyMods, keyState == Down = Just $ viewState{viewStateViewPort = motionBump port (0, 20)}
+    | isCommand commands CBumpClockwise (CKey key) keyMods, keyState == Down = Just $
+      viewState
+        { viewStateViewPort =
+            port{viewPortRotate = viewPortRotate port + 5}
+        }
+    | isCommand commands CBumpCClockwise (CKey key) keyMods, keyState == Down =Just $
+      viewState
+        { viewStateViewPort =
+            port{viewPortRotate = viewPortRotate port - 5}
+        }
+    -- Start Translation.
+    | isCommand commands CTranslate (CKey key) keyMods, keyState == Down, not $ currentlyRotating || currentlyScaling = Just $ viewState{viewStateTranslateMark = Just pos}
+    -- Start Rotation.
+    | isCommand commands CRotate (CKey key) keyMods, keyState == Down, not $ currentlyTranslating || currentlyScaling = Just $ viewState{viewStateRotateMark = Just pos}
+    -- Start Scale.
+    | isCommand commands CScale (CKey key) keyMods, keyState == Down, not $ currentlyTranslating || currentlyRotating =Just $ viewState{viewStateScaleMark = Just pos}
+    -- Kill current translate/rotate/scale command when the mouse button
+    -- is released.
+    | keyState == Up =
       let killTranslate vs = vs{viewStateTranslateMark = Nothing}
           killRotate vs = vs{viewStateRotateMark = Nothing}
           killScale vs = vs{viewStateScaleMark = Nothing}
@@ -291,23 +284,13 @@ updateViewStateWithEventMaybe (EventKey key keyState keyMods pos) viewState
               (if currentlyRotating then killRotate else id) $
                 (if currentlyScaling then killScale else id) $
                   viewState
-  | otherwise =
-      Nothing
+    | otherwise = Nothing
   where
     commands = viewStateCommands viewState
     port = viewStateViewPort viewState
     currentlyTranslating = isJust $ viewStateTranslateMark viewState
     currentlyRotating = isJust $ viewStateRotateMark viewState
     currentlyScaling = isJust $ viewStateScaleMark viewState
-
--- Note that only a translation or rotation applies, not both at the same time.
-updateViewStateWithEventMaybe (EventMotion pos) viewState =
-  motionScale (viewStateScaleMark viewState) pos viewState
-    `mplus` motionTranslate (viewStateTranslateMark viewState) pos viewState
-    `mplus` motionRotate (viewStateRotateMark viewState) pos viewState
-updateViewStateWithEventMaybe (EventDrop _) _ = Nothing
-updateViewStateWithEventMaybe (EventPick _) _ = Nothing
-updateViewStateWithEventMaybe (EventResize _) _ = Nothing
 
 
 -- | Zoom in a `ViewState` by the scale step.

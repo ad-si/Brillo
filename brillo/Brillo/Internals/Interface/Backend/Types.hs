@@ -141,6 +141,16 @@ type KeyboardMouseCallback =
   (Int, Int) ->
   IO ()
 
+-- | Arguments: WheelDirection, Ctrl \/ Alt \/ Shift pressed, latest mouse location.
+type MouseWheelCallback =
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  WheelDirection ->
+  Modifiers ->
+  (Int, Int) ->
+  IO ()
+
 
 -- | No arguments.
 type IdleCallback =
@@ -166,6 +176,7 @@ type ReshapeCallback =
 data Callback
   = Display DisplayCallback
   | KeyMouse KeyboardMouseCallback
+  | MouseWheel MouseWheelCallback
   | Idle IdleCallback
   | Motion MotionCallback
   | Drop DropCallback
@@ -192,12 +203,16 @@ data Key
   deriving (Show, Eq, Ord)
 
 
+data WheelDirection
+  = WheelUp
+  | WheelDown
+  deriving (Show, Eq, Ord)
+
+
 data MouseButton
   = LeftButton
   | MiddleButton
   | RightButton
-  | WheelUp
-  | WheelDown
   | AdditionalButton Int
   deriving (Show, Eq, Ord)
 

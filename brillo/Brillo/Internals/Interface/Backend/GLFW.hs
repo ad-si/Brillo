@@ -30,6 +30,7 @@ import Brillo.Internals.Interface.Backend.Types (
   Modifiers (..),
   MouseButton (..),
   SpecialKey (..),
+  WheelDirection (..),
  )
 import Brillo.Internals.TinyFileDialogs as TinyFileDialogs
 import Data.List (singleton)
@@ -754,27 +755,27 @@ callbackMouseWheel ::
 -- ScrollCallback = Window -> Double -> Double -> IO ()
 callbackMouseWheel stateRef callbacks _win x _y =
   do
-    (key, keystate) <- setMouseWheel stateRef (floor x)
+    wheelDir <- setMouseWheel stateRef (floor x)
     (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
 
     -- Call all the Brillo KeyMouse actions with the new state.
     mapM_
-      (\f -> f key keystate mods pos)
-      ([f stateRef | KeyMouse f <- callbacks])
+      (\f -> f wheelDir mods pos)
+      ([f stateRef | MouseWheel f <- callbacks])
 
 
 setMouseWheel ::
   IORef GLFWState ->
   Int ->
-  IO (Key, KeyState)
+  IO WheelDirection
 setMouseWheel stateRef w =
   do
     glfwState <- readIORef stateRef
     writeIORef stateRef $ glfwState{mouseWheelPos = w}
     case compare w (mouseWheelPos glfwState) of
-      LT -> return (MouseButton WheelDown, Down)
-      GT -> return (MouseButton WheelUp, Down)
-      EQ -> return (SpecialKey KeyUnknown, Up)
+      LT -> pure WheelDown
+      GT -> pure WheelUp
+      EQ -> pure WheelUp
 
 
 -- | GLFW calls this when the user drops files/directories onto the window

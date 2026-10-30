@@ -12,11 +12,13 @@ where
 import Brillo.Internals.Interface.Backend
 import Data.IORef
 
+type MousePosition = (Float, Float)
 
 -- | Possible input events.
 data Event
-  = EventKey Key KeyState Modifiers (Float, Float)
-  | EventMotion (Float, Float)
+  = EventKey Key KeyState Modifiers MousePosition
+  | EventMouseWheel WheelDirection Modifiers MousePosition
+  | EventMotion MousePosition
   | EventResize (Int, Int)
   | EventDrop [FilePath]
   | EventPick [FilePath]
