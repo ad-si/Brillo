@@ -32,7 +32,7 @@ jobs:
             artifact: brillo-tetris-windows-x86_64
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: haskell-actions/setup@v2
         with:
@@ -61,47 +61,55 @@ jobs:
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: UCRT64
           update: false
           release: false
           install: >-
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-glfw
-            mingw-w64-x86_64-freetype
-            mingw-w64-x86_64-libwebp
+            mingw-w64-ucrt-x86_64-pkg-config
+            mingw-w64-ucrt-x86_64-glfw
+            mingw-w64-ucrt-x86_64-freetype
+            mingw-w64-ucrt-x86_64-libwebp
+            mingw-w64-ucrt-x86_64-binutils
 
       - name: Configure Windows environment
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          echo 'C:\msys64\mingw64\bin' >> "$GITHUB_PATH"
+          echo 'C:\msys64\ucrt64\bin' >> "$GITHUB_PATH"
           cat >> stack.yaml <<'EOF'
 
           skip-msys: true
           extra-include-dirs:
-            - C:\msys64\mingw64\include
-            - C:\msys64\mingw64\include\freetype2
+            - C:\msys64\ucrt64\include
+            - C:\msys64\ucrt64\include\freetype2
           extra-lib-dirs:
-            - C:\msys64\mingw64\lib
+            - C:\msys64\ucrt64\lib
           EOF
 
       # --- Cache ---
       - name: Restore cache
         id: cache-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             ~/.stack
             C:\sr
-          key: tetris-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
-          restore-keys: tetris-${{ runner.os }}-${{ runner.arch }}-
+          key: tetris-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
+          restore-keys: tetris-v2-${{ runner.os }}-${{ runner.arch }}-
 
       # --- Build ---
+      # On Windows, stripping a freshly installed executable intermittently
+      # fails with "Permission denied" (file briefly locked by Defender),
+      # so strip the collected binary instead.
       - name: Install dependencies
-        run: stack build --only-dependencies brillo-examples
+        run: >-
+          stack build --only-dependencies brillo-examples
+          ${{ runner.os == 'Windows' && '--no-executable-stripping' || '' }}
 
       - name: Build Tetris
-        run: stack build brillo-examples:brillo-tetris
+        run: >-
+          stack build brillo-examples:brillo-tetris
+          ${{ runner.os == 'Windows' && '--no-executable-stripping' || '' }}
 
       # --- Collect artifact ---
       - name: Collect binary (Unix)
@@ -116,9 +124,10 @@ jobs:
         run: |
           mkdir -p artifact
           cp "$(stack exec -- which brillo-tetris)" artifact/brillo-tetris.exe
+          strip artifact/brillo-tetris.exe
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: artifact/
@@ -139,7 +148,7 @@ jobs:
 
       - name: Upload Mesa artifact
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}-mesa
           path: artifact-mesa/
@@ -147,9 +156,9 @@ jobs:
       # --- Save cache ---
       - name: Save cache
         if: always() && steps.cache-restore.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: |
             ~/.stack
             C:\sr
-          key: tetris-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
+          key: tetris-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('stack.yaml', 'stack.yaml.lock') }}
