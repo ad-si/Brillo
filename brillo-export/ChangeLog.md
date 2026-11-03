@@ -1,5 +1,13 @@
 # Changelog for brillo-export
 
+## 0.2.1.0
+
+* Support brillo and brillo-rendering 3.0
+* SVG export: emit a comment for custom `Shader` pictures,
+  as they can't be represented in SVG
+* SVG export: omit GPU-compressed bitmaps (with a comment)
+  instead of misinterpreting their data as RGBA pixels
+
 ## 0.1.0.4
 
 * Forked from gloss-export

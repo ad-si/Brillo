@@ -1,7 +1,13 @@
 # Changelog
 
-## Unreleased
+## 2026-11-03 - 3.0.0
 
+- **Breaking:** Add a `Shader` constructor to `Picture`
+  for rendering custom GLSL fragment shaders on a quad
+  (compiled lazily and cached by source text)
+  - Add `UniformValue` and `ShaderData` types,
+    a `shader` convenience function, and `defaultShaderVertex`
+  - Add `brillo-shader` example with rounded rectangle and flame shaders
 - **Breaking:** Report mouse wheel and trackpad scrolling
   as `EventScroll (offsetX, offsetY) modifiers position`
   instead of `EventKey (MouseButton WheelUp/WheelDown) Down …`
@@ -25,7 +31,13 @@
   as the OpenGL 2.1 context hint must not be combined with a profile hint
 - Retry with the driver's default context
   if an OpenGL 2.1 context can't be created
+- Fix crash on Windows GL drivers by requesting
+  an OpenGL 2.1 compatibility context on non-Apple platforms,
+  and log GL errors to `stderr` instead of crashing
 - Include GLFW's error message when window creation fails
+- Re-throw `ExitCode` from the GLFW main loop,
+  so that `exitSuccess` / `exitFailure` in user code terminate the program
+  with the intended status, and write other exceptions to `stderr`
 - Print GLFW errors to `stderr` instead of `stdout`
 - Keep the title bar of a window on screen,
   as the given position refers to the content area
@@ -39,16 +51,17 @@
 - Rasterize TrueType text at the size it's drawn at,
   so that text nested in a scaled `Picture` stays crisp
   instead of being magnified from a smaller glyph atlas
-- Support GPU-compressed textures (`glCompressedTexImage2D`):
+- **Breaking:** Support GPU-compressed textures (`glCompressedTexImage2D`):
   - Add `PxCompressed` variant of `PixelFormat` carrying a
     `CompressedFormat` (S3TC, RGTC, BPTC, …)
   - Add `compressedBitmapOfForeignPtr`, `compressedBitmapOfByteString`
     and their `BitmapData`-returning counterparts
   - Export named constants for the common compressed format enums
     (`compressedRGBA_S3TC_DXT1`, `compressedRGBA_BPTC_UNORM`, …)
+- Add Space Invaders example
 
 
-# 2026-02-27 - 2.0.0
+## 2026-02-27 - 2.0.0
 
 - Make anti-aliasing the default for all primitives
 - Add support for true type fonts and a simple GUI example using it

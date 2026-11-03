@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          brillo-juicy
-version:       0.3.0
+version:       0.3.1
 synopsis:
   Load any image supported by Juicy.Pixels in your brillo application
 
@@ -25,7 +25,7 @@ library
   exposed-modules:  Brillo.Juicy
   build-depends:
     , base         >=4.8  && <5
-    , brillo       >=2.0  && <3.0
+    , brillo       >=3.0  && <4.0
     , bytestring   >=0.11 && <0.13
     , JuicyPixels  >=3.3  && <3.4
     , vector       >=0.13 && <0.14
@@ -38,7 +38,7 @@ executable brillo-juicy-viewer
   main-is:          brillo-juicy.hs
   build-depends:
     , base         >=4.8  && <5
-    , brillo       >=2.0  && <3.0
+    , brillo       >=3.0  && <4.0
     , bytestring   >=0.11 && <0.13
     , JuicyPixels  >=3.3  && <3.4
     , vector       >=0.13 && <0.14
