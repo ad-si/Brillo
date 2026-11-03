@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **Breaking:** Report mouse wheel and trackpad scrolling
+  as `EventScroll (offsetX, offsetY) modifiers position`
+  instead of `EventKey (MouseButton WheelUp/WheelDown) Down …`
+  - Remove the `WheelUp` and `WheelDown` constructors of `MouseButton`
+  - Fix scrolling in the GLFW backend:
+    the vertical offset is now used instead of the horizontal one,
+    offsets are no longer compared like absolute positions,
+    and fractional trackpad offsets are no longer rounded
+  - Viewport command bindings (`CommandConfig`) now take a `CommandKey`,
+    which is either `CKey key`
+    or `CMouseWheel WheelUp/WheelDown/WheelLeft/WheelRight`.
+    Scroll directions can be bound to any instant command
+    (zooming, panning, rotating, restoring), e.g. Shift + wheel to rotate,
+    which is then applied proportionally to the scroll offset
+  - Zoom towards the cursor when zooming the viewport by scrolling
+  - **Breaking:** Make `CBumpZoomIn` and `CBumpZoomOut` do what their names say
+    (they were swapped), so that scrolling up or pressing `PageUp` zooms in
+    and scrolling down or pressing `PageDown` zooms out
 - Fix window creation always failing with
   `Context profiles are only defined for OpenGL version 3.2 and above`,
   as the OpenGL 2.1 context hint must not be combined with a profile hint

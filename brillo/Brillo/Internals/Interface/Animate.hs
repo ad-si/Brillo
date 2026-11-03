@@ -86,7 +86,10 @@ animateWithBackendIO
             , callback_viewState_reshape
             ]
               ++ ( if pannable
-                     then [callback_viewState_keyMouse viewSR]
+                     then
+                       [ callback_viewState_keyMouse viewSR
+                       , callback_viewState_scroll viewSR
+                       ]
                      else []
                  )
 

@@ -64,6 +64,7 @@ displayWithBackend
               callback_exit ()
             , -- Viewport control with mouse
               callback_viewState_keyMouse viewSR
+            , callback_viewState_scroll viewSR
             , callback_viewState_motion viewSR
             , callback_viewState_reshape
             ]

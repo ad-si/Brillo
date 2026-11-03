@@ -30,7 +30,6 @@ import Brillo.Internals.Interface.Backend.Types (
   Modifiers (..),
   MouseButton (..),
   SpecialKey (..),
-  WheelDirection (..),
  )
 import Brillo.Internals.TinyFileDialogs as TinyFileDialogs
 import Data.List (singleton)
@@ -45,8 +44,6 @@ data GLFWState
   -- ^ Status of Ctrl, Alt or Shift (Up or Down?)
   , mousePosition :: (Int, Int)
   -- ^ Latest mouse position
-  , mouseWheelPos :: Int
-  -- ^ Latest mousewheel position
   , dirtyScreen :: Bool
   -- ^ Does the screen need to be redrawn?
   , display :: IO ()
@@ -66,7 +63,6 @@ glfwStateInit =
   GLFWState
     { modifiers = Modifiers Up Up Up
     , mousePosition = (0, 0)
-    , mouseWheelPos = 0
     , dirtyScreen = True
     , display = return ()
     , idle = return ()
@@ -579,7 +575,7 @@ installKeyMouseCallbackGLFW stateRef callbacks =
     GLFW.setKeyCallback win (Just $ callbackKeyboard stateRef callbacks)
     GLFW.setCharCallback win (Just $ callbackChar stateRef callbacks)
     GLFW.setMouseButtonCallback win (Just $ callbackMouseButton stateRef callbacks)
-    GLFW.setScrollCallback win (Just $ callbackMouseWheel stateRef callbacks)
+    GLFW.setScrollCallback win (Just $ callbackScroll stateRef callbacks)
     GLFW.setDropCallback win (Just $ callbackDrop stateRef callbacks)
 
 
@@ -595,7 +591,7 @@ callbackKeyboard _stateRef _callbacks _win _key _scancode GLFW.KeyState'Repeatin
 callbackKeyboard stateRef callbacks _win key _scancode keystateglfw _modifiers =
   do
     let keystate = keystateglfw == GLFW.KeyState'Pressed
-    (modsSet, GLFWState mods pos _ _ _ _ _ _) <-
+    (modsSet, GLFWState{modifiers = mods, mousePosition = pos}) <-
       setModifiers stateRef key keystate
     let key' = fromGLFW key
     let keystate' = if keystate then Down else Up
@@ -708,7 +704,7 @@ callbackChar ::
 callbackChar stateRef callbacks _win char -- keystate
   =
   do
-    (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
+    GLFWState{modifiers = mods, mousePosition = pos} <- readIORef stateRef
     let key' = charToSpecial char
     -- TODO: is this correct? GLFW does not provide the keystate
     -- in a character callback, here we asume that its pressed
@@ -735,7 +731,7 @@ callbackMouseButton ::
   GLFW.MouseButtonCallback -- = Window -> MouseButton -> MouseButtonState -> ModifierKeys -> IO ()
 callbackMouseButton stateRef callbacks _win key keystate _modifier =
   do
-    (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
+    GLFWState{modifiers = mods, mousePosition = pos} <- readIORef stateRef
     let key' = fromGLFW key
     let keystate' = if keystate == GLFW.MouseButtonState'Pressed then Down else Up
 
@@ -745,37 +741,21 @@ callbackMouseButton stateRef callbacks _win key keystate _modifier =
       ([f stateRef | KeyMouse f <- callbacks])
 
 
--- GLFW calls on this when the user moves the mouse wheel.
-callbackMouseWheel ::
+{-| GLFW calls this when the user scrolls with a mouse wheel or a trackpad.
+  The offsets are relative to the last scroll event and are passed on as is.
+-}
+callbackScroll ::
   IORef GLFWState ->
   [Callback] ->
-  GLFW.ScrollCallback
--- -> Int
--- -> IO ()
--- ScrollCallback = Window -> Double -> Double -> IO ()
-callbackMouseWheel stateRef callbacks _win x _y =
+  GLFW.ScrollCallback -- = Window -> Double -> Double -> IO ()
+callbackScroll stateRef callbacks _win x y =
   do
-    wheelDir <- setMouseWheel stateRef (floor x)
-    (GLFWState mods pos _ _ _ _ _ _) <- readIORef stateRef
+    GLFWState{modifiers = mods, mousePosition = pos} <- readIORef stateRef
 
-    -- Call all the Brillo KeyMouse actions with the new state.
+    -- Call all the Brillo Scroll actions with the new state.
     mapM_
-      (\f -> f wheelDir mods pos)
-      ([f stateRef | MouseWheel f <- callbacks])
-
-
-setMouseWheel ::
-  IORef GLFWState ->
-  Int ->
-  IO WheelDirection
-setMouseWheel stateRef w =
-  do
-    glfwState <- readIORef stateRef
-    writeIORef stateRef $ glfwState{mouseWheelPos = w}
-    case compare w (mouseWheelPos glfwState) of
-      LT -> pure WheelDown
-      GT -> pure WheelUp
-      EQ -> pure WheelUp
+      (\f -> f (x, y) mods pos)
+      ([f stateRef | Scroll f <- callbacks])
 
 
 -- | GLFW calls this when the user drops files/directories onto the window
