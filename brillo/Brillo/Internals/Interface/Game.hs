@@ -114,6 +114,7 @@ playWithBackendIO
                     singleStepTime
                 )
             , callback_keyMouse worldSR viewSR worldHandleEvent
+            , callback_scroll worldSR worldHandleEvent
             , callback_motion worldSR worldHandleEvent
             , callback_drop worldSR worldHandleEvent
             , callback_reshape worldSR worldHandleEvent
@@ -150,6 +151,29 @@ handle_keyMouse ::
 handle_keyMouse worldRef _ eventFn backendRef key keyState keyMods pos =
   do
     ev <- keyMouseEvent backendRef key keyState keyMods pos
+    world <- readIORef worldRef
+    world' <- eventFn ev world
+    writeIORef worldRef world'
+
+
+-- | Callback for Scroll events.
+callback_scroll ::
+  -- | ref to world state
+  IORef world ->
+  -- | fn to handle input events
+  (Event -> world -> IO world) ->
+  Callback
+callback_scroll worldRef eventFn =
+  Scroll (handle_scroll worldRef eventFn)
+
+
+handle_scroll ::
+  IORef a ->
+  (Event -> a -> IO a) ->
+  ScrollCallback
+handle_scroll worldRef eventFn backendRef offset keyMods pos =
+  do
+    ev <- scrollEvent backendRef offset keyMods pos
     world <- readIORef worldRef
     world' <- eventFn ev world
     writeIORef worldRef world'

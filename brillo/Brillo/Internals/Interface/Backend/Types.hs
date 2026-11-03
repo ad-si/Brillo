@@ -142,6 +142,25 @@ type KeyboardMouseCallback =
   IO ()
 
 
+{-| Arguments: Scroll offset (x, y), Ctrl \/ Alt \/ Shift pressed,
+  latest mouse location.
+  A positive y offset means scrolling up,
+  a positive x offset means scrolling left.
+  The directions are the ones reported by the operating system,
+  so they are reversed if \"natural scrolling\" is enabled.
+  A notch of a regular mouse wheel corresponds to an offset of 1,
+  while trackpads also report fractional offsets.
+-}
+type ScrollCallback =
+  forall a.
+  (Backend a) =>
+  IORef a ->
+  (Double, Double) ->
+  Modifiers ->
+  (Int, Int) ->
+  IO ()
+
+
 -- | No arguments.
 type IdleCallback =
   forall a. (Backend a) => IORef a -> IO ()
@@ -166,6 +185,7 @@ type ReshapeCallback =
 data Callback
   = Display DisplayCallback
   | KeyMouse KeyboardMouseCallback
+  | Scroll ScrollCallback
   | Idle IdleCallback
   | Motion MotionCallback
   | Drop DropCallback
@@ -196,8 +216,6 @@ data MouseButton
   = LeftButton
   | MiddleButton
   | RightButton
-  | WheelUp
-  | WheelDown
   | AdditionalButton Int
   deriving (Show, Eq, Ord)
 

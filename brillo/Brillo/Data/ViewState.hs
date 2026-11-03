@@ -2,6 +2,8 @@
 
 module Brillo.Data.ViewState (
   Command (..),
+  CommandKey (..),
+  WheelDirection (..),
   CommandConfig,
   defaultCommandConfig,
   ViewState (..),
@@ -44,7 +46,37 @@ data Command
   deriving (Show, Eq, Ord)
 
 
-type CommandConfig = [(Command, [(Key, Maybe Modifiers)])]
+-- | An input that can trigger a viewport command.
+data CommandKey
+  = -- | A key or mouse button press.
+    CKey Key
+  | {-| Scrolling with a mouse wheel or a trackpad.
+    Only instant commands (i.e. not 'CTranslate', 'CRotate', and 'CScale')
+    can be triggered by scrolling.
+    They are applied proportionally to the scroll offset,
+    and zooming keeps the point under the cursor fixed.
+    -}
+    CMouseWheel WheelDirection
+  deriving (Show, Eq, Ord)
+
+
+{-| Direction of a scroll.
+  The direction is the one reported by the operating system,
+  so it is reversed if \"natural scrolling\" is enabled.
+-}
+data WheelDirection
+  = -- | Scrolling up.
+    WheelUp
+  | -- | Scrolling down.
+    WheelDown
+  | -- | Scrolling left.
+    WheelLeft
+  | -- | Scrolling right.
+    WheelRight
+  deriving (Show, Eq, Ord)
+
+
+type CommandConfig = [(Command, [(CommandKey, Maybe Modifiers)])]
 
 
 {-| The default commands.  Left click pans, wheel zooms, right click
@@ -54,13 +86,13 @@ defaultCommandConfig :: CommandConfig
 defaultCommandConfig =
   [
     ( CRestore
-    , [(Char 'r', Nothing)]
+    , [(CKey $ Char 'r', Nothing)]
     )
   ,
     ( CTranslate
     ,
       [
-        ( MouseButton LeftButton
+        ( CKey $ MouseButton LeftButton
         , Just (Modifiers{shift = Up, ctrl = Up, alt = Up})
         )
       ]
@@ -69,11 +101,11 @@ defaultCommandConfig =
     ( CScale
     ,
       [
-        ( MouseButton LeftButton
+        ( CKey $ MouseButton LeftButton
         , Just (Modifiers{shift = Up, ctrl = Down, alt = Up})
         )
       ,
-        ( MouseButton RightButton
+        ( CKey $ MouseButton RightButton
         , Just (Modifiers{shift = Up, ctrl = Up, alt = Up})
         )
       ]
@@ -82,11 +114,11 @@ defaultCommandConfig =
     ( CRotate
     ,
       [
-        ( MouseButton LeftButton
+        ( CKey $ MouseButton LeftButton
         , Just (Modifiers{shift = Up, ctrl = Up, alt = Down})
         )
       ,
-        ( MouseButton RightButton
+        ( CKey $ MouseButton RightButton
         , Just (Modifiers{shift = Up, ctrl = Down, alt = Up})
         )
       ]
@@ -95,51 +127,51 @@ defaultCommandConfig =
 
     ( CBumpZoomOut
     ,
-      [ (MouseButton WheelDown, Nothing)
-      , (SpecialKey KeyPageDown, Nothing)
+      [ (CMouseWheel WheelDown, Nothing)
+      , (CKey $ SpecialKey KeyPageDown, Nothing)
       ]
     )
   ,
     ( CBumpZoomIn
     ,
-      [ (MouseButton WheelUp, Nothing)
-      , (SpecialKey KeyPageUp, Nothing)
+      [ (CMouseWheel WheelUp, Nothing)
+      , (CKey $ SpecialKey KeyPageUp, Nothing)
       ]
     )
   , -- bump translate
 
     ( CBumpLeft
-    , [(SpecialKey KeyLeft, Nothing)]
+    , [(CKey $ SpecialKey KeyLeft, Nothing)]
     )
   ,
     ( CBumpRight
-    , [(SpecialKey KeyRight, Nothing)]
+    , [(CKey $ SpecialKey KeyRight, Nothing)]
     )
   ,
     ( CBumpUp
-    , [(SpecialKey KeyUp, Nothing)]
+    , [(CKey $ SpecialKey KeyUp, Nothing)]
     )
   ,
     ( CBumpDown
-    , [(SpecialKey KeyDown, Nothing)]
+    , [(CKey $ SpecialKey KeyDown, Nothing)]
     )
   , -- bump rotate
 
     ( CBumpClockwise
-    , [(SpecialKey KeyHome, Nothing)]
+    , [(CKey $ SpecialKey KeyHome, Nothing)]
     )
   ,
     ( CBumpCClockwise
-    , [(SpecialKey KeyEnd, Nothing)]
+    , [(CKey $ SpecialKey KeyEnd, Nothing)]
     )
   ]
 
 
 -- | Check if the provided key combination is some brillo viewport command.
 isCommand ::
-  Map Command [(Key, Maybe Modifiers)] ->
+  Map Command [(CommandKey, Maybe Modifiers)] ->
   Command ->
-  Key ->
+  CommandKey ->
   Modifiers ->
   Bool
 isCommand commands c key keyMods
@@ -150,7 +182,8 @@ isCommand commands c key keyMods
 
 
 -- | Check if the provided key combination is some brillo viewport command.
-isCommand2 :: Command -> Key -> Modifiers -> (Key, Maybe Modifiers) -> Bool
+isCommand2 ::
+  Command -> CommandKey -> Modifiers -> (CommandKey, Maybe Modifiers) -> Bool
 isCommand2 _ key keyMods cMatch
   | (keyC, mModsC) <- cMatch
   , keyC == key
@@ -169,14 +202,17 @@ isCommand2 _ key keyMods cMatch
 -}
 data ViewState
   = ViewState
-  { viewStateCommands :: !(Map Command [(Key, Maybe Modifiers)])
+  { viewStateCommands :: !(Map Command [(CommandKey, Maybe Modifiers)])
   {- ^ The command list for the viewport controller.
      These can be safely overwridden at any time by deleting
      or adding entries to the list.
      Entries at the front of the list take precedence.
   -}
   , viewStateScaleStep :: !Float
-  -- ^ How much to scale the world by for each step of the mouse wheel.
+  {- ^ How much to scale the world by for each step of the mouse wheel.
+     Fractional scroll offsets (e.g. from trackpads) scale the world
+     by the corresponding power of this value.
+  -}
   , viewStateRotateFactor :: !Float
   -- ^ How many degrees to rotate the world by for each pixel of x motion.
   , viewStateScaleFactor :: !Float
@@ -229,54 +265,42 @@ updateViewStateWithEvent ev viewState =
   was needed.
 -}
 updateViewStateWithEventMaybe :: Event -> ViewState -> Maybe ViewState
-updateViewStateWithEventMaybe (EventKey key keyState keyMods pos) viewState
-  | isCommand commands CRestore key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = viewPortInit}
-  | isCommand commands CBumpZoomOut key keyMods
-  , keyState == Down =
-      Just $ controlZoomIn viewState
-  | isCommand commands CBumpZoomIn key keyMods
-  , keyState == Down =
-      Just $ controlZoomOut viewState
-  | isCommand commands CBumpLeft key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (20, 0)}
-  | isCommand commands CBumpRight key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (-20, 0)}
-  | isCommand commands CBumpUp key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (0, -20)}
-  | isCommand commands CBumpDown key keyMods
-  , keyState == Down =
-      Just $ viewState{viewStateViewPort = motionBump port (0, 20)}
-  | isCommand commands CBumpClockwise key keyMods
-  , keyState == Down =
-      Just $
-        viewState
-          { viewStateViewPort =
-              port{viewPortRotate = viewPortRotate port + 5}
-          }
-  | isCommand commands CBumpCClockwise key keyMods
-  , keyState == Down =
-      Just $
-        viewState
-          { viewStateViewPort =
-              port{viewPortRotate = viewPortRotate port - 5}
-          }
+updateViewStateWithEventMaybe ev viewState =
+  case ev of
+    EventKey key keyState keyMods pos ->
+      updateViewStateWithKeyMaybe key keyState keyMods pos viewState
+    EventScroll offset keyMods pos ->
+      updateViewStateWithScrollMaybe offset keyMods pos viewState
+    -- Note that only a translation or rotation applies,
+    -- not both at the same time.
+    EventMotion pos ->
+      motionScale (viewStateScaleMark viewState) pos viewState
+        `mplus` motionTranslate (viewStateTranslateMark viewState) pos viewState
+        `mplus` motionRotate (viewStateRotateMark viewState) pos viewState
+    EventResize _ -> Nothing
+    EventDrop _ -> Nothing
+    EventPick _ -> Nothing
+
+
+updateViewStateWithKeyMaybe ::
+  Key -> KeyState -> Modifiers -> (Float, Float) -> ViewState -> Maybe ViewState
+updateViewStateWithKeyMaybe key keyState keyMods pos viewState
+  -- Instant commands, zooming around the center of the window.
+  | keyState == Down
+  , Just viewState' <- runInstantCommands (CKey key) keyMods 1 Nothing viewState =
+      Just viewState'
   -- Start Translation.
-  | isCommand commands CTranslate key keyMods
+  | isCommand' CTranslate
   , keyState == Down
   , not $ currentlyRotating || currentlyScaling =
       Just $ viewState{viewStateTranslateMark = Just pos}
   -- Start Rotation.
-  | isCommand commands CRotate key keyMods
+  | isCommand' CRotate
   , keyState == Down
   , not $ currentlyTranslating || currentlyScaling =
       Just $ viewState{viewStateRotateMark = Just pos}
   -- Start Scale.
-  | isCommand commands CScale key keyMods
+  | isCommand' CScale
   , keyState == Down
   , not $ currentlyTranslating || currentlyRotating =
       Just $ viewState{viewStateScaleMark = Just pos}
@@ -294,46 +318,115 @@ updateViewStateWithEventMaybe (EventKey key keyState keyMods pos) viewState
   | otherwise =
       Nothing
   where
-    commands = viewStateCommands viewState
-    port = viewStateViewPort viewState
+    isCommand' c = isCommand (viewStateCommands viewState) c (CKey key) keyMods
     currentlyTranslating = isJust $ viewStateTranslateMark viewState
     currentlyRotating = isJust $ viewStateRotateMark viewState
     currentlyScaling = isJust $ viewStateScaleMark viewState
 
--- Note that only a translation or rotation applies, not both at the same time.
-updateViewStateWithEventMaybe (EventMotion pos) viewState =
-  motionScale (viewStateScaleMark viewState) pos viewState
-    `mplus` motionTranslate (viewStateTranslateMark viewState) pos viewState
-    `mplus` motionRotate (viewStateRotateMark viewState) pos viewState
-updateViewStateWithEventMaybe (EventDrop _) _ = Nothing
-updateViewStateWithEventMaybe (EventPick _) _ = Nothing
-updateViewStateWithEventMaybe (EventResize _) _ = Nothing
+
+{-| Run the instant commands bound to the scroll directions of the offset.
+  Each axis is handled separately and runs its command
+  as many times as the absolute offset says,
+  so that fractional trackpad offsets result in fractional steps.
+  Zooming keeps the point under the cursor fixed.
+-}
+updateViewStateWithScrollMaybe ::
+  (Float, Float) -> Modifiers -> (Float, Float) -> ViewState -> Maybe ViewState
+updateViewStateWithScrollMaybe (offsetX, offsetY) keyMods pos viewState =
+  case scrollAxis offsetX WheelLeft WheelRight viewState of
+    Nothing -> scrollAxis offsetY WheelUp WheelDown viewState
+    Just viewState' ->
+      Just $ fromMaybe viewState' $ scrollAxis offsetY WheelUp WheelDown viewState'
+  where
+    scrollAxis offset positiveDir negativeDir vs
+      | offset == 0 = Nothing
+      | otherwise =
+          runInstantCommands
+            (CMouseWheel $ if offset > 0 then positiveDir else negativeDir)
+            keyMods
+            (abs offset)
+            (Just pos)
+            vs
 
 
--- | Zoom in a `ViewState` by the scale step.
-controlZoomIn :: ViewState -> ViewState
-controlZoomIn
-  viewState@ViewState
-    { viewStateViewPort = port
-    , viewStateScaleStep = scaleStep
-    } =
-    viewState
-      { viewStateViewPort =
-          port{viewPortScale = viewPortScale port / scaleStep}
-      }
+{-| Run the first instant (i.e. non-dragging) command
+  that is bound to the given key and modifiers.
+-}
+runInstantCommands ::
+  CommandKey ->
+  Modifiers ->
+  -- | Number of steps to apply the command for.
+  Float ->
+  -- | Point to zoom around. The center of the window if 'Nothing'.
+  Maybe (Float, Float) ->
+  ViewState ->
+  Maybe ViewState
+runInstantCommands key keyMods steps zoomCenter viewState =
+  case filter isBound instantCommands of
+    [] -> Nothing
+    command : _ -> Just $ runInstantCommand command steps zoomCenter viewState
+  where
+    isBound c = isCommand (viewStateCommands viewState) c key keyMods
 
 
--- | Zoom out a `ViewState` by the scale step.
-controlZoomOut :: ViewState -> ViewState
-controlZoomOut
-  viewState@ViewState
-    { viewStateViewPort = port
-    , viewStateScaleStep = scaleStep
-    } =
-    viewState
-      { viewStateViewPort =
-          port{viewPortScale = viewPortScale port * scaleStep}
-      }
+{-| The commands which take effect immediately,
+  in contrast to translating, rotating and scaling by dragging the mouse.
+  If an input is bound to several of them, the first one wins.
+-}
+instantCommands :: [Command]
+instantCommands =
+  [ CRestore
+  , CBumpZoomOut
+  , CBumpZoomIn
+  , CBumpLeft
+  , CBumpRight
+  , CBumpUp
+  , CBumpDown
+  , CBumpClockwise
+  , CBumpCClockwise
+  ]
+
+
+-- | Apply an instant command for the given number of steps.
+runInstantCommand ::
+  Command -> Float -> Maybe (Float, Float) -> ViewState -> ViewState
+runInstantCommand command steps zoomCenter viewState =
+  case command of
+    CRestore -> withPort $ const viewPortInit
+    CBumpZoomOut -> withPort $ zoomBy (scaleStep ** steps)
+    CBumpZoomIn -> withPort $ zoomBy (1 / scaleStep ** steps)
+    CBumpLeft -> withPort $ \port -> motionBump port (20 * steps, 0)
+    CBumpRight -> withPort $ \port -> motionBump port (-20 * steps, 0)
+    CBumpUp -> withPort $ \port -> motionBump port (0, -20 * steps)
+    CBumpDown -> withPort $ \port -> motionBump port (0, 20 * steps)
+    CBumpClockwise -> withPort $ rotateBy (5 * steps)
+    CBumpCClockwise -> withPort $ rotateBy (-5 * steps)
+    CTranslate -> viewState
+    CRotate -> viewState
+    CScale -> viewState
+  where
+    scaleStep = viewStateScaleStep viewState
+    withPort f = viewState{viewStateViewPort = f (viewStateViewPort viewState)}
+    rotateBy degrees port = port{viewPortRotate = viewPortRotate port + degrees}
+    zoomBy factor port =
+      let port' = port{viewPortScale = viewPortScale port * factor}
+      in  case zoomCenter of
+            Nothing -> port'
+            Just center -> keepPointFixed center port port'
+
+
+{-| Adjust the translation of the new viewport
+  so that the picture point under the given screen point
+  is the same as with the old viewport.
+-}
+keepPointFixed :: (Float, Float) -> ViewPort -> ViewPort -> ViewPort
+keepPointFixed screenPoint oldPort newPort =
+  newPort
+    { viewPortTranslate =
+        viewPortTranslate newPort
+          Pt.+ invertViewPort newPort screenPoint
+          Pt.- invertViewPort oldPort screenPoint
+    }
 
 
 -- | Offset a viewport.
