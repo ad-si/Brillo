@@ -139,6 +139,24 @@ Please test that all the `brillo-examples` still work
 before submitting your pull request.
 
 
+## Releasing
+
+1. Bump the `version` of every package that changed
+    (and of packages whose dependency bounds must change)
+    and update the bounds on the other Brillo packages accordingly.
+    Breaking changes require a new major version (first component).
+1. Rename the `Unreleased` section of the [CHANGELOG](./CHANGELOG.md)
+    to `## YYYY-MM-DD - X.Y.Z` and update `brillo-export/ChangeLog.md`.
+1. Check that `make test` passes.
+1. Commit the changes as `vX.Y.Z`, tag the commit with `vX.Y.Z`,
+    and push the commit and the tag.
+1. Run `make release`, which
+    - uploads all packages and their documentation to Hackage
+    - creates the GitHub release "Brillo X.Y"
+        with the changelog section of the version as release notes
+        (also available separately as `make github-release`)
+
+
 ## History
 
 This library is a fork of [gloss](https://github.com/benl23x5/gloss)

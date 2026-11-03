@@ -83,6 +83,24 @@ release: docs
 	stack upload brillo-export
 	# stack upload --documentation brillo-export
 
+	$(MAKE) github-release
+
+
+VERSION := $(shell awk '/^version:/ {print $$2; exit}' brillo/brillo.cabal)
+
+.PHONY: github-release
+github-release:
+	@notes=$$(awk -v v="$(VERSION)" \
+		'$$0 ~ "^## .* - " v "$$" {f=1; next} /^## / {f=0} f' CHANGELOG.md \
+		| perl -0pe 's/\n[ ]+(?!- )(?=\S)/ /g; s/\A\s+|\s+\z//g'); \
+	if test -z "$$notes"; \
+	then echo "No CHANGELOG.md section for $(VERSION)" >&2; exit 1; \
+	fi; \
+	gh release create "v$(VERSION)" \
+		--verify-tag \
+		--title "Brillo $$(echo $(VERSION) | sed 's/\.0$$//')" \
+		--notes "$$notes"
+
 
 .PHONY: clean
 clean:
